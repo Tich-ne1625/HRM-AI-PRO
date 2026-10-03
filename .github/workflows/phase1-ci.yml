@@ -68,8 +68,28 @@ jobs:
       - uses: actions/checkout@v5
       - name: Validate Compose model
         run: docker compose --env-file .env.example config --quiet
-      - name: Build and start clean stack
-        run: docker compose --project-name insighthr-ci --env-file .env.example up --detach --build --wait
+      - name: Build API image
+        run: |
+          set -o pipefail
+          docker compose --project-name insighthr-ci --env-file .env.example build --progress plain api 2>&1 | tee api-build.log || {
+            echo '### API image build failure' >> "$GITHUB_STEP_SUMMARY"
+            echo '```text' >> "$GITHUB_STEP_SUMMARY"
+            tail -n 120 api-build.log >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          }
+      - name: Build web image
+        run: |
+          set -o pipefail
+          docker compose --project-name insighthr-ci --env-file .env.example build --progress plain web 2>&1 | tee web-build.log || {
+            echo '### Web image build failure' >> "$GITHUB_STEP_SUMMARY"
+            echo '```text' >> "$GITHUB_STEP_SUMMARY"
+            tail -n 120 web-build.log >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          }
+      - name: Start clean stack
+        run: docker compose --project-name insighthr-ci --env-file .env.example up --detach --wait --no-build
       - name: Verify health and web-to-API connectivity
         run: |
           curl --fail --silent http://127.0.0.1:8000/health/live | grep '"status":"ok"'
@@ -77,7 +97,14 @@ jobs:
           curl --fail --silent http://127.0.0.1:3000 | grep 'API connected'
       - name: Show service logs after failure
         if: failure()
-        run: docker compose --project-name insighthr-ci logs --no-color
+        run: |
+          docker compose --project-name insighthr-ci ps --all || true
+          docker compose --project-name insighthr-ci logs --no-color || true
+          echo '### Docker service failure' >> "$GITHUB_STEP_SUMMARY"
+          echo '```text' >> "$GITHUB_STEP_SUMMARY"
+          docker compose --project-name insighthr-ci ps --all >> "$GITHUB_STEP_SUMMARY" 2>&1 || true
+          docker compose --project-name insighthr-ci logs --no-color --tail 200 >> "$GITHUB_STEP_SUMMARY" 2>&1 || true
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
       - name: Remove CI stack
         if: always()
         run: docker compose --project-name insighthr-ci down --volumes
