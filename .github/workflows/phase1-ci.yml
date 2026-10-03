@@ -91,7 +91,16 @@ jobs:
       - name: Start PostgreSQL
         run: docker compose --project-name insighthr-ci --env-file .env.example up --detach --wait postgres
       - name: Run migration
-        run: docker compose --project-name insighthr-ci --env-file .env.example up --no-build migrate
+        run: |
+          set +e
+          docker compose --project-name insighthr-ci --env-file .env.example up --no-build migrate 2>&1 | tee migration.log
+          migration_status=${PIPESTATUS[0]}
+          if [ "$migration_status" -ne 0 ]; then
+            while IFS= read -r line; do
+              echo "::error title=Migration container::${line}"
+            done < <(tail -n 30 migration.log)
+            exit "$migration_status"
+          fi
       - name: Start API
         run: docker compose --project-name insighthr-ci --env-file .env.example up --detach --wait --no-build api
       - name: Start web
