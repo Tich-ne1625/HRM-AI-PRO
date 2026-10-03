@@ -19,6 +19,7 @@ def test_compose_service_dependency_and_persistence_contract() -> None:
 
     assert services["migrate"]["depends_on"]["postgres"]["condition"] == "service_healthy"
     assert services["migrate"]["command"] == ["alembic", "upgrade", "head"]
+    assert services["migrate"]["image"] == services["api"]["image"] == "insighthr-api:local"
     assert services["api"]["depends_on"]["migrate"]["condition"] == (
         "service_completed_successfully"
     )
