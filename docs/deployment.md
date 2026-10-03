@@ -100,12 +100,12 @@ Both images use multi-stage builds and run as UID/GID `10001:10001`. The API run
 Verified locally on 2026-10-03:
 
 - Python 3.12.10 and PostgreSQL 16.15
-- 14 backend tests, including two real PostgreSQL integration tests
+- 18 backend tests, including two real PostgreSQL integration tests
 - Ruff and mypy clean
 - Node.js 26.8.1 used to verify the Node 24-targeted application
 - 6 frontend tests, ESLint, strict TypeScript, and Next.js production build clean
 - Docker Compose v5.5.1 accepted the Compose model
 - Static container-contract tests passed
 
-The local Docker engine could not start because this Windows installation requires an Administrator session and restart to enable WSL. The `Phase 1 CI` GitHub workflow performs the image build and clean Compose smoke test on Linux after push. Replace this note with the successful workflow run reference when CI completes.
+The local Docker engine could not start because this Windows installation requires an Administrator session and restart to enable WSL. GitHub's Linux runner built both production images and passed the clean Compose startup, migration, API readiness, and web-to-API smoke checks in [`Phase 1 CI` run 37131367452](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/37131367452).
 
