@@ -107,5 +107,5 @@ Verified locally on 2026-10-03:
 - Docker Compose v5.5.1 accepted the Compose model
 - Static container-contract tests passed
 
-The local Docker engine could not start because this Windows installation requires an Administrator session and restart to enable WSL. GitHub's Linux runner built both production images with locked runtime constraints and passed the clean Compose startup, reserved-character database password, migration, API readiness, web-to-API connectivity, final-image inspection, and normal `down`/`up` persistence checks in [`Phase 1 CI` run 37132403879](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/37132403879).
+The local Docker engine could not start because this Windows installation requires an Administrator session and restart to enable WSL. GitHub's Linux runner built both production images with locked runtime constraints and passed the clean Compose startup, reserved-character database password, migration, API readiness, web-to-API connectivity, final-image inspection, and normal `down`/`up` persistence checks in [`Phase 1 CI` run 37132907757](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/37132907757). The persistence check reads the retained Alembic revision after restarting PostgreSQL alone, before migrations can run again.
 
