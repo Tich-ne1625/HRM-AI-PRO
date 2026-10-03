@@ -23,6 +23,9 @@ def test_compose_service_dependency_and_persistence_contract() -> None:
     assert services["api"]["depends_on"]["migrate"]["condition"] == (
         "service_completed_successfully"
     )
+    assert services["api"]["environment"]["ALEMBIC_CONFIG_PATH"] == (
+        "/app/alembic.ini"
+    )
     assert services["api"]["healthcheck"]["test"][-1].endswith("/health/ready')")
     assert services["web"]["depends_on"]["api"]["condition"] == "service_healthy"
 

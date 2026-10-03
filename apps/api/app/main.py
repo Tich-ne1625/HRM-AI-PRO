@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
-from pathlib import Path
 
 from fastapi import FastAPI
 
@@ -26,7 +25,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.state.engine = get_engine(application_settings)
     app.state.readiness_service = ReadinessService(
         app.state.engine,
-        Path(__file__).resolve().parents[1] / "alembic.ini",
+        application_settings.alembic_config_path,
     )
     register_error_handling(app)
     app.include_router(health_router)

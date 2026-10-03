@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from functools import lru_cache
+from pathlib import Path
 from typing import Literal, Self
 from urllib.parse import urlsplit
 
@@ -21,6 +22,7 @@ class Settings(BaseSettings):
     app_env: Literal["development", "test", "production"] = "development"
     database_url: SecretStr
     cors_allowed_origins: list[str] = []
+    alembic_config_path: Path = Path("alembic.ini")
 
     @model_validator(mode="after")
     def validate_security_constraints(self) -> Self:

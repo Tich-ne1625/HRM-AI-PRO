@@ -1,13 +1,43 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from pathlib import Path
+from typing import Any
 
+import pytest
 from fastapi.testclient import TestClient
 
 from app.core.config import Settings
 from app.main import create_app
 from app.modules.health.router import get_readiness_service
 from app.modules.health.service import ReadinessResult
+
+
+def test_app_uses_configured_alembic_path(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    captured: dict[str, Any] = {}
+
+    class RecordingReadinessService:
+        def __init__(self, engine: Any, alembic_ini_path: Path) -> None:
+            captured["engine"] = engine
+            captured["path"] = alembic_ini_path
+
+    engine = object()
+    monkeypatch.setattr("app.main.get_engine", lambda settings: engine)
+    monkeypatch.setattr("app.main.ReadinessService", RecordingReadinessService)
+    settings = Settings(
+        app_env="test",
+        database_url="postgresql+psycopg://user:password@localhost/test",
+        alembic_config_path="/runtime/alembic.ini",
+    )
+
+    create_app(settings)
+
+    assert captured == {
+        "engine": engine,
+        "path": Path("/runtime/alembic.ini"),
+    }
 
 
 @dataclass

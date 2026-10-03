@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 import pytest
 from pydantic import ValidationError
 
@@ -14,6 +16,16 @@ def test_accepts_psycopg_url_without_revealing_password() -> None:
 
     assert settings.database_url.get_secret_value().startswith("postgresql+psycopg://")
     assert "super-secret" not in repr(settings)
+
+
+def test_accepts_explicit_alembic_config_path() -> None:
+    settings = Settings(
+        app_env="test",
+        database_url="postgresql+psycopg://user:password@db/test",
+        alembic_config_path="/app/alembic.ini",
+    )
+
+    assert settings.alembic_config_path == Path("/app/alembic.ini")
 
 
 def test_requires_database_url(monkeypatch: pytest.MonkeyPatch) -> None:
