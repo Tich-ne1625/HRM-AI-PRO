@@ -20,6 +20,9 @@ def test_compose_service_dependency_and_persistence_contract() -> None:
     assert services["migrate"]["depends_on"]["postgres"]["condition"] == "service_healthy"
     assert services["migrate"]["command"] == ["alembic", "upgrade", "head"]
     assert services["migrate"]["image"] == services["api"]["image"] == "insighthr-api:local"
+    assert "POSTGRES_PASSWORD_URLENCODED" in services["migrate"]["environment"][
+        "DATABASE_URL"
+    ]
     assert services["api"]["depends_on"]["migrate"]["condition"] == (
         "service_completed_successfully"
     )
@@ -37,6 +40,32 @@ def test_application_containers_are_immutable_and_nonroot() -> None:
         service = services[service_name]
         assert service["user"] == "10001:10001"
         assert "volumes" not in service
+
+
+def test_build_context_excludes_nested_environment_files() -> None:
+    dockerignore = (REPOSITORY_ROOT / ".dockerignore").read_text(encoding="utf-8")
+
+    assert "**/.env" in dockerignore.splitlines()
+    assert "**/.env.*" in dockerignore.splitlines()
+
+
+def test_api_image_resolves_runtime_dependencies_with_lock_constraints() -> None:
+    dockerfile = (
+        REPOSITORY_ROOT / "infrastructure" / "docker" / "api.Dockerfile"
+    ).read_text(encoding="utf-8")
+
+    assert "COPY apps/api/pyproject.toml apps/api/requirements.lock ./" in dockerfile
+    assert "--constraint requirements.lock" in dockerfile
+
+
+def test_ci_verifies_restart_persistence_and_final_image_contents() -> None:
+    workflow = (
+        REPOSITORY_ROOT / ".github" / "workflows" / "phase1-ci.yml"
+    ).read_text(encoding="utf-8")
+
+    assert "Verify persistence across normal restart" in workflow
+    assert 'SELECT version_num FROM alembic_version' in workflow
+    assert "Inspect final images" in workflow
 
 
 def _compose() -> dict[str, Any]:

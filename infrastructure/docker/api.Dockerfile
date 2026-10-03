@@ -4,9 +4,9 @@ ENV PIP_DISABLE_PIP_VERSION_CHECK=1 \
     PIP_NO_CACHE_DIR=1
 
 WORKDIR /build
-COPY apps/api/pyproject.toml ./
+COPY apps/api/pyproject.toml apps/api/requirements.lock ./
 COPY apps/api/app ./app
-RUN python -m pip wheel --wheel-dir /wheels .
+RUN python -m pip wheel --wheel-dir /wheels --constraint requirements.lock .
 
 FROM python:3.12-slim AS runtime
 

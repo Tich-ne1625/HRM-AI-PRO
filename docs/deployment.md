@@ -4,18 +4,18 @@
 
 The repository root `.env.example` lists every Phase 1 variable. Compose reads a root `.env`; direct-host applications read `apps/api/.env` and `apps/web/.env.local` from their respective working directories.
 
-The sample password is for an isolated local workstation only. Replace it before using a shared network or CI secret store. If a database password contains URL-reserved characters, percent-encode it in `DATABASE_URL`.
+The sample password is for an isolated local workstation only. Replace it before using a shared network or CI secret store. `POSTGRES_PASSWORD` is the raw PostgreSQL password; `POSTGRES_PASSWORD_URLENCODED` is its percent-encoded equivalent for Compose's SQLAlchemy URL. If a direct-host database password contains URL-reserved characters, percent-encode it in `DATABASE_URL` as well.
 
 ## Direct-host PostgreSQL
 
 Create a local role and database with PostgreSQL 16 administrative credentials:
 
 ```sql
-CREATE USER insighthr WITH PASSWORD 'replace-this-password';
+CREATE USER insighthr WITH PASSWORD 'change-me@local-only';
 CREATE DATABASE insighthr OWNER insighthr;
 ```
 
-Set `DATABASE_URL=postgresql+psycopg://insighthr:<encoded-password>@localhost:5432/insighthr`, then run from `apps/api`:
+The value above matches `.env.example`; replace it in both places outside an isolated workstation. Set `DATABASE_URL=postgresql+psycopg://insighthr:change-me%40local-only@localhost:5432/insighthr`, then run from `apps/api`:
 
 ```bash
 alembic upgrade head

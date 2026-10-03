@@ -88,10 +88,12 @@ Backend from `apps/api`:
 ```powershell
 py -3.12 -m venv .venv
 .\.venv\Scripts\Activate.ps1
-python -m pip install -e ".[dev]"
+python -m pip install --constraint requirements.lock -e ".[dev]"
 alembic upgrade head
 uvicorn app.main:app --reload
 ```
+
+Before applying migrations on a fresh workstation, create the PostgreSQL role and database using the matching credentials in `.env`. See [Direct-host PostgreSQL](docs/deployment.md#direct-host-postgresql) for the SQL and connection details.
 
 Frontend from `apps/web` in a second terminal:
 
@@ -100,7 +102,7 @@ npm ci
 npm run dev
 ```
 
-Portable activation uses `source .venv/bin/activate`; all following commands are the same.
+On portable shells, create the environment with `python3.12 -m venv .venv` and activate it with `source .venv/bin/activate`; all following commands are the same.
 
 ## Database migrations
 
@@ -138,7 +140,7 @@ The integration fixture removes the `alembic_version` table. Never point `TEST_D
 
 ## Environment and secrets
 
-`.env.example` is the public configuration contract. Copy it to `.env` and replace the sample password for any shared environment. `.env` files are ignored by Git. Phase 1 does not contain authentication or Gemini secrets.
+`.env.example` is the public configuration contract. Copy it to `.env` and replace the sample password for any shared environment. `POSTGRES_PASSWORD_URLENCODED` must be the percent-encoded form of the raw `POSTGRES_PASSWORD`; Compose uses the encoded value inside `DATABASE_URL`. `.env` files are ignored by Git and excluded recursively from image build contexts. Phase 1 does not contain authentication or Gemini secrets.
 
 ## Future phases
 
