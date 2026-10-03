@@ -120,9 +120,10 @@ jobs:
           revision_before="$(docker compose --project-name insighthr-ci --env-file .env.example exec -T postgres sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc "SELECT version_num FROM alembic_version"' | tr -d '[:space:]')"
           test "$revision_before" = "20261003_0001"
           docker compose --project-name insighthr-ci --env-file .env.example down
+          docker compose --project-name insighthr-ci --env-file .env.example up --detach --wait --no-build postgres
+          revision_after_restart="$(docker compose --project-name insighthr-ci --env-file .env.example exec -T postgres sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc "SELECT version_num FROM alembic_version"' | tr -d '[:space:]')"
+          test "$revision_after_restart" = "$revision_before"
           docker compose --project-name insighthr-ci --env-file .env.example up --detach --wait --no-build
-          revision_after="$(docker compose --project-name insighthr-ci --env-file .env.example exec -T postgres sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc "SELECT version_num FROM alembic_version"' | tr -d '[:space:]')"
-          test "$revision_after" = "$revision_before"
           curl --fail --silent http://127.0.0.1:8000/health/ready | grep '"status":"ready"'
           curl --fail --silent http://127.0.0.1:3000 | grep 'API connected'
       - name: Show service logs after failure

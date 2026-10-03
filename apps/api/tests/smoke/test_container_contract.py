@@ -16,6 +16,9 @@ def test_compose_service_dependency_and_persistence_contract() -> None:
     assert "healthcheck" in services["postgres"]
     assert "postgres_data:/var/lib/postgresql/data" in services["postgres"]["volumes"]
     assert "postgres_data" in compose["volumes"]
+    assert services["postgres"]["environment"]["POSTGRES_PASSWORD"] == (
+        "${POSTGRES_PASSWORD:-change-me@local-only}"
+    )
 
     assert services["migrate"]["depends_on"]["postgres"]["condition"] == "service_healthy"
     assert services["migrate"]["command"] == ["alembic", "upgrade", "head"]
@@ -65,6 +68,18 @@ def test_ci_verifies_restart_persistence_and_final_image_contents() -> None:
 
     assert "Verify persistence across normal restart" in workflow
     assert 'SELECT version_num FROM alembic_version' in workflow
+    restart_step = workflow.index("Verify persistence across normal restart")
+    shutdown = workflow.index("down", restart_step)
+    postgres_only_start = workflow.index(
+        "up --detach --wait --no-build postgres",
+        shutdown,
+    )
+    revision_after_restart = workflow.index("revision_after_restart", shutdown)
+    full_stack_restart = workflow.index(
+        "up --detach --wait --no-build\n",
+        postgres_only_start,
+    )
+    assert postgres_only_start < revision_after_restart < full_stack_restart
     assert "Inspect final images" in workflow
 
 
