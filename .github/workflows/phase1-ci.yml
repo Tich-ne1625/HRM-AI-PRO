@@ -88,8 +88,14 @@ jobs:
             echo '```' >> "$GITHUB_STEP_SUMMARY"
             exit 1
           }
-      - name: Start clean stack
-        run: docker compose --project-name insighthr-ci --env-file .env.example up --detach --wait --no-build
+      - name: Start PostgreSQL
+        run: docker compose --project-name insighthr-ci --env-file .env.example up --detach --wait postgres
+      - name: Run migration
+        run: docker compose --project-name insighthr-ci --env-file .env.example up --no-build migrate
+      - name: Start API
+        run: docker compose --project-name insighthr-ci --env-file .env.example up --detach --wait --no-build api
+      - name: Start web
+        run: docker compose --project-name insighthr-ci --env-file .env.example up --detach --wait --no-build web
       - name: Verify health and web-to-API connectivity
         run: |
           curl --fail --silent http://127.0.0.1:8000/health/live | grep '"status":"ok"'
