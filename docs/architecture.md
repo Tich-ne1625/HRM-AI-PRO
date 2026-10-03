@@ -1,7 +1,11 @@
 # InsightHR architecture proposal
 
 Date: 2026-10-03  
-Status: Proposed; application implementation has not started.
+Status: Approved; Phase 1 foundation implemented on 2026-10-03.
+
+## Implementation status
+
+Phase 1 foundation includes repository conventions, FastAPI configuration and error handling, PostgreSQL/Alembic readiness, the Next.js system-status page, production Dockerfiles, Docker Compose, and CI verification. Authentication and all performance-management domain features remain planned for later phases. The detailed implementation and verification record is in `docs/superpowers/plans/2026-10-03-phase-1-foundation.md` and `docs/deployment.md`.
 
 ## Purpose and existing workspace
 
