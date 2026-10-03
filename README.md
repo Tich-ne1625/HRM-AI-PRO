@@ -1,5 +1,7 @@
 # InsightHR
 
+[Đọc hướng dẫn bằng tiếng Việt](README.vi.md)
+
 InsightHR is an AI-assisted employee performance management system built as a university capstone. It focuses on employee records, review cycles, KPIs, authorized 360-degree feedback, deterministic scoring, and advisory Gemini analysis.
 
 The project is a modular monolith: a Next.js web application, a FastAPI backend, and PostgreSQL. Read the approved [architecture proposal](docs/architecture.md) for the complete design and business rules.
@@ -145,4 +147,6 @@ The integration fixture removes the `alembic_version` table. Never point `TEST_D
 ## Future phases
 
 Authentication and RBAC are Phase 2. Departments, positions, employees, review cycles, KPI scoring, feedback, performance calculations, Gemini analysis, dashboards, seed data, and Kubernetes will be added incrementally according to [the architecture](docs/architecture.md). Gemini configuration and demo seed commands will be documented when their implementations exist.
+
+The reviewed implementation sequence for the next slice is in the [Phase 2 authentication plan](docs/superpowers/plans/2026-10-03-phase-2-authentication.md).
 
