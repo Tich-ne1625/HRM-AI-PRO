@@ -100,12 +100,12 @@ Both images use multi-stage builds and run as UID/GID `10001:10001`. The API run
 Verified locally on 2026-10-03:
 
 - Python 3.12.10 and PostgreSQL 16.15
-- 18 backend tests, including two real PostgreSQL integration tests
+- 28 backend tests, including two real PostgreSQL integration tests
 - Ruff and mypy clean
 - Node.js 26.8.1 used to verify the Node 24-targeted application
-- 6 frontend tests, ESLint, strict TypeScript, and Next.js production build clean
+- 8 frontend tests, ESLint, strict TypeScript, and Next.js production build clean
 - Docker Compose v5.5.1 accepted the Compose model
 - Static container-contract tests passed
 
-The local Docker engine could not start because this Windows installation requires an Administrator session and restart to enable WSL. GitHub's Linux runner built both production images and passed the clean Compose startup, migration, API readiness, and web-to-API smoke checks in [`Phase 1 CI` run 37131367452](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/37131367452).
+The local Docker engine could not start because this Windows installation requires an Administrator session and restart to enable WSL. GitHub's Linux runner built both production images with locked runtime constraints and passed the clean Compose startup, reserved-character database password, migration, API readiness, web-to-API connectivity, final-image inspection, and normal `down`/`up` persistence checks in [`Phase 1 CI` run 37132403879](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/37132403879).
 
