@@ -57,7 +57,9 @@ def test_access_token_contains_required_claims_and_decodes_with_injected_clock()
     service = TokenService(KEY, clock=lambda: NOW)
 
     token = service.create_access_token(USER_ID, FAMILY_ID)
-    payload = jwt.decode(token, KEY, algorithms=["HS256"], options={"verify_iat": False})
+    payload = jwt.decode(
+        token, KEY, algorithms=["HS256"], options={"verify_iat": False, "verify_exp": False}
+    )
 
     assert payload == {
         "sub": str(USER_ID),

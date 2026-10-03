@@ -195,6 +195,20 @@ def test_rejects_inexact_web_origin(origin: str, monkeypatch: pytest.MonkeyPatch
         Settings(_env_file=None)
 
 
+@pytest.mark.parametrize("control", [chr(value) for value in (*range(32), 127)])
+@pytest.mark.parametrize("position", ["leading", "authority", "trailing"])
+def test_rejects_raw_ascii_controls_in_web_origin(control: str, position: str) -> None:
+    origins = {
+        "leading": f"{control}https://hr.example.com",
+        "authority": f"https://hr{control}.example.com",
+        "trailing": f"https://hr.example.com{control}",
+    }
+
+    with pytest.raises(ValidationError, match="WEB_ORIGIN"):
+        # Constructor input also covers NUL, which cannot be stored in the environment.
+        Settings(_env_file=None, web_origin=origins[position])
+
+
 @pytest.mark.parametrize("name", ["ACCESS_TOKEN_MINUTES", "REFRESH_SESSION_DAYS"])
 @pytest.mark.parametrize("value", ["0", "-1"])
 def test_rejects_nonpositive_auth_lifetimes(

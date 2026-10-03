@@ -84,6 +84,8 @@ class Settings(BaseSettings):
         if self.app_env == "production" and not self.cookie_secure:
             raise ValueError("Production requires secure cookies")
 
+        if any(ord(character) < 32 or ord(character) == 127 for character in self.web_origin):
+            raise ValueError("WEB_ORIGIN must be one exact HTTP(S) origin")
         try:
             web_origin = urlsplit(self.web_origin)
             _ = web_origin.port
