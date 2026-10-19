@@ -1,11 +1,11 @@
 # InsightHR architecture proposal
 
 Date: 2026-10-03  
-Status: Approved; Phase 1 foundation implemented on 2026-10-03.
+Status: Approved; Phase 1 foundation implemented on 2026-10-03; Phase 2 API/UI implemented on 2026-10-19, with container acceptance tracked in deployment.md.
 
 ## Implementation status
 
-Phase 1 foundation includes repository conventions, FastAPI configuration and error handling, PostgreSQL/Alembic readiness, the Next.js system-status page, production Dockerfiles, Docker Compose, and CI verification. Authentication and all performance-management domain features remain planned for later phases. The detailed implementation and verification record is in `docs/superpowers/plans/2026-10-03-phase-1-foundation.md` and `docs/deployment.md`.
+Phase 1 includes the FastAPI/Next.js foundation, PostgreSQL/Alembic readiness, Docker Compose and CI. Phase 2 implements users, refresh-session families, audits, first-ADMIN CLI, cookie login/refresh/logout/password change, current identity and role policies, ADMIN account management, and the corresponding web screens. Employee links remain null. Organization and all performance-management domain features remain planned. Implementation and acceptance evidence is in the phase plans and `docs/deployment.md`.
 
 ## Purpose and existing workspace
 
@@ -376,4 +376,4 @@ The future `.env.example` includes PostgreSQL settings, access-signing secret, c
 
 The proposal adopts these assumptions: ADMIN has system privileges without implicit HR access; KPI cap defaults to 100; feedback converts ratings with `rating / 5 * 100`; submitted reviewers count equally; SELF and MANAGER are required; a single active cycle is allowed initially; finalization locks participant evidence; HR alone requests AI generation. These are proposed business policies, not requirements already asserted by the brief.
 
-The next deliverable after design review is a detailed Phase 1 implementation plan. No application feature is represented as implemented by this document.
+The next business slice is Phase 3 Organization. Its detailed plan must define department/position/employee migrations, user–employee linkage, HR write permissions, scoped reads, reporting-tree cycle protection and tests before implementation. Later domain artifacts remain proposals until their own phase is delivered.

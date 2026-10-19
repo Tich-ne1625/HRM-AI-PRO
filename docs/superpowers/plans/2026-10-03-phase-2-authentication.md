@@ -1,6 +1,6 @@
 # InsightHR Phase 2 Authentication Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Deliver secure cookie authentication, refresh-token rotation, logout, current-user identity, password changes, reusable role policies, ADMIN user management, audit records, and the minimum web flows needed to exercise them end to end.
 
@@ -80,27 +80,27 @@
 - Consumes: existing `Settings`, `SecretStr`, and sanitized configuration validation.
 - Produces: `Settings.access_signing_key`, `Settings.web_origin`, `Settings.cookie_secure`, `Settings.access_token_minutes`, `Settings.refresh_session_days`; `PasswordService.hash/verify`, `TokenService.create_access_token/decode_access_token`, `new_opaque_token()`, and `hash_opaque_token()`.
 
-- [ ] **Step 1: Pin authentication dependencies**
+- [x] **Step 1: Pin authentication dependencies**
 
 Add exact direct dependencies `argon2-cffi==25.1.0`, `PyJWT==2.15.1`, and `email-validator==2.3.0`, install through `requirements.lock` constraints, and regenerate the lock from the resolved Python 3.12 environment.
 
-- [ ] **Step 2: Write failing auth-configuration tests**
+- [x] **Step 2: Write failing auth-configuration tests**
 
 In `test_config.py`, assert that production rejects a missing/default/short `AUTH_ACCESS_SECRET`, production requires `COOKIE_SECURE=true`, `WEB_ORIGIN` is one exact HTTP(S) origin without credentials/path/query/fragment, lifetimes default to `15` minutes and `7` days, and validation errors never reveal the secret.
 
-- [ ] **Step 3: Run configuration tests and verify failure**
+- [x] **Step 3: Run configuration tests and verify failure**
 
 Run: `python -m pytest tests/unit/test_config.py -q`
 
 Expected: FAIL because Phase 2 fields do not exist.
 
-- [ ] **Step 4: Implement the validated settings fields**
+- [x] **Step 4: Implement the validated settings fields**
 
 Add fields using these environment names: `AUTH_ACCESS_SECRET`, `WEB_ORIGIN`, `COOKIE_SECURE`, `ACCESS_TOKEN_MINUTES`, and `REFRESH_SESSION_DAYS`. Development may use the documented placeholder key and insecure cookies; test and production settings must receive an explicit key of at least 32 characters. Preserve `hide_input_in_errors=True`.
 
 Update `tests/conftest.py` with a test-only 32-character signing key and exact test origin so pre-existing application tests continue to create settings explicitly without weakening nondevelopment validation.
 
-- [ ] **Step 5: Write failing security primitive tests**
+- [x] **Step 5: Write failing security primitive tests**
 
 In `test_security.py`, test:
 
@@ -109,17 +109,17 @@ In `test_security.py`, test:
 - `new_opaque_token()` yields at least 256 bits of entropy and two calls differ.
 - `hash_opaque_token()` is deterministic SHA-256 output and never returns the token.
 
-- [ ] **Step 6: Run security tests and verify failure**
+- [x] **Step 6: Run security tests and verify failure**
 
 Run: `python -m pytest tests/unit/test_security.py -q`
 
 Expected: FAIL because `app.core.security` does not exist.
 
-- [ ] **Step 7: Implement security primitives**
+- [x] **Step 7: Implement security primitives**
 
 Create immutable `AccessClaims(user_id: UUID, family_id: UUID, issued_at: datetime, expires_at: datetime)`. `PasswordService` wraps one configured Argon2id hasher. `TokenService` accepts the signing key and an injectable UTC clock. Define cookie names `insighthr_access`, `insighthr_refresh`, and `insighthr_csrf`; never accept a JWT algorithm from token input.
 
-- [ ] **Step 8: Run Task 1 gates**
+- [x] **Step 8: Run Task 1 gates**
 
 Run: `python -m pytest tests/unit/test_config.py tests/unit/test_security.py -q`
 
@@ -127,7 +127,7 @@ Run: `python -m ruff check app tests alembic && python -m mypy app`
 
 Expected: all pass.
 
-- [ ] **Step 9: Commit Task 1**
+- [x] **Step 9: Commit Task 1**
 
 ```bash
 git add .env.example apps/api
@@ -158,7 +158,7 @@ git commit -m "feat(auth): add secure authentication primitives"
 - Consumes: shared SQLAlchemy `metadata`, `PasswordService`, `DATABASE_URL`.
 - Produces: `User`, `UserRole`, `AuthSession`, `AuditLog`, repositories, `AuditWriter.record(...)`, and `python -m app.cli.create_admin --email EMAIL [--password-stdin]`.
 
-- [ ] **Step 1: Write failing PostgreSQL schema tests**
+- [x] **Step 1: Write failing PostgreSQL schema tests**
 
 Assert migration `20261003_0002` creates:
 
@@ -167,35 +167,35 @@ Assert migration `20261003_0002` creates:
 - `audit_logs`: UUID `id`, nullable `actor_id`, action/entity/request identifiers, UTC timestamp, JSONB metadata, and timestamp/actor indexes.
 - foreign keys prevent deleting referenced users and session replacement links.
 
-- [ ] **Step 2: Run schema tests and verify failure**
+- [x] **Step 2: Run schema tests and verify failure**
 
 Run with `TEST_DATABASE_URL`: `python -m pytest tests/integration/test_auth_schema.py -q`
 
 Expected: FAIL because the revision and models do not exist.
 
-- [ ] **Step 3: Implement models and migration**
+- [x] **Step 3: Implement models and migration**
 
 Use SQLAlchemy 2 typed declarative mappings tied to shared `metadata`. `app/models.py` imports every model so Alembic sees the complete metadata. Store normalized email as lowercase text with a database unique constraint. `AuditLog` is append-only through application services; do not configure ORM delete cascades for security history.
 
-- [ ] **Step 4: Implement focused repositories and audit writer**
+- [x] **Step 4: Implement focused repositories and audit writer**
 
 Define `UserRepository.get_by_normalized_email`, `get_by_id`, `add`, and ordered active-admin locking. Define `AuthSessionRepository.get_by_token_hash_for_update`, `get_active_family`, `revoke_family`, `revoke_other_families`, and `add_successor`. Repositories flush but never commit. `AuditWriter.record(session, actor_id, action, entity_type, entity_id, request_id, metadata)` accepts allowlisted metadata assembled by services.
 
-- [ ] **Step 5: Write failing first-ADMIN CLI tests**
+- [x] **Step 5: Write failing first-ADMIN CLI tests**
 
 Test normalization, Argon2id storage, interactive password confirmation, duplicate-email refusal, 12/128-character boundaries, audit creation, rollback on failure, and `--password-stdin` consuming two matching lines without echo. Patch `getpass`/stdin in tests; never place a password in command arguments or environment variables.
 
-- [ ] **Step 6: Implement the bootstrap command**
+- [x] **Step 6: Implement the bootstrap command**
 
 `python -m app.cli.create_admin --email EMAIL` prompts twice via `getpass`. `--password-stdin` is the explicit noninteractive CI alternative and reads two lines. Both paths create one active ADMIN and `user.bootstrap_created` audit in one transaction, and exit nonzero without changing data for duplicates or invalid input. Validate then store email as `validate_email(email).normalized.casefold()` with a maximum of 254 characters.
 
-- [ ] **Step 7: Run Task 2 gates**
+- [x] **Step 7: Run Task 2 gates**
 
 Run: `python -m pytest tests/integration/test_auth_schema.py tests/integration/test_create_admin.py -q`
 
 Expected: all pass against PostgreSQL.
 
-- [ ] **Step 8: Commit Task 2**
+- [x] **Step 8: Commit Task 2**
 
 ```bash
 git add apps/api
@@ -218,7 +218,7 @@ git commit -m "feat(auth): add user and session persistence"
 - Consumes: `UserRepository`, `AuthSessionRepository`, security primitives, `AuditWriter`, and application `session_factory`.
 - Produces: `POST /api/v1/auth/login`, cookie-writing helpers, `AuthService.login(...) -> AuthResult`, and sanitized `CurrentUser` schema reused by `/auth/me`.
 
-- [ ] **Step 1: Write failing cookie-policy unit tests**
+- [x] **Step 1: Write failing cookie-policy unit tests**
 
 Assert successful login sets:
 
@@ -229,29 +229,29 @@ Assert successful login sets:
 
 Assert clear helpers expire every cookie using the same path/security attributes.
 
-- [ ] **Step 2: Write failing login integration tests**
+- [x] **Step 2: Write failing login integration tests**
 
 Cover correct normalized email/password, wrong password, unknown email with equivalent generic `401 invalid_credentials`, inactive user, missing/malformed/unapproved `Origin`, duplicate concurrent logins producing independent families, sanitized response, audit actions, and rollback if audit insertion fails. Confirm password timing uses Argon2 verification for both known and unknown emails through a fixed dummy hash.
 
-- [ ] **Step 3: Run login tests and verify failure**
+- [x] **Step 3: Run login tests and verify failure**
 
 Run: `python -m pytest tests/unit/test_auth_cookies.py tests/integration/test_auth_login.py -q`
 
 Expected: FAIL because auth service/router do not exist.
 
-- [ ] **Step 4: Add request-scoped session lifecycle**
+- [x] **Step 4: Add request-scoped session lifecycle**
 
 Store `session_factory` on `app.state`. Implement `get_db_session(request: Request) -> Iterator[Session]` that rolls back on exceptions and always closes. Services own transaction boundaries with `with session.begin()`; repositories never commit.
 
-- [ ] **Step 5: Implement login service and route**
+- [x] **Step 5: Implement login service and route**
 
 Define `LoginCommand(email: str, password: SecretStr, request_id: str)`. On success create a family UUID, refresh-token row, session-bound CSRF hash, signed access token, and `auth.login_succeeded` audit in one transaction. `POST /login` returns `200`; return only `id`, normalized `email`, `role`, `is_active`, and `employee_id: null`; keep Phase 3 responsible for linking an employee.
 
-- [ ] **Step 6: Implement exact-origin dependency**
+- [x] **Step 6: Implement exact-origin dependency**
 
 Normalize no values at request time: compare the complete `Origin` header byte-for-byte with `Settings.web_origin`. Reject missing, `null`, alternate port, alternate scheme, subdomain, userinfo, path, and comma-separated origins with `403 origin_not_allowed` before service execution.
 
-- [ ] **Step 7: Register the `/api/v1/auth` router and run Task 3 gates**
+- [x] **Step 7: Register the `/api/v1/auth` router and run Task 3 gates**
 
 Run: `python -m pytest tests/unit/test_auth_cookies.py tests/integration/test_auth_login.py -q`
 
@@ -259,7 +259,7 @@ Run: `python -m ruff check app tests alembic && python -m mypy app`
 
 Expected: all pass.
 
-- [ ] **Step 8: Commit Task 3**
+- [x] **Step 8: Commit Task 3**
 
 ```bash
 git add apps/api
@@ -279,45 +279,45 @@ git commit -m "feat(auth): add secure cookie login"
 - Consumes: login-created family/refresh/CSRF cookies and row-locking session repository.
 - Produces: `POST /api/v1/auth/refresh`, `POST /api/v1/auth/logout`, `POST /api/v1/auth/change-password`, `AuthService.rotate_refresh`, `revoke_family`, and `change_password`.
 
-- [ ] **Step 1: Write failing refresh behavior tests**
+- [x] **Step 1: Write failing refresh behavior tests**
 
 Assert rotation marks the presented row consumed, creates exactly one successor with the same family/user/CSRF hash and unchanged absolute expiry, links `replacement_id`, emits new access/refresh cookies, and never stores a raw token. Test missing, random, expired, consumed, and revoked refresh cookies with sanitized `401` responses.
 
-- [ ] **Step 2: Write failing CSRF and origin tests**
+- [x] **Step 2: Write failing CSRF and origin tests**
 
 For refresh/logout/change-password, assert rejection when Origin is missing/wrong, CSRF cookie/header is missing, values differ, or a valid token from another family is supplied. Confirm rejected requests do not consume/revoke sessions or change passwords.
 
-- [ ] **Step 3: Write failing PostgreSQL concurrency and replay tests**
+- [x] **Step 3: Write failing PostgreSQL concurrency and replay tests**
 
 Use two independent SQLAlchemy sessions and a barrier to submit the same refresh token concurrently. Assert at most one successor row is created, the second consumer detects the consumed token, all family rows become revoked, and neither returned access token remains authorized. Replaying any older consumed token later has the same family-revocation result.
 
-- [ ] **Step 4: Run refresh tests and verify failure**
+- [x] **Step 4: Run refresh tests and verify failure**
 
 Run: `python -m pytest tests/integration/test_auth_refresh.py tests/integration/test_auth_mutations.py -q`
 
 Expected: FAIL because mutation behavior is absent.
 
-- [ ] **Step 5: Implement atomic refresh rotation**
+- [x] **Step 5: Implement atomic refresh rotation**
 
 Hash the presented token, select its row `FOR UPDATE`, and branch only after the lock. Active token: consume and create successor. Consumed token: revoke the entire family and return `refresh_reuse_detected`. Missing/random token: generic `invalid_session`. Keep a family’s original `expires_at`; never slide it.
 
-- [ ] **Step 6: Implement session-bound CSRF enforcement**
+- [x] **Step 6: Implement session-bound CSRF enforcement**
 
 `require_csrf(request, active_session)` performs constant-time comparison of the header/cookie, then compares its hash to the family’s active row. It runs only after exact-origin validation and before the mutation.
 
-- [ ] **Step 7: Implement logout and password change**
+- [x] **Step 7: Implement logout and password change**
 
 Logout revokes the caller’s family, records `auth.logout`, and clears all cookies. Password change verifies the old password, enforces the same password policy as user creation, writes a new Argon2id hash, revokes every other family, records `user.password_changed`, and leaves the current family active.
 
 Return `204` from refresh, logout, and successful password change; refresh communicates rotated credentials only through cookies.
 
-- [ ] **Step 8: Run Task 4 gates**
+- [x] **Step 8: Run Task 4 gates**
 
 Run: `python -m pytest tests/integration/test_auth_refresh.py tests/integration/test_auth_mutations.py -q`
 
 Expected: all pass repeatedly with `pytest -x --count=5` if `pytest-repeat` is deliberately added to dev dependencies; otherwise loop the command five times in the shell without adding a runtime dependency.
 
-- [ ] **Step 9: Commit Task 4**
+- [x] **Step 9: Commit Task 4**
 
 ```bash
 git add apps/api
@@ -336,25 +336,25 @@ git commit -m "feat(auth): rotate sessions and protect mutations"
 - Consumes: access JWT `sub/sid`, `UserRepository`, and active session-family lookup.
 - Produces: `AuthContext(user: User, family_id: UUID, session: AuthSession)`, `get_auth_context`, `require_roles(*roles)`, and `GET /api/v1/auth/me`.
 
-- [ ] **Step 1: Write failing policy and `/auth/me` tests**
+- [x] **Step 1: Write failing policy and `/auth/me` tests**
 
 Cover valid identity; missing/malformed/expired/wrong-signature token; nonexistent user; inactive user; nonexistent, expired, revoked, or replay-revoked family; role change reflected immediately without issuing a new token; allowed role; forbidden role returning stable `403 forbidden`; and no token/hash/cookie fields in responses.
 
-- [ ] **Step 2: Run policy tests and verify failure**
+- [x] **Step 2: Run policy tests and verify failure**
 
 Run: `python -m pytest tests/unit/test_policies.py tests/integration/test_auth_me.py -q`
 
 Expected: FAIL because policies and `/auth/me` are absent.
 
-- [ ] **Step 3: Implement current authentication context**
+- [x] **Step 3: Implement current authentication context**
 
 Decode the access cookie, then load current user and one unexpired/unrevoked/unconsumed row for the claimed family. Return `401 authentication_required` for every authentication failure category. Do not trust role or active status from JWT claims.
 
-- [ ] **Step 4: Implement reusable role dependency**
+- [x] **Step 4: Implement reusable role dependency**
 
 `require_roles(*allowed: UserRole) -> Callable[[AuthContext], AuthContext]` returns the context when the current database role is allowed and otherwise raises `403 forbidden`. Object-scope policies remain Phase 3.
 
-- [ ] **Step 5: Implement `/auth/me` and run Task 5 gates**
+- [x] **Step 5: Implement `/auth/me` and run Task 5 gates**
 
 Run: `python -m pytest tests/unit/test_policies.py tests/integration/test_auth_me.py -q`
 
@@ -362,7 +362,7 @@ Run: `python -m ruff check app tests alembic && python -m mypy app`
 
 Expected: all pass.
 
-- [ ] **Step 6: Commit Task 5**
+- [x] **Step 6: Commit Task 5**
 
 ```bash
 git add apps/api
@@ -383,35 +383,35 @@ git commit -m "feat(auth): enforce current session policies"
 - Consumes: `require_roles(UserRole.ADMIN)`, repositories, `PasswordService`, and `AuditWriter`.
 - Produces: `GET /api/v1/users`, `POST /api/v1/users`, `PATCH /api/v1/users/{user_id}` and paginated sanitized user schemas.
 
-- [ ] **Step 1: Write failing user API tests**
+- [x] **Step 1: Write failing user API tests**
 
 Assert ADMIN can list with `page`, `page_size<=100`, allowlisted `sort`, role/status filters; create normalized unique email with initial password; and update role/status. Assert HR/MANAGER/EMPLOYEE receive `403`, duplicate email returns `409 email_already_exists`, unknown IDs return `404`, invalid roles/pagination/passwords return `422`, and no response exposes hashes.
 
-- [ ] **Step 2: Write failing audit and session-invalidation tests**
+- [x] **Step 2: Write failing audit and session-invalidation tests**
 
 Assert create/update and their `user.created`, `user.role_changed`, or `user.status_changed` audits commit together. Deactivation invalidates every family immediately. Demotion affects authorization immediately because policies read the database role.
 
-- [ ] **Step 3: Write failing last-admin tests including concurrency**
+- [x] **Step 3: Write failing last-admin tests including concurrency**
 
 Test one active ADMIN cannot self-demote/deactivate. With two active ADMIN users, run two transactions concurrently attempting to remove different admins; order `SELECT ... FOR UPDATE` by UUID and assert one operation returns `409 last_active_admin` and at least one active ADMIN remains.
 
-- [ ] **Step 4: Run user tests and verify failure**
+- [x] **Step 4: Run user tests and verify failure**
 
 Run: `python -m pytest tests/integration/test_users_api.py tests/integration/test_last_admin_concurrency.py -q`
 
 Expected: FAIL because users service/router do not exist.
 
-- [ ] **Step 5: Implement schemas, service, routes and locking rule**
+- [x] **Step 5: Implement schemas, service, routes and locking rule**
 
 Use `UserCreate(email: EmailStr, password: SecretStr, role: UserRole)` and `UserUpdate(role: UserRole | None, is_active: bool | None)` with at least one update field. Normalize emails with the same function used by login/bootstrap. `GET /users` defaults to email ascending and permits only `email`, `created_at`, `role`, and `is_active`; create returns `201`, list/update return `200`. Lock all active ADMIN rows in stable ID order before a transition that could reduce their count; validate after acquiring locks and before mutation.
 
-- [ ] **Step 6: Register users router and run Task 6 gates**
+- [x] **Step 6: Register users router and run Task 6 gates**
 
 Run: `python -m pytest tests/integration/test_users_api.py tests/integration/test_last_admin_concurrency.py -q`
 
 Expected: all pass against PostgreSQL.
 
-- [ ] **Step 7: Commit Task 6**
+- [x] **Step 7: Commit Task 6**
 
 ```bash
 git add apps/api
@@ -438,29 +438,29 @@ git commit -m "feat(users): add administrator account management"
 - Consumes: same-origin `/api/v1/auth/*`, `insighthr_csrf` browser cookie, stable API error envelope.
 - Produces: `apiFetch<T>()`, one shared refresh promise, `AuthProvider`, `useAuth()`, and TanStack Query client.
 
-- [ ] **Step 1: Pin frontend state/form/test dependencies**
+- [x] **Step 1: Pin frontend state/form/test dependencies**
 
 Add exact runtime dependencies `@tanstack/react-query@5.104.1`, `react-hook-form@7.89.0`, and `@hookform/resolvers@5.9.1`. Add exact dev dependencies `@testing-library/react@16.3.3`, `@testing-library/user-event@14.6.7`, and `jsdom@30.1.1`; regenerate `package-lock.json` with Node 24/npm.
 
-- [ ] **Step 2: Write failing API-client tests**
+- [x] **Step 2: Write failing API-client tests**
 
 Assert `credentials: "include"`, CSRF header only for mutations, stable error parsing, one refresh attempt after `401`, original-request retry exactly once, no refresh loop, no refresh for login/refresh endpoints, and ten simultaneous `401` responses sharing one refresh request.
 
-- [ ] **Step 3: Run client tests and verify failure**
+- [x] **Step 3: Run client tests and verify failure**
 
 Run: `npm run test -- --run src/lib/api-client.test.ts`
 
 Expected: FAIL because client does not exist.
 
-- [ ] **Step 4: Implement Next same-origin API proxy**
+- [x] **Step 4: Implement Next same-origin API proxy**
 
 Add a rewrite from `/api/v1/:path*` to `${API_INTERNAL_URL}/api/v1/:path*`. Validate the internal base as HTTP(S), strip one trailing slash, never expose it as `NEXT_PUBLIC_*`, and keep the existing production standalone setting.
 
-- [ ] **Step 5: Implement API client and auth provider**
+- [x] **Step 5: Implement API client and auth provider**
 
 `apiFetch<T>(path, init, options)` reads the CSRF cookie for non-safe methods, parses the stable error envelope, coordinates a module-level single-flight refresh, retries once, and throws typed `ApiClientError`. `AuthProvider` owns the `/auth/me` query, login/logout mutations, cache clearing, and redirect-safe status; it never stores access or refresh tokens in JavaScript storage.
 
-- [ ] **Step 6: Run Task 7 gates**
+- [x] **Step 6: Run Task 7 gates**
 
 Run: `npm run test -- --run src/lib/api-client.test.ts`
 
@@ -468,7 +468,7 @@ Run: `npm run lint && npm run typecheck`
 
 Expected: all pass.
 
-- [ ] **Step 7: Commit Task 7**
+- [x] **Step 7: Commit Task 7**
 
 ```bash
 git add apps/web
@@ -496,29 +496,29 @@ git commit -m "feat(web): add authenticated API client"
 - Consumes: `useAuth`, `apiFetch`, auth/user schemas.
 - Produces: accessible `/login`, `/account`, and ADMIN-only `/admin/users` flows.
 
-- [ ] **Step 1: Write failing login and protected-route tests**
+- [x] **Step 1: Write failing login and protected-route tests**
 
 Test labeled email/password controls, keyboard submission, generic invalid-credentials message, disabled pending state, safe redirect only to an internal path, successful redirect to `/account`, authenticated-user redirect away from `/login`, anonymous protected-route redirect, refresh-before-redirect behavior, and inactive/revoked sessions returning to login.
 
-- [ ] **Step 2: Write failing account and user-management tests**
+- [x] **Step 2: Write failing account and user-management tests**
 
 Test current email/role display, logout, password change with old/new/confirmation validation, ADMIN list/create/change-role/deactivate flows, validation/conflict messages, pending controls, and non-ADMIN denial without issuing the users request.
 
-- [ ] **Step 3: Run UI tests and verify failure**
+- [x] **Step 3: Run UI tests and verify failure**
 
 Run: `npm run test -- --run src/features/auth src/features/users`
 
 Expected: FAIL because components/pages do not exist.
 
-- [ ] **Step 4: Implement login and protected account flow**
+- [x] **Step 4: Implement login and protected account flow**
 
 Use React Hook Form with Zod for client ergonomics while treating backend validation as authoritative. `ProtectedRoute` shows a neutral loading state during `/auth/me`/refresh and uses `router.replace`; never render protected children before authorization is known. Set protected layouts to dynamic/no-store behavior.
 
-- [ ] **Step 5: Implement ADMIN user management**
+- [x] **Step 5: Implement ADMIN user management**
 
 Provide a simple accessible table, explicit create form, role selector, active-state action, pagination controls, and confirmation before deactivation. Do not add employee profile fields or HR domain controls.
 
-- [ ] **Step 6: Run Task 8 gates**
+- [x] **Step 6: Run Task 8 gates**
 
 Run: `npm run test -- --run`
 
@@ -526,7 +526,7 @@ Run: `npm run lint && npm run typecheck && npm run build`
 
 Expected: all pass; production build contains public status, login, account, and admin users routes.
 
-- [ ] **Step 7: Commit Task 8**
+- [x] **Step 7: Commit Task 8**
 
 ```bash
 git add apps/web
@@ -551,11 +551,11 @@ git commit -m "feat(web): add authentication and user administration"
 - Consumes: every Phase 2 endpoint, environment variable, migration, CLI command, UI route, and image change.
 - Produces: reproducible bootstrap/login/rotation/logout/user-management runbook and final Phase 2 evidence.
 
-- [ ] **Step 1: Add a real end-to-end authentication test**
+- [x] **Step 1: Add a real end-to-end authentication test**
 
 Against PostgreSQL, bootstrap ADMIN, login, call `/auth/me`, create an HR user, login as HR, reject HR access to `/users`, change HR password, prove another HR family is revoked, rotate the current family, logout, and prove the old access and refresh cookies no longer work. Assert expected audits without secrets.
 
-- [ ] **Step 2: Update container and CI contracts**
+- [x] **Step 2: Update container and CI contracts**
 
 Ensure Compose supplies a nondefault CI-only `AUTH_ACCESS_SECRET`, exact `WEB_ORIGIN`, and correct cookie security mode; production examples remain placeholders. CI applies both revisions, runs the full PostgreSQL suite including concurrency tests, builds images from lock constraints, starts the clean stack, bootstraps an ADMIN through the CLI, exercises login/me/refresh/logout through HTTP with a cookie jar and CSRF header, and confirms web login page plus API proxy behavior.
 
@@ -563,15 +563,15 @@ Ensure Compose supplies a nondefault CI-only `AUTH_ACCESS_SECRET`, exact `WEB_OR
 
 Extend CI canaries so nested API/web env files and authentication secrets do not appear in final layers. Assert API runtime has Argon2/JWT runtime packages but not pytest/mypy/Ruff, both images remain UID/GID `10001:10001`, and no source test directories are present.
 
-- [ ] **Step 4: Update English and Vietnamese documentation**
+- [x] **Step 4: Update English and Vietnamese documentation**
 
 Document every auth variable, percent/secret requirements, first-ADMIN command, cookie behavior, local HTTP versus HTTPS, endpoint payload/status/error examples, database constraints, session-family replay semantics, password change, ADMIN management, audit actions, and recovery from a lost bootstrap password. Clearly state employee links remain `null` until Phase 3.
 
-- [ ] **Step 5: Update architecture implementation status**
+- [x] **Step 5: Update architecture implementation status**
 
 Mark only Phase 2 authentication artifacts complete. Keep Organization and later business phases planned.
 
-- [ ] **Step 6: Run the complete local gate**
+- [x] **Step 6: Run the complete local gate**
 
 Backend from `apps/api` with dedicated PostgreSQL:
 
@@ -603,7 +603,7 @@ Expected: every command exits zero and PostgreSQL integration tests do not skip.
 
 Use a unique project name and empty volume. Start the stack, run the interactive bootstrap safely, verify login and cookie attributes, current user, refresh rotation, CSRF rejection, logout revocation, ADMIN user creation, persistence across normal `down`/`up`, and final cleanup limited to that project. Record exact versions and the successful CI run in `docs/deployment.md`.
 
-- [ ] **Step 8: Review scope and tracked files**
+- [x] **Step 8: Review scope and tracked files**
 
 Confirm no plain passwords, signing keys, raw tokens, `.env` files, build output, Employee/domain tables, or later-phase features are tracked. Confirm migration history has one head and `git status --short` contains only intended documentation before commit.
 

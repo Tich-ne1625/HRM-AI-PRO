@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getApiStatus } from "../features/system-status/api";
 import { SystemStatus } from "../features/system-status/system-status";
 
@@ -15,19 +16,19 @@ export default async function HomePage() {
             <p className="mt-1 text-sm text-slate-600">Performance management platform</p>
           </div>
           <span className="rounded-full bg-slate-900 px-3 py-1.5 text-xs font-medium text-white">
-            Foundation
+            <Link href="/login">Đăng nhập</Link>
           </span>
         </header>
 
         <section className="grid items-start gap-10 lg:grid-cols-[1.4fr_0.8fr]">
           <div className="max-w-3xl">
-            <p className="text-sm font-semibold text-blue-700">Phase 1</p>
+            <p className="text-sm font-semibold text-blue-700">InsightHR</p>
             <h1 className="mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">
               A reliable foundation for fair, explainable performance reviews.
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600">
               The web application, API, migrations, and PostgreSQL readiness checks are wired
-              together. Employee workflows and authentication will be added in the next phases.
+              together. Sign in to manage your account. Employee workflows are coming in the next phase.
             </p>
           </div>
 

@@ -1,4 +1,4 @@
-name: Phase 1 CI
+name: InsightHR CI
 
 on:
   push:
@@ -32,6 +32,8 @@ jobs:
       APP_ENV: test
       DATABASE_URL: postgresql+psycopg://insighthr_test:insighthr-test-password@127.0.0.1:5432/insighthr_test
       TEST_DATABASE_URL: postgresql+psycopg://insighthr_test:insighthr-test-password@127.0.0.1:5432/insighthr_test
+      AUTH_ACCESS_SECRET: ci-only-signing-key-at-least-32-characters
+      WEB_ORIGIN: http://testserver
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6
@@ -64,6 +66,11 @@ jobs:
 
   docker-smoke:
     runs-on: ubuntu-latest
+    env:
+      APP_ENV: test
+      AUTH_ACCESS_SECRET: ci-only-compose-signing-key-at-least-32-characters
+      WEB_ORIGIN: http://localhost:3000
+      COOKIE_SECURE: "false"
     steps:
       - uses: actions/checkout@v5
       - name: Validate Compose model
@@ -112,17 +119,27 @@ jobs:
         run: |
           test "$(docker image inspect insighthr-api:local --format '{{.Config.User}}')" = "10001:10001"
           test "$(docker image inspect insighthr-web:local --format '{{.Config.User}}')" = "10001:10001"
-          docker run --rm --entrypoint python insighthr-api:local -c "import importlib.util; assert importlib.util.find_spec('pytest') is None"
+          docker run --rm --entrypoint python insighthr-api:local -c "import importlib.util; import argon2, jwt; assert all(importlib.util.find_spec(name) is None for name in ['pytest', 'mypy', 'ruff']); from pathlib import Path; assert not Path('/app/tests').exists()"
           docker run --rm --entrypoint sh insighthr-api:local -c 'test -z "$(find /app -type f \( -name .env -o -name ".env.*" \) -print -quit)"'
           docker run --rm --entrypoint sh insighthr-web:local -c 'test -z "$(find /app -type f \( -name .env -o -name ".env.*" \) -print -quit)"'
+          docker run --rm --entrypoint python insighthr-api:local -c "import os; assert os.getenv('AUTH_ACCESS_SECRET') is None"
+          docker run --rm --entrypoint sh insighthr-web:local -c 'test ! -d /app/src/test && test ! -d /app/src/features/auth/__tests__'
+      - name: Verify authentication through web proxy
+        run: |
+          curl --fail --silent http://localhost:3000/login | grep 'Đang kiểm tra phiên đăng nhập'
+          python scripts/smoke_auth.py --compose-project insighthr-ci
       - name: Verify persistence across normal restart
         run: |
           revision_before="$(docker compose --project-name insighthr-ci --env-file .env.example exec -T postgres sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc "SELECT version_num FROM alembic_version"' | tr -d '[:space:]')"
-          test "$revision_before" = "20261003_0001"
+          test "$revision_before" = "20261003_0002"
+          users_before="$(docker compose --project-name insighthr-ci --env-file .env.example exec -T postgres sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc "SELECT count(*) FROM users"' | tr -d '[:space:]')"
+          test "$users_before" -ge 2
           docker compose --project-name insighthr-ci --env-file .env.example down
           docker compose --project-name insighthr-ci --env-file .env.example up --detach --wait --no-build postgres
           revision_after_restart="$(docker compose --project-name insighthr-ci --env-file .env.example exec -T postgres sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc "SELECT version_num FROM alembic_version"' | tr -d '[:space:]')"
           test "$revision_after_restart" = "$revision_before"
+          users_after="$(docker compose --project-name insighthr-ci --env-file .env.example exec -T postgres sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc "SELECT count(*) FROM users"' | tr -d '[:space:]')"
+          test "$users_after" = "$users_before"
           docker compose --project-name insighthr-ci --env-file .env.example up --detach --wait --no-build
           curl --fail --silent http://127.0.0.1:8000/health/ready | grep '"status":"ready"'
           curl --fail --silent http://127.0.0.1:3000 | grep 'API connected'

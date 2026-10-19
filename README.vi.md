@@ -18,7 +18,7 @@ Phase 1 đã hoàn thành:
 - Docker Compose thực hiện migration trước khi khởi động API và web.
 - GitHub Actions kiểm tra backend, frontend, image, migration và khả năng giữ dữ liệu sau khi khởi động lại.
 
-Authentication và RBAC thuộc Phase 2. Các chức năng nghiệp vụ như nhân viên, phòng ban, chu kỳ đánh giá, KPI, phản hồi, tính điểm, Gemini và dashboard chưa được triển khai.
+API và giao diện Phase 2 đã được triển khai: đăng nhập bằng cookie bảo mật, refresh token rotation và chống dùng lại, đăng xuất, đổi mật khẩu, xem tài khoản hiện tại, phân quyền theo role trong DB, quản trị tài khoản ADMIN và ghi audit trong cùng giao dịch. Bằng chứng nghiệm thu container được cập nhật trong [hướng dẫn triển khai](docs/deployment.md). Các chức năng nhân viên, phòng ban, chu kỳ đánh giá, KPI, phản hồi, tính điểm, Gemini và dashboard thuộc những phase sau; `employee_id` hiện luôn là `null`.
 
 ## Công nghệ
 
@@ -130,7 +130,7 @@ alembic revision --autogenerate -m "mo ta thay doi schema"
 alembic upgrade head
 ```
 
-Luôn kiểm tra migration được sinh ra trước khi chạy. Phase 1 chỉ có baseline rỗng `20261003_0001`; các bảng nghiệp vụ được bổ sung trong những phase sau.
+Luôn kiểm tra migration được sinh ra trước khi chạy. Head hiện tại là `20261003_0002`, nối sau baseline `20261003_0001`, tạo các bảng `users`, `auth_sessions` và `audit_logs`.
 
 ## Kiểm thử và kiểm tra chất lượng
 
@@ -143,7 +143,7 @@ python -m ruff check app tests alembic
 python -m mypy app
 ```
 
-Không trỏ `TEST_DATABASE_URL` vào database development, staging hoặc production vì fixture integration sẽ xóa bảng `alembic_version`.
+Chỉ dùng database kiểm thử riêng có tên kết thúc bằng `_test`. Fixture sẽ xóa các bảng user/session/audit và `alembic_version`; không dùng database có dữ liệu cần giữ.
 
 Frontend từ `apps/web`:
 
@@ -160,7 +160,30 @@ npm run build
 
 `POSTGRES_PASSWORD_URLENCODED` phải là dạng percent-encoded của `POSTGRES_PASSWORD`. Docker Compose dùng giá trị đã mã hóa khi tạo `DATABASE_URL`. Mọi file `.env` đều bị Git bỏ qua và bị loại khỏi Docker build context.
 
-Phase 1 chưa chứa secret xác thực hoặc Gemini. Các biến đó chỉ được thêm ở phase sở hữu chức năng tương ứng.
+`AUTH_ACCESS_SECRET` là khóa ký access token, cần giá trị riêng có ít nhất 32 ký tự trong test/production. Giá trị mẫu chỉ dành cho development. `WEB_ORIGIN` phải đúng origin của trình duyệt, ví dụ `http://localhost:3000` (không có dấu `/` ở cuối); đổi cổng web thì phải sửa origin tương ứng. `localhost` và `127.0.0.1` là hai origin khác nhau.
+
+`COOKIE_SECURE=false` chỉ dùng cho HTTP local; production cần HTTPS và `COOKIE_SECURE=true`. `ACCESS_TOKEN_MINUTES=15`, `REFRESH_SESSION_DAYS=7`: refresh giữ nguyên thời hạn tuyệt đối của phiên, không gia hạn thêm bảy ngày mỗi lần. Chưa có cấu hình Gemini ở phase này.
+
+## Tạo ADMIN đầu tiên và dùng ứng dụng
+
+Sau khi Compose đã chạy và migration thành công, từ thư mục gốc repository:
+
+```powershell
+docker compose --env-file .env exec api python -m app.cli.create_admin --email admin@example.com
+```
+
+Lệnh hỏi mật khẩu hai lần và không hiển thị khi gõ. Mật khẩu cần 12–128 ký tự Unicode, không bị tự cắt khoảng trắng. Nếu chạy API trực tiếp, dùng `python -m app.cli.create_admin --email admin@example.com` trong `apps/api` với virtual environment đang hoạt động. Chế độ `--password-stdin` đọc hai dòng trùng nhau cho CI; không đưa mật khẩu vào đối số lệnh, biến môi trường hoặc lịch sử terminal.
+
+1. Mở `http://localhost:3000/login`, nhập email và mật khẩu vừa tạo.
+2. Trang `/account` hiển thị email, role, nút đăng xuất và form đổi mật khẩu. Đổi mật khẩu cần mật khẩu hiện tại, mật khẩu mới khác mật khẩu cũ và xác nhận khớp; các phiên khác bị thu hồi.
+3. ADMIN mở liên kết **Quản lý tài khoản** hoặc `/admin/users`: xem danh sách/phân trang, tạo tài khoản, đổi role và kích hoạt/vô hiệu hóa. Vô hiệu hóa cần xác nhận và thu hồi mọi phiên của tài khoản đó.
+4. Hệ thống không cho hạ quyền hoặc vô hiệu hóa ADMIN đang hoạt động cuối cùng, kể cả hai yêu cầu cùng lúc. ADMIN chỉ quản trị hệ thống, không tự có quyền HR.
+
+Cookie access/refresh là HttpOnly, trình duyệt tự gửi; ứng dụng không lưu token trong localStorage. Cookie CSRF có thể đọc bởi web để gửi `X-CSRF-Token` cho thao tác ghi. Backend kiểm tra cả Origin và CSRF gắn với phiên; không tắt các kiểm tra này khi gặp lỗi 403.
+
+Nếu quên mật khẩu bootstrap: chưa có chức năng reset qua email. Người vận hành có quyền máy chủ có thể tạo ADMIN mới bằng lệnh trên với **email khác**, đăng nhập rồi vô hiệu hóa tài khoản mất quyền truy cập. Lệnh không ghi đè tài khoản trùng email. Không sửa trực tiếp hash trong DB. Xem [runbook vận hành](docs/deployment.md#phase-2-authentication-operations).
+
+Trên PowerShell nếu `npm.ps1` bị chặn, dùng `npm.cmd` thay cho `npm`; không cần thay đổi execution policy toàn máy.
 
 ## Tài liệu liên quan
 
@@ -174,4 +197,4 @@ Phase 1 chưa chứa secret xác thực hoặc Gemini. Các biến đó chỉ đ
 
 ## Các phase tiếp theo
 
-Phase 2 triển khai đăng nhập, refresh token rotation, logout, RBAC, quản trị tài khoản ADMIN và chính sách bảo mật dùng chung. Các phase sau lần lượt bổ sung tổ chức và nhân viên, chu kỳ/KPI, phản hồi, tính điểm, Gemini, dashboard, kiểm thử tích hợp bảo mật và Kubernetes.
+Phase 3 sẽ bổ sung phòng ban, chức danh và hồ sơ nhân viên, liên kết user–employee cùng quyền truy cập theo phạm vi tổ chức. Các phase sau tiếp tục chu kỳ/KPI, phản hồi, tính điểm, Gemini, dashboard, kiểm thử tích hợp bảo mật và Kubernetes. Không tự tạo dữ liệu demo hoặc bảng nghiệp vụ trước phase tương ứng.

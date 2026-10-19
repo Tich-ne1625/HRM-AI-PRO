@@ -24,7 +24,12 @@ services:
       dockerfile: infrastructure/docker/api.Dockerfile
     user: "10001:10001"
     environment:
-      APP_ENV: development
+      APP_ENV: ${APP_ENV:-development}
+      AUTH_ACCESS_SECRET: ${AUTH_ACCESS_SECRET:-development-only-change-me-signing-key}
+      WEB_ORIGIN: ${WEB_ORIGIN:-http://localhost:3000}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      ACCESS_TOKEN_MINUTES: ${ACCESS_TOKEN_MINUTES:-15}
+      REFRESH_SESSION_DAYS: ${REFRESH_SESSION_DAYS:-7}
       DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-insighthr}:${POSTGRES_PASSWORD_URLENCODED:-change-me%40local-only}@postgres:5432/${POSTGRES_DB:-insighthr}
       CORS_ALLOWED_ORIGINS: '["http://localhost:${WEB_PORT:-3000}"]'
       ALEMBIC_CONFIG_PATH: /app/alembic.ini
@@ -42,7 +47,12 @@ services:
       dockerfile: infrastructure/docker/api.Dockerfile
     user: "10001:10001"
     environment:
-      APP_ENV: development
+      APP_ENV: ${APP_ENV:-development}
+      AUTH_ACCESS_SECRET: ${AUTH_ACCESS_SECRET:-development-only-change-me-signing-key}
+      WEB_ORIGIN: ${WEB_ORIGIN:-http://localhost:3000}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      ACCESS_TOKEN_MINUTES: ${ACCESS_TOKEN_MINUTES:-15}
+      REFRESH_SESSION_DAYS: ${REFRESH_SESSION_DAYS:-7}
       DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-insighthr}:${POSTGRES_PASSWORD_URLENCODED:-change-me%40local-only}@postgres:5432/${POSTGRES_DB:-insighthr}
       CORS_ALLOWED_ORIGINS: '["http://localhost:${WEB_PORT:-3000}"]'
       ALEMBIC_CONFIG_PATH: /app/alembic.ini

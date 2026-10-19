@@ -50,7 +50,7 @@ def get_auth_context(
 
 def require_roles(
     *allowed: UserRole,
-) -> Callable[..., AuthContext]:
+) -> Callable[[AuthContext], AuthContext]:
     def policy(context: Annotated[AuthContext, Depends(get_auth_context)]) -> AuthContext:
         if context.user.role not in allowed:
             raise ApiError(403, "forbidden", "Access is forbidden")

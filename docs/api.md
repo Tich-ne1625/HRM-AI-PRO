@@ -1,5 +1,55 @@
 # API contract
 
+## Authentication and accounts (Phase 2)
+
+All responses use `Cache-Control: no-store` for successful personalized endpoints. Public user JSON contains only `id`, normalized `email`, `role`, `is_active`, `employee_id` (currently `null`). No response returns a password/hash or access/refresh token in JSON.
+
+| Method/path under `/api/v1` | Input | Success | Authorization |
+| --- | --- | --- | --- |
+| `POST /auth/login` | `{"email":"admin@example.com","password":"<password>"}` | `200` user + cookies | Exact Origin |
+| `GET /auth/me` | None | `200` user | Valid access + current user/family |
+| `POST /auth/refresh` | No body | Empty `204` + rotated cookies | Refresh cookie, Origin, CSRF |
+| `POST /auth/logout` | No body | Empty `204`, clears cookies | Access, active family, Origin, CSRF |
+| `POST /auth/change-password` | `{"old_password":"<old>","new_password":"<new>"}` | Empty `204` | Access, active family, Origin, CSRF |
+| `GET /users` | Query parameters below | `200` page | Current ADMIN |
+| `POST /users` | `{"email":"hr@example.com","password":"<initial>","role":"HR"}` | `201` user | Current ADMIN, Origin, CSRF |
+| `PATCH /users/{uuid}` | `{"role":"MANAGER","is_active":false}`; one or both fields | `200` user | Current ADMIN, Origin, CSRF |
+
+Passwords contain 12–128 Unicode characters and are not trimmed. Replacement must differ from current. Login accepts shorter existing password input for verification; account creation enforces policy. No self-registration or email reset is provided. Roles: `ADMIN`, `HR`, `MANAGER`, `EMPLOYEE`; ADMIN has no implicit HR privileges.
+
+`GET /users?page=1&page_size=20&sort=email&role=HR&is_active=true` returns `{"items":[],"total":0,"page":1,"page_size":20}`. Page starts at 1; page size is 1–100; ascending sort permits only `email`, `created_at`, `role`, `is_active`, with UUID tie-breaking. Role/status filters are optional. PATCH rejects empty, unknown-only, or explicitly null updates.
+
+### Cookies and mutation headers
+
+| Cookie | Path | HttpOnly | Lifetime |
+| --- | --- | --- | --- |
+| `insighthr_access` | `/` | Yes | 15 minutes by default |
+| `insighthr_refresh` | `/api/v1/auth/refresh` | Yes | Remaining absolute family lifetime |
+| `insighthr_csrf` | `/` | No | Same absolute family lifetime |
+
+All use SameSite=Lax and Secure according to validated configuration. HTTPS production requires Secure. Login/refresh set cookies; logout deletes each with its original attributes/path. Use the same browser origin for web and `/api/v1/*`; Next.js proxies API calls. Origin must match `WEB_ORIGIN` byte-for-byte, including scheme/host/port, with exactly one header and no trailing slash. Missing/null/comma-separated/duplicate origins are rejected.
+
+For mutations, send `Origin: <WEB_ORIGIN>` and `X-CSRF-Token: <insighthr_csrf cookie value>`. Header/cookie must match and their SHA-256 must match the session family. Login requires Origin but no CSRF. Reads need neither Origin nor CSRF. Refresh preserves family CSRF and absolute expiry; a consumed token presented with valid family CSRF revokes its whole family. Authorization always checks the current DB user and an active family, so replay/logout/deactivation immediately invalidate existing signed access tokens.
+
+### Stable errors
+
+| Status/code | Meaning |
+| --- | --- |
+| `401 invalid_credentials` | Wrong, unknown, or inactive login; also wrong old password |
+| `401 authentication_required` | Missing/invalid access or inactive/missing user/family on protected reads |
+| `401 invalid_session` | Missing/random/expired/revoked refresh; invalid access session for auth mutations |
+| `401 refresh_reuse_detected` | Consumed refresh replay; family revocation committed |
+| `403 origin_not_allowed` | Exact Origin check failed |
+| `403 csrf_failed` | Missing/mismatched/cross-family CSRF |
+| `403 forbidden` | Current DB role lacks permission |
+| `404 user_not_found` | Target user does not exist |
+| `409 email_already_exists` | Normalized duplicate email |
+| `409 last_active_admin` | Would remove the final active ADMIN |
+| `422 validation_error` / `invalid_password` | Invalid input or replacement policy |
+| `500 internal_server_error` | Sanitized internal failure; transaction rolled back |
+
+Errors follow the envelope below. Audit/database failures do not commit partial changes. Client code retries an authenticated request only once after one shared refresh; login and refresh never recursively refresh themselves.
+
 ## Base paths
 
 Operational health endpoints are intentionally unversioned:
@@ -7,7 +57,7 @@ Operational health endpoints are intentionally unversioned:
 - `GET /health/live`
 - `GET /health/ready`
 
-Business endpoints will use `/api/v1` beginning in Phase 2. Phase 1 does not expose placeholder business routes.
+Implemented authentication and account-management endpoints use `/api/v1`. OpenAPI is available at `/docs`. Health routes remain public.
 
 ## Liveness
 

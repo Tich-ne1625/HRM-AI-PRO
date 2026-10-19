@@ -2,7 +2,50 @@
 
 ## Environment files
 
-The repository root `.env.example` lists every Phase 1 variable. Compose reads a root `.env`; direct-host applications read `apps/api/.env` and `apps/web/.env.local` from their respective working directories.
+The repository root `.env.example` lists foundation and authentication variables. Compose reads a root `.env`; direct-host applications read `apps/api/.env` and `apps/web/.env.local` from their respective working directories.
+
+## Phase 2 authentication operations
+
+| Variable | Contract |
+| --- | --- |
+| `AUTH_ACCESS_SECRET` | Signing key, nondefault and at least 32 characters in test/production; replace the development placeholder before shared use |
+| `WEB_ORIGIN` | Exact browser origin, no trailing slash; e.g. `http://localhost:3000`. Changing port/hostname requires changing this value |
+| `COOKIE_SECURE` | False only for explicit local HTTP; production requires true and HTTPS |
+| `ACCESS_TOKEN_MINUTES` | Positive integer; default 15 |
+| `REFRESH_SESSION_DAYS` | Positive integer; default 7, fixed absolute family expiry |
+| `API_INTERNAL_URL` | Server-only API origin; never `NEXT_PUBLIC_*`. Rewrites resolve during web build; local default localhost:8000, image builder defaults api:8000 |
+
+Compose forwards auth settings to migrate/API. Production must supply a real signing key via an environment/secret store, secure cookies and the correct HTTPS origin; this local Compose database is not a production operations design. Raw PostgreSQL passwords and their percent-encoded URL forms must remain equivalent. Do not percent-encode signing keys. Never put credentials/tokens into Git, command arguments or logs.
+
+After migrations, bootstrap the first administrator from repository root:
+
+```bash
+docker compose --env-file .env exec api python -m app.cli.create_admin --email admin@example.com
+```
+
+The CLI uses hidden interactive prompts and confirms a 12–128 Unicode-character password. If no interactive TTY is available it refuses to echo a password. Direct-host alternative from `apps/api`: `python -m app.cli.create_admin --email admin@example.com`. `--password-stdin` reads two matching lines for automation; supply them through a secret provider or process stdin, never literal shell arguments/history. Creation and `user.bootstrap_created` audit commit atomically; duplicate email or validation failure changes nothing.
+
+Open `/login`, then `/account`; ADMIN can open `/admin/users`. Every employee reference remains null until Phase 3. ADMIN does not inherit HR privileges. Account changes require exact Origin and family-bound CSRF; the browser client reads only the CSRF cookie, never the HttpOnly access/refresh cookies. A 403 origin error commonly means a trailing slash, port mismatch or localhost versus 127.0.0.1; fix configuration rather than bypassing checks.
+
+Access lasts 15 minutes by default. The client shares one refresh across concurrent 401s and retries once. Refresh consumes a token, preserves absolute expiry/CSRF, and issues only cookies. Reuse with valid family CSRF revokes the whole family. Logout clears matching cookie paths and revokes the family. Password change keeps the caller's family and revokes every other family; deactivation revokes all families. Current DB role/status is always authoritative.
+
+### Lost administrator password
+
+Phase 2 has no email reset or administrative password-reset endpoint. An operator with trusted host access can create a replacement ADMIN with a different email through the bootstrap CLI, log in, and deactivate the lost account. Duplicate-email bootstrap does not overwrite passwords. Do not edit password hashes directly or delete users/audits. If another active ADMIN exists, they can manage role/status but cannot retrieve or reset another user's password through the UI.
+
+### Acceptance and reproducibility
+
+The workflow `.github/workflows/phase1-ci.yml` is named **InsightHR CI** and retains its filename to preserve existing branch checks. It runs PostgreSQL unit/integration/concurrency tests and web tests/lint/types/build, builds nonroot locked images, checks runtime contents, starts a fresh Compose project, and exercises authentication through the actual Next.js proxy. `scripts/smoke_auth.py` generates passwords in memory, bootstraps via process stdin, and checks login/me, ADMIN creation, HR denial, CSRF rejection, password revocation, refresh and logout. It never prints credentials.
+
+For an already running disposable acceptance project:
+
+```bash
+python scripts/smoke_auth.py --compose-project insighthr-acceptance
+```
+
+That command creates disposable accounts; choose the project intentionally. Use a unique Compose project/empty volume when checking a clean install. Normal `down`/`up` must preserve users and revision `20261003_0002`; CI checks counts before migrations run again. Cleanup must name only that acceptance project. An HTTPS deployment additionally needs a real browser cookie check with Secure enabled.
+
+Local evidence on 2026-10-19: Python 3.12/PostgreSQL suite passed all 387 tests including the final end-to-end acceptance test; frontend 35 tests, ESLint, TypeScript and production build passed with Node 26.8.1 (images/CI target Node 24). `npm audit --omit=dev` reported zero vulnerabilities; full audit reported five high findings in the existing ESLint → fast-glob → micromatch → braces dev-tool chain, with no compatible fix offered (the suggested downgrade to Next 14 is not applied). Local clean-container execution remains unavailable because Docker's Linux engine/WSL prerequisite is absent. Final Phase 2 CI evidence is recorded below after the workflow runs; Phase 1's older successful run does not validate Phase 2.
 
 The sample password is for an isolated local workstation only. Replace it before using a shared network or CI secret store. `POSTGRES_PASSWORD` is the raw PostgreSQL password; `POSTGRES_PASSWORD_URLENCODED` is its percent-encoded equivalent for Compose's SQLAlchemy URL. If a direct-host database password contains URL-reserved characters, percent-encode it in `DATABASE_URL` as well.
 

@@ -8,7 +8,7 @@ The project is a modular monolith: a Next.js web application, a FastAPI backend,
 
 ## Current scope
 
-Phase 1 is implemented: repository conventions, validated API configuration, stable API errors, liveness/readiness checks, PostgreSQL/Alembic integration, a Next.js system-status page, production container definitions, Docker Compose, and CI verification. Authentication and business features begin in Phase 2 and are not implemented yet.
+Phase 1 foundation and Phase 2 authentication API/UI are implemented: secure cookie login, refresh rotation/replay detection, logout, password change, current identity, ADMIN account management, transactional audits, and reusable role policies. Container acceptance evidence is recorded in [deployment.md](docs/deployment.md). Organization and employee workflows begin in Phase 3; `employee_id` remains `null`.
 
 ## Technology stack
 
@@ -63,6 +63,16 @@ docker compose --env-file .env up --build --wait
 
 Open `http://localhost:3000`. The page should report `API connected`.
 
+Create the first administrator interactively, without passing a password in arguments:
+
+```bash
+docker compose --env-file .env exec api python -m app.cli.create_admin --email admin@example.com
+```
+
+Enter the same 12–128-character password twice. Open `http://localhost:3000/login`, sign in, and visit `/account`. ADMIN accounts can open `/admin/users` to create accounts, change roles, and activate/deactivate users. The final active ADMIN is protected. ADMIN does not inherit HR permissions.
+
+For a direct-host API, run `python -m app.cli.create_admin --email admin@example.com` from `apps/api`. `--password-stdin` is available for automation and reads two matching lines; do not put passwords in environment variables, process arguments, or shell history. See the [authentication runbook](docs/deployment.md#phase-2-authentication-operations).
+
 Operational endpoints:
 
 - `http://localhost:8000/health/live`
@@ -116,7 +126,7 @@ alembic revision --autogenerate -m "describe the schema change"
 alembic upgrade head
 ```
 
-Review every generated migration before running it. Phase 1 contains the empty baseline revision `20261003_0001`; domain tables begin in later phases.
+Review every generated migration before running it. The sole head is `20261003_0002`, after baseline `20261003_0001`; it adds users, refresh sessions, and audits.
 
 ## Tests and quality gates
 
@@ -138,15 +148,17 @@ npm run typecheck
 npm run build
 ```
 
-The integration fixture removes the `alembic_version` table. Never point `TEST_DATABASE_URL` at a development, staging, or production database.
+The integration fixture drops user/session/audit tables and `alembic_version`; the database name must end in `_test`. Never use a database containing application data.
 
 ## Environment and secrets
 
-`.env.example` is the public configuration contract. Copy it to `.env` and replace the sample password for any shared environment. `POSTGRES_PASSWORD_URLENCODED` must be the percent-encoded form of the raw `POSTGRES_PASSWORD`; Compose uses the encoded value inside `DATABASE_URL`. `.env` files are ignored by Git and excluded recursively from image build contexts. Phase 1 does not contain authentication or Gemini secrets.
+`.env.example` is the public configuration contract. Copy it to `.env` and replace the sample password for any shared environment. `POSTGRES_PASSWORD_URLENCODED` must be the percent-encoded form of the raw `POSTGRES_PASSWORD`; Compose uses the encoded value inside `DATABASE_URL`. `.env` files are ignored by Git and excluded recursively from image build contexts.
+
+Set `AUTH_ACCESS_SECRET` to a nondefault key of at least 32 characters outside development. `WEB_ORIGIN` must match the browser's exact scheme, hostname, and port, without a trailing slash. `COOKIE_SECURE=true` is mandatory for production HTTPS; local HTTP uses `false`. Access defaults to 15 minutes (`ACCESS_TOKEN_MINUTES`), with fixed seven-day families (`REFRESH_SESSION_DAYS`). Change `WEB_ORIGIN` when changing `WEB_PORT`. Browser code never receives the signing key or `API_INTERNAL_URL`; the API proxy destination is fixed when building the web image. See [configuration and recovery](docs/deployment.md#phase-2-authentication-operations).
 
 ## Future phases
 
-Authentication and RBAC are Phase 2. Departments, positions, employees, review cycles, KPI scoring, feedback, performance calculations, Gemini analysis, dashboards, seed data, and Kubernetes will be added incrementally according to [the architecture](docs/architecture.md). Gemini configuration and demo seed commands will be documented when their implementations exist.
+Phase 3 introduces departments, positions, employee records, user–employee links, and organization-scoped access. Review cycles, KPIs, feedback, performance scoring, Gemini, dashboards, seed data, and Kubernetes follow [the architecture](docs/architecture.md).
 
-The reviewed implementation sequence for the next slice is in the [Phase 2 authentication plan](docs/superpowers/plans/2026-10-03-phase-2-authentication.md).
+The [Phase 2 implementation plan](docs/superpowers/plans/2026-10-03-phase-2-authentication.md) records the authentication sequence and verification gates.
 
