@@ -7,6 +7,21 @@ from app.modules.audit.models import AuditLog, AuditValue
 
 # Services construct these small metadata objects explicitly; never pass request bodies.
 ALLOWED_METADATA_KEYS = frozenset({"role", "previous_role", "is_active", "previous_is_active"})
+ORGANIZATION_METADATA_KEYS = frozenset(
+    {
+        "changed_fields",
+        "code",
+        "is_active",
+        "employee_code",
+        "department_id",
+        "position_id",
+        "manager_id",
+        "user_id",
+        "employment_status",
+        "previous_user_id",
+        "previous_manager_id",
+    }
+)
 
 
 class AuditWriter:
@@ -20,7 +35,12 @@ class AuditWriter:
         request_id: str,
         metadata: Mapping[str, AuditValue],
     ) -> AuditLog:
-        if metadata.keys() - ALLOWED_METADATA_KEYS:
+        allowed = (
+            ORGANIZATION_METADATA_KEYS
+            if action.startswith(("department.", "position.", "employee."))
+            else ALLOWED_METADATA_KEYS
+        )
+        if metadata.keys() - allowed:
             raise ValueError("Audit metadata contains an unsupported field")
         record = AuditLog(
             actor_id=actor_id,

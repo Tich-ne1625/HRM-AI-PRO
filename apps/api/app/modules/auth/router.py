@@ -18,16 +18,20 @@ from app.modules.auth.cookies import clear_auth_cookies, set_auth_cookies
 from app.modules.auth.models import AuthSession
 from app.modules.auth.schemas import ChangePasswordRequest, CurrentUser, LoginCommand, LoginRequest
 from app.modules.auth.service import AuthService
+from app.modules.users.presenters import current_user
 
 router = APIRouter(prefix="/api/v1/auth", tags=["auth"])
 
 
 @router.get("/me", response_model=CurrentUser)
 def me(
-    response: Response, context: Annotated[AuthContext, Depends(get_auth_context)]
+    response: Response,
+    context: Annotated[AuthContext, Depends(get_auth_context)],
+    session: Annotated[Session, Depends(get_db_session)],
 ) -> CurrentUser:
     response.headers["Cache-Control"] = "no-store"
-    return CurrentUser.model_validate(context.user)
+    with session.begin():
+        return current_user(session, context.user)
 
 
 def require_same_origin(request: Request) -> None:

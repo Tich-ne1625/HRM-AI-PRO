@@ -15,6 +15,7 @@ from app.modules.auth.models import AuthSession
 from app.modules.auth.repository import AuthSessionRepository
 from app.modules.auth.schemas import CurrentUser
 from app.modules.users.models import User, UserRole
+from app.modules.users.presenters import current_user, current_users
 from app.modules.users.repository import UserRepository
 from app.modules.users.schemas import UserCreate, UserPage, UserUpdate
 
@@ -50,7 +51,7 @@ class UserService:
                 .limit(page_size)
             ).all()
             return UserPage(
-                items=[CurrentUser.model_validate(row) for row in rows],
+                items=current_users(self.session, rows),
                 total=total,
                 page=page,
                 page_size=page_size,
@@ -109,7 +110,7 @@ class UserService:
                     request_id,
                     {"role": user.role.value},
                 )
-                return CurrentUser.model_validate(user)
+                return current_user(self.session, user)
         except IntegrityError as error:
             if getattr(error.orig, "sqlstate", None) == "23505":
                 raise ApiError(409, "email_already_exists", "Email already exists") from None
@@ -172,4 +173,4 @@ class UserService:
                     {"previous_is_active": previous_active, "is_active": next_active},
                 )
             self.session.flush()
-            return CurrentUser.model_validate(user)
+            return current_user(self.session, user)

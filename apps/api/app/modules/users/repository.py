@@ -1,8 +1,10 @@
+from collections.abc import Sequence
 from uuid import UUID
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from app.modules.employees.models import Employee
 from app.modules.users.models import User, UserRole
 
 
@@ -18,6 +20,16 @@ class UserRepository:
 
     def get_by_id(self, user_id: UUID) -> User | None:
         return self.session.get(User, user_id)
+
+    def get_employee_ids(self, user_ids: Sequence[UUID]) -> dict[UUID, UUID]:
+        if not user_ids:
+            return {}
+        rows = self.session.execute(
+            select(Employee.user_id, Employee.id).where(
+                Employee.user_id.in_(user_ids),
+            )
+        )
+        return {user_id: employee_id for user_id, employee_id in rows if user_id is not None}
 
     def get_by_id_for_update(self, user_id: UUID) -> User | None:
         return self.session.scalar(

@@ -21,6 +21,7 @@ from app.modules.auth.models import AuthSession
 from app.modules.auth.repository import AuthSessionRepository
 from app.modules.auth.schemas import ChangePasswordRequest, CurrentUser, LoginCommand
 from app.modules.users.models import User
+from app.modules.users.presenters import current_user
 from app.modules.users.repository import UserRepository
 
 # Fixed, valid Argon2id hash with the same work parameters as account passwords.
@@ -89,7 +90,7 @@ class AuthService:
                     )
                 )
                 result = AuthResult(
-                    user=CurrentUser.model_validate(user),
+                    user=current_user(self.session, user),
                     access_token=SecretStr(self.tokens.create_access_token(user.id, family_id)),
                     refresh_token=SecretStr(refresh_token),
                     csrf_token=SecretStr(csrf_token),
@@ -156,7 +157,7 @@ class AuthService:
                     consumed_at=now,
                 )
                 result = AuthResult(
-                    user=CurrentUser.model_validate(user),
+                    user=current_user(self.session, user),
                     access_token=SecretStr(self.tokens.create_access_token(user.id, row.family_id)),
                     refresh_token=SecretStr(refresh),
                     csrf_token=SecretStr(csrf_token or ""),

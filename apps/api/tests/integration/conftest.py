@@ -14,6 +14,8 @@ from alembic import command
 from app.core.config import Settings, get_settings
 from app.core.database import get_engine
 
+from .organization_fixtures import world as world
+
 ALEMBIC_INI = Path(__file__).resolve().parents[2] / "alembic.ini"
 
 
