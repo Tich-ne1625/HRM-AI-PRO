@@ -17,8 +17,10 @@ from .conftest import ALEMBIC_INI
 pytestmark = pytest.mark.integration
 
 
-def test_authentication_revision_is_head() -> None:
-    assert ScriptDirectory.from_config(Config(str(ALEMBIC_INI))).get_heads() == ["20261003_0002"]
+def test_authentication_revision_remains_in_the_single_migration_chain() -> None:
+    scripts = ScriptDirectory.from_config(Config(str(ALEMBIC_INI)))
+    assert len(scripts.get_heads()) == 1
+    assert "20261003_0002" in {revision.revision for revision in scripts.walk_revisions()}
 
 
 def test_model_aggregation_matches_the_migrated_schema(auth_engine: Engine) -> None:

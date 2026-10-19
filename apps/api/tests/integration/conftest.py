@@ -21,7 +21,15 @@ def drop_test_tables(engine: Engine) -> None:
     if not (engine.url.database or "").endswith("_test"):
         raise ValueError("Cleanup requires an explicitly disposable _test database")
     with engine.begin() as connection:
-        for table in ("audit_logs", "auth_sessions", "users", "alembic_version"):
+        for table in (
+            "employees",
+            "positions",
+            "departments",
+            "audit_logs",
+            "auth_sessions",
+            "users",
+            "alembic_version",
+        ):
             connection.execute(text(f"DROP TABLE IF EXISTS {table}"))
 
 
