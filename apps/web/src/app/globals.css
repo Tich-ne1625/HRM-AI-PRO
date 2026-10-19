@@ -58,3 +58,14 @@ td { font-size: .9rem; }
 .confirmation button { margin-right: .5rem; }
 @media (min-width: 800px) { .create-user-form { grid-template-columns: 1fr 1fr 12rem; align-items: end; } }
 
+.section-heading { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.filters { grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); align-items: end; }
+.directory-reference-filter { max-width: 24rem; margin-bottom: 1.5rem; }
+.row-actions { display: flex; gap: .5rem; flex-wrap: wrap; }
+.auth-card .checkbox-label { display: flex; gap: .65rem; align-items: center; }
+.auth-card input[type="checkbox"] { width: auto; }
+.form-grid, .detail-grid { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr)); }
+.auth-card h3 { font-weight: 650; margin: 1.5rem 0 .75rem; }
+.auth-card hr { border: 0; border-top: 1px solid #e2e8f0; margin: 2rem 0; }
+.workspace-header nav { flex-wrap: wrap; gap: .8rem 1.2rem; }
+
