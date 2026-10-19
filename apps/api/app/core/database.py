@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+from collections.abc import Iterator
+from typing import cast
+
+from fastapi import Request
 from psycopg import Connection
 from sqlalchemy import Engine, MetaData, create_engine, event
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
@@ -38,3 +42,15 @@ def _set_utc_timezone(
 
 def get_session_factory(engine: Engine) -> sessionmaker[Session]:
     return sessionmaker(bind=engine, autoflush=False, expire_on_commit=False)
+
+
+def get_db_session(request: Request) -> Iterator[Session]:
+    factory = cast(sessionmaker[Session], request.app.state.session_factory)
+    session = factory()
+    try:
+        yield session
+    except BaseException:
+        session.rollback()
+        raise
+    finally:
+        session.close()

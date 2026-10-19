@@ -6,8 +6,9 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 from app.core.config import Settings, get_settings
-from app.core.database import get_engine
+from app.core.database import get_engine, get_session_factory
 from app.core.errors import register_error_handling
+from app.modules.auth.router import router as auth_router
 from app.modules.health.router import router as health_router
 from app.modules.health.service import ReadinessService
 
@@ -23,12 +24,14 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app = FastAPI(title=application_settings.app_name, lifespan=lifespan)
     app.state.settings = application_settings
     app.state.engine = get_engine(application_settings)
+    app.state.session_factory = get_session_factory(app.state.engine)
     app.state.readiness_service = ReadinessService(
         app.state.engine,
         application_settings.alembic_config_path,
     )
     register_error_handling(app)
     app.include_router(health_router)
+    app.include_router(auth_router)
     return app
 
 
