@@ -126,7 +126,9 @@ jobs:
           docker run --rm --entrypoint sh insighthr-web:local -c 'test ! -d /app/src/test && test ! -d /app/src/features/auth/__tests__'
       - name: Verify authentication through web proxy
         run: |
-          curl --fail --silent http://localhost:3000/login | grep 'Đang kiểm tra phiên đăng nhập'
+          # Static login emits a Suspense shell; hydrated form behavior is covered by Vitest.
+          curl --fail --silent http://localhost:3000/login --output login-page.html
+          grep -q '<title>InsightHR</title>' login-page.html
           python scripts/smoke_auth.py --compose-project insighthr-ci
       - name: Verify persistence across normal restart
         run: |
