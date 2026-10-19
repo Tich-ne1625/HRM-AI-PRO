@@ -9,6 +9,13 @@ from app.models import AuditLog, Department, Position
 from app.modules.audit.service import AuditWriter
 
 
+def test_reference_label_rejects_database_unsupported_control_characters(world):
+    response = world.client().post(
+        "/api/v1/departments", json={"code": "BAD-INPUT", "name": "Name\u0000Suffix"}
+    )
+    assert response.status_code == 422
+
+
 def test_reference_search_matches_code_or_label_and_escapes_wildcards(world):
     client = world.client()
     result = client.get("/api/v1/departments", params={"q": "Eng"}).json()

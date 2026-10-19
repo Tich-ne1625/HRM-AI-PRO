@@ -17,7 +17,15 @@ def normalize_code(value: object) -> object:
 
 
 Code = Annotated[str, BeforeValidator(normalize_code), Field(pattern=r"^[A-Z0-9][A-Z0-9_-]{1,31}$")]
-Label = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=200)]
+Label = Annotated[
+    str,
+    StringConstraints(
+        strip_whitespace=True,
+        min_length=1,
+        max_length=200,
+        pattern=r"^[^\x00-\x1f\x7f]+$",
+    ),
+]
 
 
 class Input(BaseModel):

@@ -9,6 +9,13 @@ from app.models import AuditLog, Employee, UserRole
 from app.modules.audit.service import AuditWriter
 
 
+def test_employee_name_rejects_database_unsupported_control_characters(world):
+    response = world.client().post(
+        "/api/v1/employees", json=world.employee_payload(display_name="Name\u0000Suffix")
+    )
+    assert response.status_code == 422
+
+
 @pytest.mark.parametrize("kind", ["department", "employee"])
 def test_creation_audit_failure_leaves_no_partial_organization_row(world, monkeypatch, kind):
     def fail(*args, **kwargs):
