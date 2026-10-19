@@ -9,6 +9,31 @@ from app.models import AuditLog, Employee, UserRole
 from app.modules.audit.service import AuditWriter
 
 
+@pytest.mark.parametrize("kind", ["department", "employee"])
+def test_creation_audit_failure_leaves_no_partial_organization_row(world, monkeypatch, kind):
+    def fail(*args, **kwargs):
+        raise SQLAlchemyError("private-create-error")
+
+    monkeypatch.setattr(AuditWriter, "record", fail)
+    client = world.client()
+    response = (
+        client.post("/api/v1/departments", json={"code": "ROLLBACK", "name": "Rollback"})
+        if kind == "department"
+        else client.post("/api/v1/employees", json=world.employee_payload())
+    )
+    assert response.status_code == 500
+    assert "private-create-error" not in response.text
+    with Session(world.engine) as session:
+        from app.models import Department
+
+        if kind == "department":
+            assert session.scalar(select(Department).where(Department.code == "ROLLBACK")) is None
+        else:
+            assert (
+                session.scalar(select(Employee).where(Employee.employee_code == "NEW-01")) is None
+            )
+
+
 @pytest.mark.parametrize(
     "actor,expected",
     [

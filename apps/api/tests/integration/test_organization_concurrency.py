@@ -8,6 +8,83 @@ from sqlalchemy.orm import Session
 from app.models import Employee
 
 
+def test_concurrent_employee_codes_have_one_winner(world, monkeypatch):
+    from app.modules.organization.repository import OrganizationRepository
+
+    barrier = Barrier(2)
+    original = OrganizationRepository.lock_guard
+
+    def acquire(self):
+        barrier.wait(timeout=15)
+        return original(self)
+
+    monkeypatch.setattr(OrganizationRepository, "lock_guard", acquire)
+
+    def create(name):
+        return world.client().post(
+            "/api/v1/employees",
+            json=world.employee_payload(
+                employee_code="CONCURRENT-01",
+                display_name=name,
+            ),
+        )
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        responses = list(pool.map(create, ["First", "Second"]))
+    assert sorted(response.status_code for response in responses) == [201, 409]
+    with Session(world.engine) as session:
+        assert (
+            len(
+                session.scalars(
+                    select(Employee).where(
+                        Employee.employee_code == "CONCURRENT-01",
+                    )
+                ).all()
+            )
+            == 1
+        )
+
+
+@pytest.mark.parametrize("kind,reference", [("departments", "ENG"), ("positions", "DEV")])
+def test_reference_retirement_and_assignment_share_one_serial_order(
+    world, monkeypatch, kind, reference
+):
+    from app.modules.audit.service import AuditWriter
+    from app.modules.organization.repository import OrganizationRepository
+
+    barrier = Barrier(2)
+    original_guard, original_audit = OrganizationRepository.lock_guard, AuditWriter.record
+    actions = []
+
+    def acquire(self):
+        barrier.wait(timeout=15)
+        return original_guard(self)
+
+    def audit(self, session, actor, action, entity_type, entity_id, request_id, metadata):
+        actions.append(action)
+        return original_audit(
+            self, session, actor, action, entity_type, entity_id, request_id, metadata
+        )
+
+    monkeypatch.setattr(OrganizationRepository, "lock_guard", acquire)
+    monkeypatch.setattr(AuditWriter, "record", audit)
+
+    def retire():
+        identifier = (world.departments if kind == "departments" else world.positions)[reference]
+        return world.client().patch(f"/api/v1/{kind}/{identifier}", json={"is_active": False})
+
+    def assign():
+        return world.client().post("/api/v1/employees", json=world.employee_payload())
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        first, second = pool.submit(retire), pool.submit(assign)
+        retired, assigned = first.result(timeout=25), second.result(timeout=25)
+    assert retired.status_code == 200
+    assert assigned.status_code == (201 if actions[0] == "employee.created" else 409)
+    if assigned.status_code == 409:
+        assert assigned.json()["error"]["code"] == "reference_inactive"
+
+
 def test_admin_disabling_hr_and_hr_linking_admin_do_not_deadlock(world, monkeypatch):
     from app.modules.users.repository import UserRepository
 
