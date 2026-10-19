@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from app.core.config import Settings
 from app.core.database import get_db_session
 from app.core.errors import ApiError
+from app.core.policies import AuthContext, get_auth_context
 from app.core.security import (
     ACCESS_COOKIE_NAME,
     CSRF_COOKIE_NAME,
@@ -19,6 +20,14 @@ from app.modules.auth.schemas import ChangePasswordRequest, CurrentUser, LoginCo
 from app.modules.auth.service import AuthService
 
 router = APIRouter(prefix="/api/v1/auth", tags=["auth"])
+
+
+@router.get("/me", response_model=CurrentUser)
+def me(
+    response: Response, context: Annotated[AuthContext, Depends(get_auth_context)]
+) -> CurrentUser:
+    response.headers["Cache-Control"] = "no-store"
+    return CurrentUser.model_validate(context.user)
 
 
 def require_same_origin(request: Request) -> None:
