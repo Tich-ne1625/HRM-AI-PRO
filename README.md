@@ -8,7 +8,7 @@ The project is a modular monolith: a Next.js web application, a FastAPI backend,
 
 ## Current scope
 
-Phase 1 foundation and Phase 2 authentication API/UI are implemented: secure cookie login, refresh rotation/replay detection, logout, password change, current identity, ADMIN account management, transactional audits, and reusable role policies. Container acceptance evidence is recorded in [deployment.md](docs/deployment.md). Organization and employee workflows begin in Phase 3; `employee_id` remains `null`.
+Phase 1 foundation and Phase 2 authentication are implemented and CI-verified: secure cookie login, refresh rotation/replay detection, logout, password change, current identity, ADMIN account management, transactional audits, and reusable role policies. Container acceptance evidence is recorded in [deployment.md](docs/deployment.md). Organization and employee workflows begin in Phase 3; `employee_id` remains `null`.
 
 ## Technology stack
 
@@ -158,7 +158,7 @@ Set `AUTH_ACCESS_SECRET` to a nondefault key of at least 32 characters outside d
 
 ## Future phases
 
-Phase 3 introduces departments, positions, employee records, user–employee links, and organization-scoped access. Review cycles, KPIs, feedback, performance scoring, Gemini, dashboards, seed data, and Kubernetes follow [the architecture](docs/architecture.md).
+The [Phase 3 plan (Vietnamese)](docs/superpowers/plans/2026-10-19-phase-3-organization.md) introduces departments, positions, employee records, user–employee links, and organization-scoped access. Review cycles, KPIs, feedback, performance scoring, Gemini, dashboards, seed data, and Kubernetes follow [the architecture](docs/architecture.md).
 
 The [Phase 2 implementation plan](docs/superpowers/plans/2026-10-03-phase-2-authentication.md) records the authentication sequence and verification gates.
 

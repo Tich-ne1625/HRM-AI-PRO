@@ -18,7 +18,7 @@ Phase 1 đã hoàn thành:
 - Docker Compose thực hiện migration trước khi khởi động API và web.
 - GitHub Actions kiểm tra backend, frontend, image, migration và khả năng giữ dữ liệu sau khi khởi động lại.
 
-API và giao diện Phase 2 đã được triển khai: đăng nhập bằng cookie bảo mật, refresh token rotation và chống dùng lại, đăng xuất, đổi mật khẩu, xem tài khoản hiện tại, phân quyền theo role trong DB, quản trị tài khoản ADMIN và ghi audit trong cùng giao dịch. Bằng chứng nghiệm thu container được cập nhật trong [hướng dẫn triển khai](docs/deployment.md). Các chức năng nhân viên, phòng ban, chu kỳ đánh giá, KPI, phản hồi, tính điểm, Gemini và dashboard thuộc những phase sau; `employee_id` hiện luôn là `null`.
+Phase 2 đã hoàn tất và qua CI: đăng nhập bằng cookie bảo mật, refresh token rotation và chống dùng lại, đăng xuất, đổi mật khẩu, xem tài khoản hiện tại, phân quyền theo role trong DB, quản trị tài khoản ADMIN và ghi audit trong cùng giao dịch. Bằng chứng nghiệm thu container được cập nhật trong [hướng dẫn triển khai](docs/deployment.md). Các chức năng nhân viên, phòng ban, chu kỳ đánh giá, KPI, phản hồi, tính điểm, Gemini và dashboard thuộc những phase sau; `employee_id` hiện luôn là `null`.
 
 ## Công nghệ
 
@@ -197,4 +197,4 @@ Trên PowerShell nếu `npm.ps1` bị chặn, dùng `npm.cmd` thay cho `npm`; kh
 
 ## Các phase tiếp theo
 
-Phase 3 sẽ bổ sung phòng ban, chức danh và hồ sơ nhân viên, liên kết user–employee cùng quyền truy cập theo phạm vi tổ chức. Các phase sau tiếp tục chu kỳ/KPI, phản hồi, tính điểm, Gemini, dashboard, kiểm thử tích hợp bảo mật và Kubernetes. Không tự tạo dữ liệu demo hoặc bảng nghiệp vụ trước phase tương ứng.
+Phase 3 sẽ bổ sung phòng ban, chức danh và hồ sơ nhân viên, liên kết user–employee cùng quyền truy cập theo phạm vi tổ chức. [Kế hoạch Phase 3 bằng tiếng Việt](docs/superpowers/plans/2026-10-19-phase-3-organization.md) chia thành bảy phần, có migration/API impact, kiểm thử phân quyền và cạnh tranh trước khi viết mã. Các phase sau tiếp tục chu kỳ/KPI, phản hồi, tính điểm, Gemini, dashboard, kiểm thử tích hợp bảo mật và Kubernetes. Không tự tạo dữ liệu demo hoặc bảng nghiệp vụ trước phase tương ứng.

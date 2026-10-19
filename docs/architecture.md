@@ -1,7 +1,7 @@
 # InsightHR architecture proposal
 
 Date: 2026-10-03  
-Status: Approved; Phase 1 foundation implemented on 2026-10-03; Phase 2 API/UI implemented on 2026-10-19, with container acceptance tracked in deployment.md.
+Status: Approved; Phase 1 foundation implemented on 2026-10-03; Phase 2 authentication completed and CI-verified on 2026-10-19. See deployment.md for acceptance evidence.
 
 ## Implementation status
 
@@ -376,4 +376,4 @@ The future `.env.example` includes PostgreSQL settings, access-signing secret, c
 
 The proposal adopts these assumptions: ADMIN has system privileges without implicit HR access; KPI cap defaults to 100; feedback converts ratings with `rating / 5 * 100`; submitted reviewers count equally; SELF and MANAGER are required; a single active cycle is allowed initially; finalization locks participant evidence; HR alone requests AI generation. These are proposed business policies, not requirements already asserted by the brief.
 
-The next business slice is Phase 3 Organization. Its detailed plan must define department/position/employee migrations, user–employee linkage, HR write permissions, scoped reads, reporting-tree cycle protection and tests before implementation. Later domain artifacts remain proposals until their own phase is delivered.
+The next business slice is Phase 3 Organization. Its [implementation plan](superpowers/plans/2026-10-19-phase-3-organization.md) defines department/position/employee migrations, user–employee linkage, HR write permissions, scoped reads, reporting-tree cycle protection and tests before implementation. Later domain artifacts remain proposals until their own phase is delivered.

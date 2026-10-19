@@ -559,7 +559,7 @@ Against PostgreSQL, bootstrap ADMIN, login, call `/auth/me`, create an HR user, 
 
 Ensure Compose supplies a nondefault CI-only `AUTH_ACCESS_SECRET`, exact `WEB_ORIGIN`, and correct cookie security mode; production examples remain placeholders. CI applies both revisions, runs the full PostgreSQL suite including concurrency tests, builds images from lock constraints, starts the clean stack, bootstraps an ADMIN through the CLI, exercises login/me/refresh/logout through HTTP with a cookie jar and CSRF header, and confirms web login page plus API proxy behavior.
 
-- [ ] **Step 3: Inspect final images and secret hygiene**
+- [x] **Step 3: Inspect final images and secret hygiene**
 
 Extend CI canaries so nested API/web env files and authentication secrets do not appear in final layers. Assert API runtime has Argon2/JWT runtime packages but not pytest/mypy/Ruff, both images remain UID/GID `10001:10001`, and no source test directories are present.
 
@@ -599,7 +599,7 @@ git diff --check
 
 Expected: every command exits zero and PostgreSQL integration tests do not skip.
 
-- [ ] **Step 7: Run clean Compose acceptance**
+- [x] **Step 7: Run clean Compose acceptance**
 
 Use a unique project name and empty volume. Start the stack, run the interactive bootstrap safely, verify login and cookie attributes, current user, refresh rotation, CSRF rejection, logout revocation, ADMIN user creation, persistence across normal `down`/`up`, and final cleanup limited to that project. Record exact versions and the successful CI run in `docs/deployment.md`.
 
@@ -607,7 +607,7 @@ Use a unique project name and empty volume. Start the stack, run the interactive
 
 Confirm no plain passwords, signing keys, raw tokens, `.env` files, build output, Employee/domain tables, or later-phase features are tracked. Confirm migration history has one head and `git status --short` contains only intended documentation before commit.
 
-- [ ] **Step 9: Commit Phase 2 completion evidence**
+- [x] **Step 9: Commit Phase 2 completion evidence**
 
 ```bash
 git add README.md README.vi.md .env.example .github apps docs
