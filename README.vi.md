@@ -18,7 +18,7 @@ Phase 1 đã hoàn thành:
 - Docker Compose thực hiện migration trước khi khởi động API và web.
 - GitHub Actions kiểm tra backend, frontend, image, migration và khả năng giữ dữ liệu sau khi khởi động lại.
 
-Phase 2 đã hoàn tất và qua CI: xác thực cookie, đổi mật khẩu, phân quyền và quản trị tài khoản. Phase 3 đã có API và giao diện tiếng Việt cho phòng ban, chức danh, hồ sơ nhân viên, cây quản lý và liên kết tài khoản; bằng chứng nghiệm thu được cập nhật trong [hướng dẫn triển khai](docs/deployment.md). `employee_id` trả mã hồ sơ khi đã liên kết, hoặc `null` nếu chưa có. Chu kỳ/KPI, phản hồi, tính điểm, Gemini và dashboard thuộc các phase sau.
+Phase 2 đã hoàn tất và qua CI: xác thực cookie, đổi mật khẩu, phân quyền và quản trị tài khoản. Phase 3 cũng đã hoàn tất và qua CI, gồm API và giao diện tiếng Việt cho phòng ban, chức danh, hồ sơ nhân viên, cây quản lý và liên kết tài khoản; xem bằng chứng trong [hướng dẫn triển khai](docs/deployment.md). `employee_id` trả mã hồ sơ khi đã liên kết, hoặc `null` nếu chưa có. Chu kỳ/KPI, phản hồi, tính điểm, Gemini và dashboard thuộc các phase sau.
 
 ## Công nghệ
 

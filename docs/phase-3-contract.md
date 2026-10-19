@@ -5,7 +5,7 @@ Triển khai theo kế hoạch `superpowers/plans/2026-10-19-phase-3-organizatio
 ## Dữ liệu và quy tắc
 
 - Department: UUID, `code`, `name`, `is_active`, timestamp UTC. Position: tương tự với `title`.
-- Mã department/position/employee: trim, viết hoa ASCII, regex `[A-Z0-9][A-Z0-9_-]{1,31}`; unique theo từng loại và CHECK chuẩn hóa trong DB. Tên/display name được trim, 1–200 ký tự không trắng.
+- Mã department/position/employee: trim, viết hoa ASCII, regex `[A-Z0-9][A-Z0-9_-]{1,31}`; unique theo từng loại và CHECK chuẩn hóa trong DB. Tên/display name được trim, 1–200 ký tự không trắng, không chứa ký tự điều khiển; dữ liệu không hợp lệ trả 422 trước khi ghi DB.
 - Employee: `employee_code`, `display_name`, department/position FK bắt buộc, manager FK nullable, user FK unique nullable, `employment_status` enum `ACTIVE|INACTIVE`, timestamp UTC. Không có trường payroll/nghỉ phép hoặc thông tin cá nhân bổ sung.
 - Không xóa cứng; FK RESTRICT. Nghỉ hoạt động reference data hoặc manager vẫn giữ các liên kết hiện hữu. Tạo mới/đổi liên kết chỉ được chọn department/position và manager đang hoạt động; cập nhật trường khác không bắt buộc thay liên kết cũ.
 - Trạng thái việc làm độc lập với `users.is_active`; đổi employment status không tự khóa tài khoản. Quyền vẫn dựa trên role/user đang hoạt động và quan hệ hiện tại.

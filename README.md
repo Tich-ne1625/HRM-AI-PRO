@@ -8,7 +8,7 @@ The project is a modular monolith: a Next.js web application, a FastAPI backend,
 
 ## Current scope
 
-Foundation and authentication are implemented and CI-verified. Phase 3 adds organization/employee APIs and Vietnamese screens, account linkage, reporting-cycle prevention and SQL-scoped reads. `employee_id` is populated when linked, otherwise null. Acceptance evidence is recorded in [deployment.md](docs/deployment.md); KPI/review/AI features remain planned.
+Foundation, authentication and Phase 3 organization are implemented and CI-verified. Organization/employee APIs and Vietnamese screens support account linkage, reporting-cycle prevention and SQL-scoped reads. `employee_id` is populated when linked, otherwise null. Acceptance evidence is recorded in [deployment.md](docs/deployment.md); KPI/review/AI features remain planned.
 
 ## Technology stack
 

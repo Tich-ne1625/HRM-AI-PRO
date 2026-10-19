@@ -26,7 +26,7 @@ Employee create example (UUID placeholders must be replaced):
 {"employee_code":"EMP-01","display_name":"Nguyễn An","department_id":"<department UUID>","position_id":"<position UUID>","manager_id":null,"user_id":null,"employment_status":"ACTIVE"}
 ```
 
-Codes trim/uppercase to ASCII pattern `[A-Z0-9][A-Z0-9_-]{1,31}`; names trim to 1–200 characters. Employee output contains id/code/display_name, department_id/name, position_id/title, manager_id/name, user_id, employment_status, created_at/updated_at. It never contains account secrets. Status is ACTIVE/INACTIVE, independent of user activation. New department/position/manager assignments must be active; unchanged retired references may be retained. No hard delete exists.
+Codes trim/uppercase to ASCII pattern `[A-Z0-9][A-Z0-9_-]{1,31}`; names trim to 1–200 characters and reject control characters with 422. Employee output contains id/code/display_name, department_id/name, position_id/title, manager_id/name, user_id, employment_status, created_at/updated_at. It never contains account secrets. Status is ACTIVE/INACTIVE, independent of user activation. New department/position/manager assignments must be active; unchanged retired references may be retained. No hard delete exists.
 
 Reference sorts: code, name (department)/title (position), created_at, is_active. Employee sorts: employee_code, display_name, created_at, employment_status. UUID breaks ties. PATCH rejects unknown fields, empty bodies and null required fields. New errors: 409 duplicate_code, employee_code_already_exists, user_already_linked, reference_inactive, manager_inactive, reporting_cycle; 404 reference_not_found, employee_not_found, user_not_found. Other auth/validation errors retain the common envelope.
 

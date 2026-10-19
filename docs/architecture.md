@@ -1,7 +1,7 @@
 # InsightHR architecture proposal
 
 Date: 2026-10-03  
-Status: Approved; Phases 1–2 completed; Phase 3 organization API/UI implemented on 2026-10-19. See deployment.md for acceptance evidence.
+Status: Approved; Phases 1–3 completed and CI-verified as of 2026-10-19. See deployment.md for acceptance evidence.
 
 ## Implementation status
 

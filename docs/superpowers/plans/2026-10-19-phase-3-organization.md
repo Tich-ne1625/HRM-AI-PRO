@@ -1,6 +1,6 @@
 # Kế hoạch Phase 3 — Tổ chức và hồ sơ nhân viên
 
-Trạng thái: schema, API và giao diện đã triển khai; đang nghiệm thu CI Linux. Hợp đồng chi tiết tại `docs/phase-3-contract.md`.
+Trạng thái: hoàn tất schema, API, giao diện và nghiệm thu CI Linux ngày 2026-10-19. Hợp đồng chi tiết tại `docs/phase-3-contract.md`.
 
 Tham chiếu: `docs/architecture.md`, đặc biệt Database ERD, Role and scope policy và REST API map. Nền tảng đầu vào là Phase 2: xác thực cookie, user hiện tại, role policies, ADMIN quản lý tài khoản, audit cùng giao dịch và client API cùng origin.
 
@@ -61,8 +61,10 @@ HR quản lý phòng ban, chức danh và hồ sơ nhân viên. MANAGER chỉ đ
 
 - [x] E2E PostgreSQL: bootstrap ADMIN → tạo HR/MANAGER/EMPLOYEE qua API user → HR tạo tổ chức/hồ sơ và liên kết → xác nhận `/me` → kiểm tra scope bằng các tài khoản thật → đổi quan hệ → scope đổi ngay.
 - [x] Chạy đầy đủ backend test, Ruff/mypy; frontend test/lint/typecheck/build; Compose config; sole migration head và clean image checks.
-- [ ] CI Linux khởi động volume sạch, chạy cả ba migration, kiểm tra luồng tổ chức qua web proxy và dữ liệu còn sau restart.
-- [ ] Cập nhật README Việt/Anh, API/database/deployment và trạng thái architecture chỉ cho artifact đã kiểm chứng.
-- [ ] Review bảo mật chú trọng UUID ngoài phạm vi, liên kết giả, cycle/write skew, stale permissions và audit rollback. Chỉ chuyển sang Phase 4 sau khi gate Phase 3 sạch.
+- [x] CI Linux khởi động volume sạch, chạy cả ba migration, kiểm tra luồng tổ chức qua web proxy và dữ liệu còn sau restart.
+- [x] Cập nhật README Việt/Anh, API/database/deployment và trạng thái architecture chỉ cho artifact đã kiểm chứng.
+- [x] Review bảo mật chú trọng UUID ngoài phạm vi, liên kết giả, cycle/write skew, stale permissions và audit rollback. Chỉ chuyển sang Phase 4 sau khi gate Phase 3 sạch.
 
 Thực hiện từng mục nhỏ có test trước, commit riêng và ghi bằng chứng xác minh. Không thêm bảng hoặc tính năng của phase sau trong quá trình triển khai kế hoạch này.
+
+Bằng chứng cuối: CI run [39221690393](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/39221690393), commit 8f193b3, backend 467 test, frontend 49 test và Docker smoke đều qua. Chưa triển khai Phase 4 hoặc dữ liệu seed.
