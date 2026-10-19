@@ -5,6 +5,7 @@ from sqlalchemy import select, update
 from sqlalchemy.orm import Session
 
 from app.modules.auth.models import AuthSession
+from app.modules.users.models import User
 
 
 class AuthSessionRepository:
@@ -17,12 +18,38 @@ class AuthSessionRepository:
         return auth_session
 
     def get_by_token_hash_for_update(self, token_hash: str) -> AuthSession | None:
+        # Every auth mutation locks its owner before session rows. Serializing a
+        # user's families also prevents a rotation escaping password revocation.
+        self.session.scalar(
+            select(User)
+            .join(AuthSession, AuthSession.user_id == User.id)
+            .where(AuthSession.token_hash == token_hash)
+            .with_for_update(of=User)
+            .execution_options(populate_existing=True)
+        )
         # Include consumed/revoked rows so the caller can detect token replay.
         return self.session.scalar(
             select(AuthSession)
             .where(AuthSession.token_hash == token_hash)
             .with_for_update()
             .execution_options(populate_existing=True)
+        )
+
+    def get_active_family_for_update(self, family_id: UUID, *, now: datetime) -> list[AuthSession]:
+        # Caller holds the owner lock, matching refresh's owner -> session order.
+        return list(
+            self.session.scalars(
+                select(AuthSession)
+                .where(
+                    AuthSession.family_id == family_id,
+                    AuthSession.consumed_at.is_(None),
+                    AuthSession.revoked_at.is_(None),
+                    AuthSession.expires_at > now,
+                )
+                .order_by(AuthSession.id)
+                .with_for_update()
+                .execution_options(populate_existing=True)
+            )
         )
 
     def get_active_family(self, family_id: UUID, *, now: datetime) -> list[AuthSession]:

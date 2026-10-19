@@ -24,3 +24,8 @@ class CurrentUser(BaseModel):
     role: UserRole
     is_active: bool
     employee_id: UUID | None = None
+
+
+class ChangePasswordRequest(BaseModel):
+    old_password: SecretStr = Field(min_length=1, max_length=128)
+    new_password: SecretStr = Field(min_length=12, max_length=128)

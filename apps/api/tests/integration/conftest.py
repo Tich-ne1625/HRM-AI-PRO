@@ -52,3 +52,42 @@ def auth_engine(empty_test_engine: Engine) -> Engine:
     assert len(heads) == 1, "Integration tests require exactly one Alembic head"
     command.upgrade(config, heads[0])
     return empty_test_engine
+
+
+@pytest.fixture
+def mutation_app(auth_engine: Engine):
+    from app.core.database import get_session_factory
+    from app.core.security import PasswordService
+    from app.main import create_app
+    from app.models import User, UserRole
+
+    app = create_app(Settings(database_url=auth_engine.url.render_as_string(hide_password=False)))
+    app.state.engine.dispose()
+    app.state.engine = auth_engine
+    app.state.session_factory = get_session_factory(auth_engine)
+    with app.state.session_factory.begin() as session:
+        session.add(
+            User(
+                email="mutations@example.com",
+                role=UserRole.HR,
+                is_active=True,
+                password_hash=PasswordService().hash("original-password"),
+            )
+        )
+    return app
+
+
+@pytest.fixture
+def login_cookies(mutation_app):
+    from fastapi.testclient import TestClient
+
+    def login():
+        response = TestClient(mutation_app).post(
+            "/api/v1/auth/login",
+            headers={"Origin": "http://testserver"},
+            json={"email": "mutations@example.com", "password": "original-password"},
+        )
+        assert response.status_code == 200
+        return dict(response.cookies)
+
+    return login
