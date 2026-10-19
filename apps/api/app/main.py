@@ -11,6 +11,7 @@ from app.core.errors import register_error_handling
 from app.modules.auth.router import router as auth_router
 from app.modules.health.router import router as health_router
 from app.modules.health.service import ReadinessService
+from app.modules.users.router import router as users_router
 
 
 @asynccontextmanager
@@ -32,6 +33,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     register_error_handling(app)
     app.include_router(health_router)
     app.include_router(auth_router)
+    app.include_router(users_router)
     return app
 
 
