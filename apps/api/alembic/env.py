@@ -5,6 +5,7 @@ from logging.config import fileConfig
 from sqlalchemy import engine_from_config, pool
 
 from alembic import context
+from app import models  # noqa: F401 -- register all mapped tables in shared metadata
 from app.core.config import get_settings
 from app.core.database import metadata
 
