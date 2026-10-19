@@ -1,8 +1,26 @@
 # Database design status
 
+## Phase 3 organization schema
+
+Current sole head is `20261019_0003`, following authentication `20261003_0002` and baseline `20261003_0001`. Upgrade/downgrade and metadata parity are tested against PostgreSQL.
+
+| Table | Contract |
+| --- | --- |
+| `departments` | UUID, unique normalized `code VARCHAR(32)`, nonblank `name VARCHAR(200)`, active boolean, UTC-aware created/updated timestamps |
+| `positions` | UUID, unique normalized code, nonblank title, active boolean, UTC timestamps |
+| `employees` | UUID, unique normalized employee_code, nonblank display_name, required department/position FK, nullable manager self-FK, nullable UNIQUE user FK, constrained ACTIVE/INACTIVE employment status, UTC timestamps |
+
+Codes have a database ASCII-uppercase regex check. Employee self-management is blocked by CHECK; indexes support department/position/manager lookups, and the unique user constraint enforces one employee per account while permitting multiple unlinked employees. Foreign keys use RESTRICT; no history-deleting cascades or DELETE APIs are added.
+
+All organization writers acquire advisory transaction lock `730031`, then ordered active-admin locks, ordered participating user locks, then organization rows. This matches user-management/auth lock order and prevents reporting-tree write skew, duplicate link races and cross-module deadlocks. The service rereads graph/reference/user state under the guard. A single shared guard intentionally serializes the modest capstone write workload; scoped reads do not acquire it.
+
+Retiring references/managers preserves existing links. Newly changed links must target active references; unchanged inactive links can be retained. Employment status does not activate/deactivate login accounts. SQL list/detail/count scopes derive employee identity from the current user link, not JWT fields. Account presentation batches employee links for user lists.
+
+Organization audits are department.created/updated, position.created/updated and employee.created/updated. Their separate metadata allowlist stores changed field names, codes, status, relevant UUIDs and previous user/manager IDs, without free-text names or lookup emails. Audit failure rolls back every mutation.
+
 ## Phase 2 authentication schema
 
-Sole current head: `20261003_0002`, following baseline `20261003_0001`. The migration creates:
+Authentication revision: `20261003_0002`, following baseline `20261003_0001`. The migration creates:
 
 | Table | Fields/constraints |
 | --- | --- |
@@ -20,7 +38,7 @@ Login, rotation, logout and password changes lock the user first, preventing a c
 
 Implemented audit actions: `user.bootstrap_created`, `user.created`, `user.role_changed`, `user.status_changed`, `user.password_changed`, `auth.login_succeeded`, `auth.login_failed`, `auth.refresh_succeeded`, `auth.refresh_reuse_detected`, `auth.logout`. Metadata permits only role/previous-role and active/previous-active fields; no passwords, cookies, tokens, hashes or request bodies.
 
-Employee, department, position and business tables are still planned for Phase 3 onward. No user–employee foreign key exists yet; API employee references remain null.
+Phase 3 now supplies organization/employee tables and the nullable unique `employees.user_id` foreign key. Review-cycle, KPI, feedback, scoring and AI tables remain planned. API employee references reflect current links and remain null only for unlinked accounts.
 
 ## Phase 1 baseline
 

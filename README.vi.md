@@ -18,7 +18,7 @@ Phase 1 đã hoàn thành:
 - Docker Compose thực hiện migration trước khi khởi động API và web.
 - GitHub Actions kiểm tra backend, frontend, image, migration và khả năng giữ dữ liệu sau khi khởi động lại.
 
-Phase 2 đã hoàn tất và qua CI: đăng nhập bằng cookie bảo mật, refresh token rotation và chống dùng lại, đăng xuất, đổi mật khẩu, xem tài khoản hiện tại, phân quyền theo role trong DB, quản trị tài khoản ADMIN và ghi audit trong cùng giao dịch. Bằng chứng nghiệm thu container được cập nhật trong [hướng dẫn triển khai](docs/deployment.md). Các chức năng nhân viên, phòng ban, chu kỳ đánh giá, KPI, phản hồi, tính điểm, Gemini và dashboard thuộc những phase sau; `employee_id` hiện luôn là `null`.
+Phase 2 đã hoàn tất và qua CI: xác thực cookie, đổi mật khẩu, phân quyền và quản trị tài khoản. Phase 3 đã có API và giao diện tiếng Việt cho phòng ban, chức danh, hồ sơ nhân viên, cây quản lý và liên kết tài khoản; bằng chứng nghiệm thu được cập nhật trong [hướng dẫn triển khai](docs/deployment.md). `employee_id` trả mã hồ sơ khi đã liên kết, hoặc `null` nếu chưa có. Chu kỳ/KPI, phản hồi, tính điểm, Gemini và dashboard thuộc các phase sau.
 
 ## Công nghệ
 
@@ -130,7 +130,7 @@ alembic revision --autogenerate -m "mo ta thay doi schema"
 alembic upgrade head
 ```
 
-Luôn kiểm tra migration được sinh ra trước khi chạy. Head hiện tại là `20261003_0002`, nối sau baseline `20261003_0001`, tạo các bảng `users`, `auth_sessions` và `audit_logs`.
+Luôn kiểm tra migration được sinh ra trước khi chạy. Head hiện tại là `20261019_0003`: sau baseline `20261003_0001` và auth `20261003_0002`, revision mới tạo `departments`, `positions`, `employees`. Nâng cấp database hiện hữu bằng `alembic upgrade head`; sao lưu dữ liệu cần giữ trước khi migration.
 
 ## Kiểm thử và kiểm tra chất lượng
 
@@ -185,6 +185,18 @@ Nếu quên mật khẩu bootstrap: chưa có chức năng reset qua email. Ngư
 
 Trên PowerShell nếu `npm.ps1` bị chặn, dùng `npm.cmd` thay cho `npm`; không cần thay đổi execution policy toàn máy.
 
+## Dùng phần tổ chức và nhân viên (Phase 3)
+
+1. Đăng nhập ADMIN, mở `/admin/users` và tạo ít nhất một tài khoản role **HR**. Tạo thêm MANAGER/EMPLOYEE để thử phân quyền. ADMIN không tự có quyền quản lý hồ sơ nhân sự.
+2. Đăng xuất ADMIN rồi đăng nhập HR. Menu sẽ có **Nhân viên**, **Phòng ban**, **Chức danh**. Trên database mới, danh sách rỗng là bình thường; chưa có seed tự động.
+3. Mở `/departments` và `/positions`, tạo mã/tên phòng ban và chức danh. Mã gồm 2–32 ký tự chữ ASCII, số, `_` hoặc `-`; hệ thống chuẩn hóa viết hoa. Tên tối đa 200 ký tự.
+4. Mở `/employees`, bấm **Thêm nhân viên**, nhập mã/họ tên và chọn phòng ban/chức danh đang hoạt động. Có thể tìm và phân trang các lựa chọn. Tạo hồ sơ người quản lý trước rồi chọn người này cho nhân viên cấp dưới.
+5. Trong form hồ sơ, nhập **đúng email** tài khoản đã được ADMIN tạo, bấm **Tìm tài khoản**, chọn **Liên kết tài khoản này**, rồi **Lưu hồ sơ**. Một tài khoản chỉ liên kết một hồ sơ. HR không thể tạo hay đổi quyền tài khoản qua form này.
+6. Bấm tên nhân viên để mở `/employees/{id}`. HR có thể sửa hồ sơ, đổi/bỏ người quản lý, thay/bỏ liên kết tài khoản và đổi trạng thái làm việc. Hệ thống chặn tự quản lý và vòng lặp nhiều cấp, kể cả hai yêu cầu đồng thời.
+7. Đăng nhập MANAGER đã liên kết: chỉ thấy bản thân và nhân viên báo cáo trực tiếp, không thấy cấp dưới gián tiếp. EMPLOYEE chỉ thấy chính mình. Tài khoản chưa liên kết hồ sơ sẽ thấy danh sách rỗng. Quyền đổi ngay khi HR chuyển manager hoặc thay liên kết, không cần phát hành lại JWT.
+
+Ngừng hoạt động phòng ban/chức danh cần xác nhận và không xóa hồ sơ cũ. Các hồ sơ đang tham chiếu vẫn đọc/sửa được; không được gán mới reference đã ngừng hoạt động. Trạng thái nhân viên `ACTIVE`/`INACTIVE` độc lập với trạng thái đăng nhập của user: HR đổi trạng thái làm việc **không** tự khóa tài khoản; ADMIN quản lý quyền đăng nhập.
+
 ## Tài liệu liên quan
 
 - [Kiến trúc hệ thống](docs/architecture.md).
@@ -197,4 +209,4 @@ Trên PowerShell nếu `npm.ps1` bị chặn, dùng `npm.cmd` thay cho `npm`; kh
 
 ## Các phase tiếp theo
 
-Phase 3 sẽ bổ sung phòng ban, chức danh và hồ sơ nhân viên, liên kết user–employee cùng quyền truy cập theo phạm vi tổ chức. [Kế hoạch Phase 3 bằng tiếng Việt](docs/superpowers/plans/2026-10-19-phase-3-organization.md) chia thành bảy phần, có migration/API impact, kiểm thử phân quyền và cạnh tranh trước khi viết mã. Các phase sau tiếp tục chu kỳ/KPI, phản hồi, tính điểm, Gemini, dashboard, kiểm thử tích hợp bảo mật và Kubernetes. Không tự tạo dữ liệu demo hoặc bảng nghiệp vụ trước phase tương ứng.
+Theo dõi bằng chứng và checklist trong [kế hoạch Phase 3](docs/superpowers/plans/2026-10-19-phase-3-organization.md), cùng [hợp đồng dữ liệu/quyền](docs/phase-3-contract.md). Công đoạn tiếp theo là Phase 4: chu kỳ đánh giá, danh sách tham gia và KPI. Phản hồi, tính điểm, Gemini, dashboard, seed và Kubernetes chưa được triển khai.

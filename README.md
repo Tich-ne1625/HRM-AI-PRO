@@ -8,7 +8,7 @@ The project is a modular monolith: a Next.js web application, a FastAPI backend,
 
 ## Current scope
 
-Phase 1 foundation and Phase 2 authentication are implemented and CI-verified: secure cookie login, refresh rotation/replay detection, logout, password change, current identity, ADMIN account management, transactional audits, and reusable role policies. Container acceptance evidence is recorded in [deployment.md](docs/deployment.md). Organization and employee workflows begin in Phase 3; `employee_id` remains `null`.
+Foundation and authentication are implemented and CI-verified. Phase 3 adds organization/employee APIs and Vietnamese screens, account linkage, reporting-cycle prevention and SQL-scoped reads. `employee_id` is populated when linked, otherwise null. Acceptance evidence is recorded in [deployment.md](docs/deployment.md); KPI/review/AI features remain planned.
 
 ## Technology stack
 
@@ -126,7 +126,7 @@ alembic revision --autogenerate -m "describe the schema change"
 alembic upgrade head
 ```
 
-Review every generated migration before running it. The sole head is `20261003_0002`, after baseline `20261003_0001`; it adds users, refresh sessions, and audits.
+Review every generated migration before running it. The sole head is `20261019_0003` (organization/employees), following `20261003_0002` (authentication) and baseline `20261003_0001`. Back up data that must be kept before upgrades.
 
 ## Tests and quality gates
 
@@ -158,7 +158,13 @@ Set `AUTH_ACCESS_SECRET` to a nondefault key of at least 32 characters outside d
 
 ## Future phases
 
-The [Phase 3 plan (Vietnamese)](docs/superpowers/plans/2026-10-19-phase-3-organization.md) introduces departments, positions, employee records, user–employee links, and organization-scoped access. Review cycles, KPIs, feedback, performance scoring, Gemini, dashboards, seed data, and Kubernetes follow [the architecture](docs/architecture.md).
+The [Phase 3 plan (Vietnamese)](docs/superpowers/plans/2026-10-19-phase-3-organization.md) tracks organization acceptance. Next is Phase 4: review cycles, participants and KPIs. Feedback, scoring, Gemini, dashboards, seed data and Kubernetes follow [the architecture](docs/architecture.md).
+
+## Organization walkthrough
+
+As ADMIN, create HR, MANAGER and EMPLOYEE accounts in `/admin/users`. Sign out and sign in as HR: ADMIN does not inherit HR privileges. Create reference data in `/departments` and `/positions`, then employee profiles in `/employees`; select a manager and link an existing account through exact-email lookup before saving. Open a profile by clicking its name. Reference selectors support search/pagination; retiring a reference preserves existing links and prevents new assignment.
+
+HR manages all profiles. MANAGER reads self plus direct reports; EMPLOYEE reads self. Unlinked accounts see empty scoped lists, and inaccessible UUIDs return 404. One account links to at most one employee. Employment ACTIVE/INACTIVE is independent of account activation; organization changes do not grant roles or reset passwords. See the [Phase 3 contract](docs/phase-3-contract.md).
 
 The [Phase 2 implementation plan](docs/superpowers/plans/2026-10-03-phase-2-authentication.md) records the authentication sequence and verification gates.
 

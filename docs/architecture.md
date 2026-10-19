@@ -1,11 +1,11 @@
 # InsightHR architecture proposal
 
 Date: 2026-10-03  
-Status: Approved; Phase 1 foundation implemented on 2026-10-03; Phase 2 authentication completed and CI-verified on 2026-10-19. See deployment.md for acceptance evidence.
+Status: Approved; Phases 1–2 completed; Phase 3 organization API/UI implemented on 2026-10-19. See deployment.md for acceptance evidence.
 
 ## Implementation status
 
-Phase 1 includes the FastAPI/Next.js foundation, PostgreSQL/Alembic readiness, Docker Compose and CI. Phase 2 implements users, refresh-session families, audits, first-ADMIN CLI, cookie login/refresh/logout/password change, current identity and role policies, ADMIN account management, and the corresponding web screens. Employee links remain null. Organization and all performance-management domain features remain planned. Implementation and acceptance evidence is in the phase plans and `docs/deployment.md`.
+Phase 1 includes the FastAPI/Next.js foundation, PostgreSQL/Alembic readiness, Docker Compose and CI. Phase 2 implements authentication and account administration. Phase 3 adds department/position/employee schema and APIs, SQL-scoped reads, HR-only writes, user–employee linkage, guarded reporting-tree changes and Vietnamese web screens. Current identity reflects employee links. Review cycles, KPIs, feedback, scoring, Gemini and dashboards remain planned. Implementation/acceptance evidence is in the phase plans, the Phase 3 contract and `docs/deployment.md`.
 
 ## Purpose and existing workspace
 
@@ -376,4 +376,4 @@ The future `.env.example` includes PostgreSQL settings, access-signing secret, c
 
 The proposal adopts these assumptions: ADMIN has system privileges without implicit HR access; KPI cap defaults to 100; feedback converts ratings with `rating / 5 * 100`; submitted reviewers count equally; SELF and MANAGER are required; a single active cycle is allowed initially; finalization locks participant evidence; HR alone requests AI generation. These are proposed business policies, not requirements already asserted by the brief.
 
-The next business slice is Phase 3 Organization. Its [implementation plan](superpowers/plans/2026-10-19-phase-3-organization.md) defines department/position/employee migrations, user–employee linkage, HR write permissions, scoped reads, reporting-tree cycle protection and tests before implementation. Later domain artifacts remain proposals until their own phase is delivered.
+The [Phase 3 plan](superpowers/plans/2026-10-19-phase-3-organization.md) and [contract](phase-3-contract.md) record organization decisions and gates. Next is Phase 4: review-cycle lifecycle, participant/relationship snapshots and complete KPI allocations/actuals. Later domain artifacts remain proposals until their own phase is delivered.

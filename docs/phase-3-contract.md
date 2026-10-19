@@ -32,6 +32,6 @@ Mọi writer tổ chức dùng PostgreSQL advisory transaction lock cố định
 
 Sau guard, đọc lại toàn bộ cây manager cần kiểm tra trong transaction. Không cho self manager hoặc bất kỳ chu trình nhiều cấp nào. Chứng minh bằng test PostgreSQL với hai session độc lập, không chỉ test tuần tự. Unique constraint là hàng rào cuối cho code và user link.
 
-Audit action: department.created/updated, position.created/updated, employee.created/updated. Metadata chỉ chứa allowlist field thay đổi (`code`, `name`, `title`, `is_active`, `employee_code`, `display_name`, `department_id`, `position_id`, `manager_id`, `user_id`, `employment_status`) với giá trị tối thiểu; UUID chuyển thành chuỗi. Không ghi nguyên payload, email tra cứu, token, cookie, mật khẩu hoặc hash. Test rollback khi audit thất bại.
+Audit action: department.created/updated, position.created/updated, employee.created/updated. Metadata chứa `changed_fields` (tên field, không phải toàn bộ payload), mã, trạng thái và UUID liên quan; liên kết user/manager giữ thêm `previous_user_id`/`previous_manager_id`. Không sao chép tên tự do hoặc email tra cứu vào metadata. UUID chuyển thành chuỗi. Không ghi token, cookie, mật khẩu hoặc hash. Test rollback khi audit thất bại. Allowlist tổ chức tách khỏi allowlist auth/user của Phase 2.
 
 Giao diện tiếng Việt cho danh sách/chi tiết và form HR, loading/error/empty states, xác nhận nghỉ hoạt động, tìm tài khoản đúng email để liên kết và invalidation cache/identity khi cập nhật. Không tạo seed, KPI, review, dashboard hoặc Gemini trong phase này.

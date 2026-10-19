@@ -25,7 +25,7 @@ class Browser:
         path: str,
         *,
         method: str = "GET",
-        body: dict[str, str] | None = None,
+        body: dict[str, str | None] | None = None,
         expected: int = 200,
         csrf: bool = True,
     ) -> dict:
@@ -45,6 +45,74 @@ class Browser:
                 raise RuntimeError(f"Unexpected status for {method} {path}: {response.status}")
             raw = response.read()
             return json.loads(raw) if raw else {}
+
+
+def organization_smoke(admin: Browser, hr: Browser, suffix: str) -> None:
+    password = secrets.token_urlsafe(24)
+    accounts = {}
+    browsers = {}
+    for name, role in (("manager", "MANAGER"), ("employee", "EMPLOYEE")):
+        email = f"{name}-{suffix}@example.com"
+        accounts[name] = admin.request(
+            "/api/v1/users",
+            method="POST",
+            expected=201,
+            body={"email": email, "password": password, "role": role},
+        )["id"]
+        browser = Browser(hr.base, hr.origin)
+        browser.request(
+            "/api/v1/auth/login", method="POST", body={"email": email, "password": password}
+        )
+        browsers[name] = browser
+    department = hr.request(
+        "/api/v1/departments",
+        method="POST",
+        expected=201,
+        body={"code": f"ENG-{suffix}", "name": "Smoke Engineering"},
+    )
+    position = hr.request(
+        "/api/v1/positions",
+        method="POST",
+        expected=201,
+        body={"code": f"DEV-{suffix}", "title": "Smoke Developer"},
+    )
+    base = {"department_id": department["id"], "position_id": position["id"]}
+    leader = hr.request(
+        "/api/v1/employees",
+        method="POST",
+        expected=201,
+        body={
+            **base,
+            "employee_code": f"MGR-{suffix}",
+            "display_name": "Smoke Manager",
+            "user_id": accounts["manager"],
+        },
+    )
+    report = hr.request(
+        "/api/v1/employees",
+        method="POST",
+        expected=201,
+        body={
+            **base,
+            "employee_code": f"EMP-{suffix}",
+            "display_name": "Smoke Employee",
+            "user_id": accounts["employee"],
+            "manager_id": leader["id"],
+        },
+    )
+    browsers["employee"].request("/api/v1/employees/" + leader["id"], expected=404)
+    assert browsers["employee"].request("/api/v1/auth/me")["employee_id"] == report["id"]
+    assert browsers["manager"].request("/api/v1/employees")["total"] == 2
+    admin.request("/api/v1/employees", expected=403)
+    hr.request(
+        "/api/v1/employees/" + leader["id"],
+        method="PATCH",
+        expected=409,
+        body={"manager_id": report["id"]},
+    )
+    hr.request("/api/v1/employees/" + report["id"], method="PATCH", body={"manager_id": None})
+    browsers["manager"].request("/api/v1/employees/" + report["id"], expected=404)
+    print("Organization HTTP smoke passed: references, linking, scope, cycle rejection, transfer.")
 
 
 def main() -> None:
@@ -119,6 +187,7 @@ def main() -> None:
             },
         )
     current.request("/api/v1/users", expected=403)
+    organization_smoke(admin, current, suffix)
     current.request("/api/v1/auth/refresh", method="POST", csrf=False, expected=403)
     current.request(
         "/api/v1/auth/change-password",

@@ -2,7 +2,35 @@
 
 ## Authentication and accounts (Phase 2)
 
-All responses use `Cache-Control: no-store` for successful personalized endpoints. Public user JSON contains only `id`, normalized `email`, `role`, `is_active`, `employee_id` (currently `null`). No response returns a password/hash or access/refresh token in JSON.
+All responses use `Cache-Control: no-store` for successful personalized endpoints. Public user JSON contains only `id`, normalized `email`, `role`, `is_active`, `employee_id` (linked employee UUID, otherwise null). No response returns a password/hash or access/refresh token in JSON.
+
+## Organization and employees (Phase 3)
+
+| Method/path under `/api/v1` | Contract |
+| --- | --- |
+| GET `/departments`, `/positions` | Scoped `{items,total,page,page_size}`; `page>=1`, `page_size=1..100`, optional `q` (literal code/label search, max 100), `is_active`, allowlisted ascending `sort` |
+| POST `/departments` | HR only, `{"code":"ENG","name":"Engineering"}`; optional is_active default true; 201 |
+| POST `/positions` | HR only, `{"code":"DEV","title":"Developer"}`; optional is_active default true; 201 |
+| PATCH `/departments/{id}`, `/positions/{id}` | HR, at least one code/name-or-title/is_active change; 200; required fields cannot be null |
+| GET `/employees` | Scoped page; `page`, `page_size`, `q` (literal code/name), `department_id`, `position_id`, `employment_status`, `sort` |
+| GET `/employees/{id}` | Scoped detail; nonexistent and inaccessible UUIDs both return 404 employee_not_found |
+| POST `/employees` | HR; employee payload below; 201 |
+| PATCH `/employees/{id}` | HR; supported employee fields, at least one; manager_id/user_id allow null to clear; 200 |
+| GET `/employees/linkable-users?email=...` | HR-only exact normalized email lookup; returns `{items:[{id,email,is_active,employee_id}]}` or empty items; does not allow user creation/role changes |
+
+All mutations require Origin + family-bound CSRF and recheck current HR authorization under locks. ADMIN has no implicit domain permission. HR sees all; MANAGER sees self + current direct reports only; EMPLOYEE sees self. Unlinked users see empty lists. Reference data is restricted to records referenced by visible employees for non-HR readers. Filtered count and items apply the same SQL scope.
+
+Employee create example (UUID placeholders must be replaced):
+
+```json
+{"employee_code":"EMP-01","display_name":"Nguyễn An","department_id":"<department UUID>","position_id":"<position UUID>","manager_id":null,"user_id":null,"employment_status":"ACTIVE"}
+```
+
+Codes trim/uppercase to ASCII pattern `[A-Z0-9][A-Z0-9_-]{1,31}`; names trim to 1–200 characters. Employee output contains id/code/display_name, department_id/name, position_id/title, manager_id/name, user_id, employment_status, created_at/updated_at. It never contains account secrets. Status is ACTIVE/INACTIVE, independent of user activation. New department/position/manager assignments must be active; unchanged retired references may be retained. No hard delete exists.
+
+Reference sorts: code, name (department)/title (position), created_at, is_active. Employee sorts: employee_code, display_name, created_at, employment_status. UUID breaks ties. PATCH rejects unknown fields, empty bodies and null required fields. New errors: 409 duplicate_code, employee_code_already_exists, user_already_linked, reference_inactive, manager_inactive, reporting_cycle; 404 reference_not_found, employee_not_found, user_not_found. Other auth/validation errors retain the common envelope.
+
+## Authentication endpoint reference
 
 | Method/path under `/api/v1` | Input | Success | Authorization |
 | --- | --- | --- | --- |
