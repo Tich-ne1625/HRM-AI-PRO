@@ -12,7 +12,9 @@ from app.modules.auth.router import router as auth_router
 from app.modules.employees.router import router as employees_router
 from app.modules.health.router import router as health_router
 from app.modules.health.service import ReadinessService
+from app.modules.kpis.router import router as kpis_router
 from app.modules.organization.router import router as organization_router
+from app.modules.settings.router import router as settings_router
 from app.modules.users.router import router as users_router
 
 
@@ -38,6 +40,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(users_router)
     app.include_router(organization_router)
     app.include_router(employees_router)
+    app.include_router(settings_router)
+    app.include_router(kpis_router)
     return app
 
 

@@ -44,13 +44,13 @@ Gate: schema tests + readiness/auth smoke có PostgreSQL, Ruff/mypy; Alembic m�
 
 File dự kiến: `modules/settings/{repository,service,router}.py`, `modules/kpis/{repository,service,router}.py`; authorization helper gần `app/core/policies.py`; `modules/audit/service.py`; `app/main.py`; `tests/integration/test_scoring_settings.py`, `test_kpi_definitions.py` và unit schema tests.
 
-- [ ] Viết test trước cho ADMIN-only settings, HR-only definition mutations, role denied, unlinked account, SQL-scoped list/count, inactive definitions, code normalization/uniqueness.
-- [ ] Settings GET/PATCH dùng expected_version, validate exact component sum/cap, optimistic conflict; GET không làm thay đổi DB.
-- [ ] KPI GET/POST/PATCH có q/status/direction, sort allowlist và phân trang; lỗi 404/409/422 ổn định, không DELETE.
-- [ ] Catalog của manager/employee chỉ thấy định nghĩa được gán trong scope; chưa được gán thì empty. Chuẩn bị query options riêng theo participant ở Task 5.
-- [ ] Tạo helper khóa/revalidate dùng allowed roles rõ ràng theo hợp đồng. Kiểm thử endpoint HR cũ vẫn HR-only; không tái sử dụng cứng hàm chỉ cho HR rồi vô tình mở quyền.
-- [ ] Audit allowlist riêng cho settings/KPI, version và mutation atomic; inject audit failure để chứng minh rollback.
-- [ ] Race cùng expected_version của defaults/definition chỉ một writer thắng; duplicate code có một 201 và một 409, không 500.
+- [x] Viết test trước cho ADMIN-only settings, HR-only definition mutations, role denied, unlinked account, SQL-scoped list/count, inactive definitions, code normalization/uniqueness.
+- [x] Settings GET/PATCH dùng expected_version, validate exact component sum/cap, optimistic conflict; GET không làm thay đổi DB.
+- [x] KPI GET/POST/PATCH có q/status/direction, sort allowlist và phân trang; lỗi 404/409/422 ổn định, không DELETE.
+- [x] Catalog của manager/employee chỉ thấy định nghĩa được gán trong scope; chưa được gán thì empty. Chuẩn bị query options riêng theo participant ở Task 5.
+- [x] Tạo helper khóa/revalidate dùng allowed roles rõ ràng theo hợp đồng. Kiểm thử endpoint HR cũ vẫn HR-only; không tái sử dụng cứng hàm chỉ cho HR rồi vô tình mở quyền.
+- [x] Audit allowlist riêng cho settings/KPI, version và mutation atomic; inject audit failure để chứng minh rollback.
+- [x] Race cùng expected_version của defaults/definition chỉ một writer thắng; duplicate code có một 201 và một 409, không 500.
 
 Gate: focused tests + auth/organization authorization regression, Ruff/mypy. Commit dự kiến `feat(kpis): add definitions and scoring defaults`.
 
@@ -162,3 +162,5 @@ docker compose --env-file .env.example config --quiet
 Lệnh upgrade/downgrade và smoke tạo dữ liệu phải chọn rõ môi trường dùng riêng; không thêm lệnh xóa volume hàng loạt vào quy trình bình thường. Baseline Phase 3 vẫn là điểm đối chiếu hồi quy cho auth, role và tổ chức.
 
 B?ng ch?ng Task 1 (2026-10-20): baseline PostgreSQL 467/467 qua; test schema/validation m?i v? h?i quy schema auth/organization/readiness 47/47 qua; sole head `20261020_0004`, metadata parity v? downgrade/upgrade b?o to?n d? li?u Phase 3.
+
+B?ng ch?ng Task 2 (2026-10-20): 14 test settings/catalog m?i qua; 76 test concurrency v? h?i quy users/organization/auth/policies qua, g?m ba race defaults/code/definition version. Exact Origin/CSRF, audit rollback, scoped empty lists, no-op v? stale version ???c ki?m tra. Ruff/mypy s?ch.

@@ -22,6 +22,24 @@ ORGANIZATION_METADATA_KEYS = frozenset(
         "previous_manager_id",
     }
 )
+REVIEW_METADATA_KEYS = frozenset(
+    {
+        "changed_fields",
+        "code",
+        "is_active",
+        "previous_version",
+        "version",
+        "cycle_id",
+        "participant_id",
+        "employee_id",
+        "definition_id",
+        "count",
+        "status",
+        "previous_evidence_version",
+        "evidence_version",
+        "policy_source_version",
+    }
+)
 
 
 class AuditWriter:
@@ -40,6 +58,17 @@ class AuditWriter:
             if action.startswith(("department.", "position.", "employee."))
             else ALLOWED_METADATA_KEYS
         )
+        if action.startswith(
+            (
+                "scoring_defaults.",
+                "review_cycle.",
+                "cycle_participant.",
+                "kpi_definition.",
+                "kpi_allocation.",
+                "employee_kpi.",
+            )
+        ):
+            allowed = REVIEW_METADATA_KEYS
         if metadata.keys() - allowed:
             raise ValueError("Audit metadata contains an unsupported field")
         record = AuditLog(

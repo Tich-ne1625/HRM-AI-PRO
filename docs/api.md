@@ -140,3 +140,7 @@ The same request ID is returned in the `X-Request-ID` response header. A caller-
 
 The reviewed endpoint map, pagination contract, role scopes, error meanings, and evidence-version concurrency rules are defined in [architecture.md](architecture.md). Documentation will add concrete request/response schemas as each phase implements them.
 
+
+## Phase 4 settings and KPI definitions (partial implementation)
+
+ADMIN-only `GET/PATCH /api/v1/settings/scoring` returns `{version,policy}`; PATCH requires `{expected_version,policy}` and changes future activation defaults only. HR-only `POST /api/v1/kpis` creates a definition; `PATCH /api/v1/kpis/{id}` requires expected_version and supported changes, including is_active retirement. `GET /api/v1/kpis` is paginated: HR sees all, MANAGER/EMPLOYEE see definitions assigned within their current employee scope, and ADMIN has no implicit HR access. Code/name search is literal; sorting is allowlisted. All mutations use the existing Origin/family-CSRF policy and atomic audit. Conflicts return stale_version or duplicate_code; invalid decimal policy inputs return 422. Cycle/assignment endpoints remain under implementation; see the [contract](phase-4-contract.md).
