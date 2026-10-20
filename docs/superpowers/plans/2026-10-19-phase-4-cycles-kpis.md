@@ -115,13 +115,13 @@ Gate: frontend tests, ESLint, TypeScript, production build; rà luồng trên m�
 
 File dự kiến: integration tests luồng tài khoản thật và concurrency; tài liệu bằng chứng review. Sửa code tại module gây lỗi nếu phát hiện, có regression test chứng minh.
 
-- [ ] E2E: bootstrap ADMIN → tạo HR/manager/employee accounts → HR lập tổ chức/liên kết → ADMIN sửa defaults → HR tạo cycle/enroll/activate → manager phân bổ/nhập actual → employee đọc; thử UUID ngoài scope bằng các session thật.
-- [ ] Transfer nhân viên: manager cũ mất quyền, manager mới nhận quyền, snapshot vẫn cũ; thay link/inactive/role và dùng access token trước đó để kiểm tra DB authority hiện tại.
-- [ ] Review mọi writer cùng lock order, không deadlock với user management/auth/organization; scoped counts và errors không lộ resource.
-- [ ] Mutation thiếu/sai Origin/CSRF, family revoked, payload extra/forged scope đều từ chối; audit không có body/snapshot/free-text/credential.
-- [ ] Chạy các race quan trọng ít nhất 5 lượt bằng PostgreSQL với barrier và giới hạn timeout; ghi từng kịch bản/kết quả thay vì chỉ tổng số pass.
-- [ ] Kiểm tra audit rollback của activation, allocation replacement, actual và config; snapshot private không xuất hiện trong scoped DTO ngoài allowlist.
-- [ ] Ghi rõ review trực tiếp hay reviewer độc lập thực tế; xử lý phát hiện nghiêm trọng trước Task 8, không tự nhận đã có independent review.
+- [x] E2E: bootstrap ADMIN → tạo HR/manager/employee accounts → HR lập tổ chức/liên kết → ADMIN sửa defaults → HR tạo cycle/enroll/activate → manager phân bổ/nhập actual → employee đọc; thử UUID ngoài scope bằng các session thật.
+- [x] Transfer nhân viên: manager cũ mất quyền, manager mới nhận quyền, snapshot vẫn cũ; thay link/inactive/role và dùng access token trước đó để kiểm tra DB authority hiện tại.
+- [x] Review mọi writer cùng lock order, không deadlock với user management/auth/organization; scoped counts và errors không lộ resource.
+- [x] Mutation thiếu/sai Origin/CSRF, family revoked, payload extra/forged scope đều từ chối; audit không có body/snapshot/free-text/credential.
+- [x] Chạy các race quan trọng ít nhất 5 lượt bằng PostgreSQL với barrier và giới hạn timeout; ghi từng kịch bản/kết quả thay vì chỉ tổng số pass.
+- [x] Kiểm tra audit rollback của activation, allocation replacement, actual và config; snapshot private không xuất hiện trong scoped DTO ngoài allowlist.
+- [x] Ghi rõ review trực tiếp hay reviewer độc lập thực tế; xử lý phát hiện nghiêm trọng trước Task 8, không tự nhận đã có independent review.
 
 Gate: không còn lỗi phân quyền, lost update, snapshot không nhất quán, deadlock hoặc atomicity chưa giải quyết. Commit dự kiến `test(cycles): verify authorization and concurrent evidence updates`.
 
@@ -172,3 +172,5 @@ B?ng ch?ng Task 4 (2026-10-20): 17 test activation/concurrency qua, g?m hai chu 
 B?ng ch?ng Task 5 (2026-10-20): 14 test allocation/actual, 7 test KPI concurrency v? 6 test scope qua. Event/barrier x?c nh?n request ?ang ch? ph?i t? ch?i sau logout, disable, chuy?n manager ho?c ??i role; manager kh?ng ghi self/indirect. C?c writer evidence d?ng c?ng participant/version, audit failure kh?i ph?c d?ng v? version. Ruff/mypy s?ch.
 
 B?ng ch?ng Task 6 (2026-10-20): 69 frontend test qua; ESLint/TypeScript v? production build s?ch. Edge headless tr?n stack Docker ri?ng x?c nh?n login b?ng Enter, HR desktop/390px, ?i?u h??ng b?n ph?m, MANAGER l?u actual qua giao di?n, EMPLOYEE ch? ??c v? ADMIN settings; kh?ng tr?n viewport. Gi?i h?n Vitest 2 worker gi?p tr?nh qu? t?i jsdom tr?n m?y/CI.
+
+B?ng ch?ng Task 7 (2026-10-20): review tr?c ti?p, kh?ng t? nh?n reviewer ??c l?p. 15 race PostgreSQL qua ?? 5 l??t (22.04s/30.25s/20.79s/31.10s/22.44s). Full suite local tr??c b? sung security: 566 qua; 5 test security/real-account b? sung qua, final collection 570. M??i ???ng mutation ???c ki?m tra Origin/CSRF/revoked family; audit allowlist, SQL scope v? lock order kh?ng c? blocker ch?a x? l?. Smoke HTTP qua proxy Docker x?c nh?n bootstrap/t?i kho?n th?t ? t? ch?c ? activation ? manager allocation/actual ? employee read ? transfer/revocation.

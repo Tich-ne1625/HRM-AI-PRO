@@ -83,13 +83,82 @@ def test_real_accounts_organization_linkage_scopes_and_transfer(auth_engine, mon
         assert refreshed_identity["employee_id"] == report_id
         assert manager.post("/api/v1/auth/refresh").status_code == 204
         assert manager.get("/api/v1/auth/me").json()["employee_id"] == leader.json()["id"]
+        # Continue the same real-account workflow through Phase 4; no forged tokens.
+        configured = admin.patch(
+            "/api/v1/settings/scoring",
+            json={
+                "expected_version": 1,
+                "policy": {"kpi_cap": "120.00"},
+            },
+        )
+        assert configured.status_code == 200
+        cycle = hr.post(
+            "/api/v1/review-cycles",
+            json={
+                "name": "Q4",
+                "start_date": "2026-10-01",
+                "end_date": "2026-12-31",
+            },
+        )
+        assert cycle.status_code == 201
+        cycle_path = "/api/v1/review-cycles/" + cycle.json()["id"]
+        assert (
+            hr.post(
+                cycle_path + "/participants",
+                json={
+                    "expected_version": 1,
+                    "employee_ids": [report_id],
+                },
+            ).status_code
+            == 200
+        )
+        activated = hr.post(cycle_path + "/activate", json={"expected_version": 2})
+        assert activated.status_code == 200
+        assert activated.json()["policy"]["kpi_cap"] == "120.00"
+        definition = hr.post(
+            "/api/v1/kpis",
+            json={
+                "code": "SALES",
+                "name": "Sales",
+                "unit": "VND",
+                "direction": "HIGHER_IS_BETTER",
+            },
+        )
+        assert definition.status_code == 201
+        kpis_path = f"/api/v1/employees/{report_id}/kpis?cycle_id={cycle.json()['id']}"
+        assigned = manager.put(
+            kpis_path,
+            json={
+                "expected_evidence_version": 2,
+                "items": [
+                    {
+                        "definition_id": definition.json()["id"],
+                        "target": "100.0000",
+                        "weight": "100.00",
+                    },
+                ],
+            },
+        )
+        assert assigned.status_code == 200
+        actual = manager.patch(
+            "/api/v1/employee-kpis/" + assigned.json()["items"][0]["id"],
+            json={
+                "expected_evidence_version": 3,
+                "actual": "75.0000",
+            },
+        )
+        assert actual.status_code == 200
+        assert employee.get(kpis_path).json()["items"][0]["actual"] == "75.0000"
+        assert admin.get(kpis_path).status_code == 403
         assert (
             hr.patch(f"/api/v1/employees/{report_id}", json={"manager_id": None}).status_code == 200
         )
         assert manager.get(f"/api/v1/employees/{report_id}").status_code == 404
+        assert manager.get(kpis_path).status_code == 404
         assert hr.patch(f"/api/v1/employees/{report_id}", json={"user_id": None}).status_code == 200
         assert employee.get("/api/v1/auth/me").json()["employee_id"] is None
         assert employee.get("/api/v1/employees").json()["total"] == 0
+        assert employee.get(kpis_path).status_code == 404
         with Session(auth_engine) as session:
             audits = session.scalars(select(AuditLog)).all()
             assert {
