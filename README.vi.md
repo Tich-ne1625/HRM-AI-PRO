@@ -18,7 +18,7 @@ Phase 1 đã hoàn thành:
 - Docker Compose thực hiện migration trước khi khởi động API và web.
 - GitHub Actions kiểm tra backend, frontend, image, migration và khả năng giữ dữ liệu sau khi khởi động lại.
 
-Phase 2 đã hoàn tất và qua CI: xác thực cookie, đổi mật khẩu, phân quyền và quản trị tài khoản. Phase 3 đã hoàn tất và qua CI, gồm phòng ban, chức danh, hồ sơ nhân viên, cây quản lý và liên kết tài khoản. Phase 4 cũng đã nghiệm thu CI: chu kỳ đánh giá, danh sách tham gia, định nghĩa/phân bổ KPI, nhập kết quả thực tế và cấu hình mặc định. Phase 5 đã có mã nguồn phản hồi 360 và đang nghiệm thu. Xem bằng chứng trong [hướng dẫn triển khai](docs/deployment.md). `employee_id` trả mã hồ sơ khi đã liên kết, hoặc `null` nếu chưa có. Tính điểm, Gemini và dashboard chưa triển khai.
+Phases 1–5 đã hoàn tất và qua CI: nền tảng, xác thực/quản trị tài khoản, tổ chức/nhân viên, chu kỳ/KPI và phản hồi 360. Phase 5 có phân công HR, inbox cho mọi role được giao, gửi một lần và tổng hợp có giới hạn bảo mật; các trang dùng chung bố cục desktop/mobile. [CI Phase 5](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/39369977157): **661 test backend, 89 test web** và Docker smoke qua. Xem bằng chứng trong [hướng dẫn triển khai](docs/deployment.md). `employee_id` là mã hồ sơ đã liên kết hoặc `null`. Tính điểm, Gemini và dashboard chưa triển khai.
 
 ## Công nghệ
 
@@ -228,9 +228,9 @@ Lệnh build lại và áp head hiện tại `20261020_0005`; chức năng chu k
 
 ## Các phase tiếp theo
 
-Phase 4 đã hoàn tất theo [kế hoạch chi tiết](docs/superpowers/plans/2026-10-19-phase-4-cycles-kpis.md) và [hợp đồng nghiệp vụ](docs/phase-4-contract.md), nghiệm thu CI ngày 2026-10-20. Phase 5 phản hồi đang nghiệm thu; công đoạn tiếp theo là Phase 6 tính điểm/chốt đánh giá, bao gồm điều kiện đóng chu kỳ. Tính điểm, Gemini, dashboard, seed và Kubernetes chưa được triển khai.
+Phase 4 đã hoàn tất theo [kế hoạch chi tiết](docs/superpowers/plans/2026-10-19-phase-4-cycles-kpis.md) và [hợp đồng nghiệp vụ](docs/phase-4-contract.md), nghiệm thu CI ngày 2026-10-20. Phase 5 phản hồi cũng đã nghiệm thu; công đoạn tiếp theo là Phase 6 tính điểm/chốt đánh giá, bao gồm điều kiện đóng chu kỳ. Tính điểm, Gemini, dashboard, seed và Kubernetes chưa được triển khai.
 
-Phase 5 đang được triển khai theo [kế hoạch 8 task](docs/superpowers/plans/2026-10-20-phase-5-feedback.md) và [hợp đồng](docs/phase-5-contract.md). Phần phản hồi đang chạy các bước nghiệm thu; chưa đánh dấu hoàn tất CI.
+Phase 5 hoàn tất theo [kế hoạch 8 task](docs/superpowers/plans/2026-10-20-phase-5-feedback.md) và [hợp đồng](docs/phase-5-contract.md); runtime `bf04fe2` đã qua đầy đủ CI. Năm lượt test cạnh tranh đều đạt 26/26. Giới hạn bảo mật và account lịch sử được mô tả trong hướng dẫn dưới đây.
 
 ## Dùng phản hồi 360 (Phase 5)
 

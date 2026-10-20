@@ -8,7 +8,7 @@ The project is a modular monolith: a Next.js web application, a FastAPI backend,
 
 ## Current scope
 
-Phases 1–4 are implemented and CI-verified: foundation, authentication, organization/employees and cycle/KPI workflows with Vietnamese screens. Current account linkage and SQL scopes enforce live access; cycle and assignment snapshots preserve history. Phase 4 includes definitions, complete allocations, actual entry and default scoring configuration. Phase 5 feedback is implemented and undergoing acceptance. Evidence is in [deployment.md](docs/deployment.md). Scoring and AI remain planned.
+Phases 1–5 are implemented and CI-verified: foundation, authentication, organization/employees, cycle/KPI workflows and feedback 360 with Vietnamese screens. Current account linkage and SQL scopes enforce live access; snapshots preserve historical assignment rights. Shared responsive layouts serve desktop/mobile. [Phase 5 CI](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/39369977157) passed **661 backend tests, 89 web tests and Docker smoke** at runtime `bf04fe2`. Evidence is in [deployment.md](docs/deployment.md). Scoring and AI remain planned.
 
 ## Technology stack
 
@@ -158,9 +158,9 @@ Set `AUTH_ACCESS_SECRET` to a nondefault key of at least 32 characters outside d
 
 ## Future phases
 
-The [Phase 4 plan](docs/superpowers/plans/2026-10-19-phase-4-cycles-kpis.md) and [contract](docs/phase-4-contract.md) record implementation and CI acceptance on 2026-10-20. Phase 5 feedback assignments/submission are undergoing acceptance. Closing cycles depends on review finalization in Phase 6. Scoring, Gemini, dashboards, seed data and Kubernetes follow [the architecture](docs/architecture.md).
+The [Phase 4 plan](docs/superpowers/plans/2026-10-19-phase-4-cycles-kpis.md) and [contract](docs/phase-4-contract.md) record implementation and CI acceptance on 2026-10-20. Phase 5 feedback assignments/submission are also accepted. Closing cycles depends on review finalization in Phase 6. Scoring, Gemini, dashboards, seed data and Kubernetes follow [the architecture](docs/architecture.md).
 
-Phase 5 implementation is undergoing acceptance against the [plan](docs/superpowers/plans/2026-10-20-phase-5-feedback.md) and [contract](docs/phase-5-contract.md). CI acceptance is still pending. It separates historical reviewer rights from live report scope and suppresses small peer/subordinate groups without promising anonymity.
+Phase 5 is complete against the [plan](docs/superpowers/plans/2026-10-20-phase-5-feedback.md) and [contract](docs/phase-5-contract.md), with CI acceptance at `bf04fe2`. It separates historical reviewer rights from live report scope and suppresses small peer/subordinate groups without promising anonymity. All 26 concurrency cases passed in each of five runs.
 
 ## Feedback walkthrough (Phase 5)
 

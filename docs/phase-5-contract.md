@@ -1,8 +1,8 @@
 # Hợp đồng Phase 5 — Phản hồi 360
 
-Ngày lập: 2026-10-20. Trạng thái: đang triển khai theo phê duyệt, chưa nghiệm thu CI. Tham chiếu [kiến trúc](architecture.md), [hợp đồng Phase 4](phase-4-contract.md) và [kế hoạch triển khai](superpowers/plans/2026-10-20-phase-5-feedback.md).
+Ngày lập: 2026-10-20. Trạng thái: **đã triển khai và nghiệm thu CI**, runtime `bf04fe2`, [run 39369977157](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/39369977157). Tham chiếu [kiến trúc](architecture.md), [hợp đồng Phase 4](phase-4-contract.md) và [kế hoạch triển khai](superpowers/plans/2026-10-20-phase-5-feedback.md).
 
-Các quy tắc dưới đây cụ thể hóa thiết kế tổng thể để triển khai và review. Trạng thái nghiệm thu và bằng chứng kiểm tra được cập nhật trong kế hoạch; không coi chức năng đang viết là đã nghiệm thu.
+Các quy tắc dưới đây cụ thể hóa thiết kế tổng thể đã triển khai. Bằng chứng kiểm tra và giới hạn được ghi trong kế hoạch và [review trực tiếp](phase-5-review.md); chức năng Phase 6 trở đi vẫn nằm ngoài phạm vi Phase 5.
 
 ## 1. Điểm nối đã đối chiếu
 

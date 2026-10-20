@@ -172,7 +172,7 @@ Policy defaults are `{schema_version:1,kpi_weight:"70.00",feedback_weight:"30.00
 
 ## Phase 5 assignments and feedback
 
-Implemented endpoints, currently undergoing final acceptance, use `/api/v1`, no-store responses and the existing error envelope. Mutations require exact Origin, session-bound CSRF and authorization revalidation under locks. The [feedback contract](phase-5-contract.md) records all eligibility and recovery decisions.
+Implemented and CI-accepted endpoints use `/api/v1`, no-store responses and the existing error envelope. Mutations require exact Origin, session-bound CSRF and authorization revalidation under locks. The [feedback contract](phase-5-contract.md) records all eligibility and recovery decisions.
 
 | Method/path | Scope and payload |
 | --- | --- |
