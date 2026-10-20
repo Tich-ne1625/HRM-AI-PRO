@@ -186,3 +186,15 @@ it("shows overdue assignments in the inbox without offering an automatic retry",
   await screen.findByText("Đã quá hạn — liên hệ HR gia hạn");
   expect(mocks.api.submit).not.toHaveBeenCalled();
 });
+it("changing required does not rewrite an untouched deadline or truncate its precision", async () => {
+  mocks.role = "HR"; const user = userEvent.setup();
+  const row = { ...assignment, relationship: "PEER", due_at: "2099-01-01T10:00:45.123456Z", reviewer_name: "Bình", reviewer_id: "peer", reviewer_employee_id: "e2", reviewer_active: true };
+  mocks.api.administration.mockResolvedValue({ items: [row], total: 1, page: 1, page_size: 20 });
+  mocks.api.update.mockResolvedValue({ ...row, required: false });
+  mount(<FeedbackAdministration />);
+  await user.click(await screen.findByRole("button", { name: "Mở phân công Bình" }));
+  await user.click(screen.getByLabelText("Phản hồi bắt buộc"));
+  await user.click(screen.getByRole("button", { name: "Lưu phân công" }));
+  await user.click(screen.getByRole("button", { name: "Xác nhận thao tác" }));
+  await waitFor(() => expect(mocks.api.update).toHaveBeenCalledWith("a1", { expected_assignment_version: 1, expected_evidence_version: 3, required: false }));
+});

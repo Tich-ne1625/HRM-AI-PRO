@@ -89,9 +89,11 @@ function AssignmentEditor({ initial, close, saved }: { initial: Administration; 
   const [reason, setReason] = useState<Reason>("WRONG_SELECTION"), [reloadError, setReloadError] = useState<Error | null>(null);
   const mandatory = row.relationship === "SELF" || row.relationship === "MANAGER";
   const mutation = useMutation({ mutationFn: async () => {
+    const dueChanged = due !== localDate(row.due_at);
+    const effectiveDue = dueChanged ? toUtc(due) : row.due_at;
     if (action === "cancel") return feedbackApi.cancel(row.id, { ...versions(row), reason_code: reason });
-    if (action === "replace") return feedbackApi.replace(row.id, { ...versions(row), reviewer_id: reviewer, due_at: toUtc(due), reason_code: reason });
-    return feedbackApi.update(row.id, { ...versions(row), required: mandatory || required, due_at: toUtc(due), ...(row.status === "CANCELLED" ? { status: "OPEN" as const } : {}) });
+    if (action === "replace") return feedbackApi.replace(row.id, { ...versions(row), reviewer_id: reviewer, due_at: effectiveDue, reason_code: reason });
+    return feedbackApi.update(row.id, { ...versions(row), required: mandatory || required, ...(dueChanged || row.status === "CANCELLED" ? { due_at: effectiveDue } : {}), ...(row.status === "CANCELLED" ? { status: "OPEN" as const } : {}) });
   }, onSuccess: async (result) => { setRow(result); setAction(null); setDue(localDate(result.due_at)); setRequired(result.required); await saved(); } });
   const reload = async () => { try { setRow(await feedbackApi.adminDetail(row.id)); setAction(null); mutation.reset(); setReloadError(null); } catch (e) { setReloadError(e as Error); } };
   return <section ref={panel} tabIndex={-1} className="auth-card wide" aria-label="Chi tiết phân công"><div className="section-heading"><h2>{row.reviewer_name} · {relationships[row.relationship]}</h2><button className="secondary" onClick={close}>Đóng chi tiết</button></div><p>{statuses[row.status]} · {row.employee_code} · {row.display_name}</p>
