@@ -158,7 +158,7 @@ Set `AUTH_ACCESS_SECRET` to a nondefault key of at least 32 characters outside d
 
 ## Future phases
 
-The [Phase 3 plan (Vietnamese)](docs/superpowers/plans/2026-10-19-phase-3-organization.md) tracks organization acceptance. Next is Phase 4: review cycles, participants and KPIs. Feedback, scoring, Gemini, dashboards, seed data and Kubernetes follow [the architecture](docs/architecture.md).
+The [Phase 3 plan (Vietnamese)](docs/superpowers/plans/2026-10-19-phase-3-organization.md) tracks organization acceptance. Next is Phase 4: review cycles, participants and KPIs. Its [detailed plan](docs/superpowers/plans/2026-10-19-phase-4-cycles-kpis.md) and [proposed contract](docs/phase-4-contract.md) are ready; implementation has not started. Closing cycles depends on review finalization in Phase 6. Feedback, scoring, Gemini, dashboards, seed data and Kubernetes follow [the architecture](docs/architecture.md).
 
 ## Organization walkthrough
 

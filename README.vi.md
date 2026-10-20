@@ -209,4 +209,4 @@ Ngừng hoạt động phòng ban/chức danh cần xác nhận và không xóa 
 
 ## Các phase tiếp theo
 
-Theo dõi bằng chứng và checklist trong [kế hoạch Phase 3](docs/superpowers/plans/2026-10-19-phase-3-organization.md), cùng [hợp đồng dữ liệu/quyền](docs/phase-3-contract.md). Công đoạn tiếp theo là Phase 4: chu kỳ đánh giá, danh sách tham gia và KPI. Phản hồi, tính điểm, Gemini, dashboard, seed và Kubernetes chưa được triển khai.
+Theo dõi bằng chứng và checklist trong [kế hoạch Phase 3](docs/superpowers/plans/2026-10-19-phase-3-organization.md), cùng [hợp đồng dữ liệu/quyền](docs/phase-3-contract.md). Công đoạn tiếp theo là Phase 4: chu kỳ đánh giá, danh sách tham gia và KPI; đã có [kế hoạch chi tiết](docs/superpowers/plans/2026-10-19-phase-4-cycles-kpis.md) và [hợp đồng đề xuất](docs/phase-4-contract.md), chưa bắt đầu triển khai. Thao tác đóng chu kỳ phụ thuộc chốt đánh giá ở Phase 6. Phản hồi, tính điểm, Gemini, dashboard, seed và Kubernetes chưa được triển khai.
