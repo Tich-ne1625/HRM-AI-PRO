@@ -31,6 +31,7 @@ export function EmployeeForm({ initial, onSaved }: { initial?: Employee; onSaved
   const mutation = useMutation({ mutationFn: (input: EmployeeInput) => organizationApi.saveEmployee(initial?.id ?? null, input), onSuccess: () => {
     void cache.invalidateQueries({ queryKey: ["organization"] });
     void cache.invalidateQueries({ queryKey: ["reviews"] });
+    void cache.invalidateQueries({ queryKey: ["feedback"] });
     void cache.invalidateQueries({ queryKey: ["users"] });
     void cache.invalidateQueries({ queryKey: ["auth"] }); onSaved();
   } });

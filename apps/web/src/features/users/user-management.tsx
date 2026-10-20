@@ -46,6 +46,7 @@ function AdminUsers() {
   }) => usersApi.update(id, values), onSuccess: () => {
     setConfirm(null); void cache.invalidateQueries({ queryKey: ["users"] });
     void cache.invalidateQueries({ queryKey: ["auth"] });
+    void cache.invalidateQueries({ queryKey: ["feedback"] });
   } });
   return <>
     <section className="auth-card wide">

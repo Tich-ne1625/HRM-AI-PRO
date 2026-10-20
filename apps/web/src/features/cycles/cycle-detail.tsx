@@ -3,6 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useState } from "react";
+import { useAuth } from "../auth/auth-provider";
 import { organizationApi } from "../organization/api";
 import { Pagination } from "../organization/shared";
 import { reviewApi, type Cycle } from "./api";
@@ -11,6 +12,7 @@ import { cycleStatus, ReviewAccess, ReviewError } from "./shared";
 
 export function CycleDetail({ id }: { id: string }) { return <ReviewAccess><Detail id={id} /></ReviewAccess>; }
 function Detail({ id }: { id: string }) {
+  const { user } = useAuth();
   const cache = useQueryClient();
   const [page, setPage] = useState(1), [q, setQ] = useState("");
   const [confirmation, setConfirmation] = useState<number | null>(null), [generation, setGeneration] = useState(0);
@@ -46,7 +48,7 @@ function Detail({ id }: { id: string }) {
       {participants.data && <><div className="table-scroll"><table><caption>{participants.data.total} người tham gia trong phạm vi</caption><thead><tr><th>Nhân viên</th><th>Phòng ban</th><th>Chức danh</th><th>Thao tác</th></tr></thead><tbody>
         {participants.data.items.map((p) => <tr key={p.id}><td>{p.employee_code} · {p.display_name}</td><td>{p.department_name}</td><td>{p.position_title}</td><td>{row.can_edit
           ? <button className="secondary" disabled={remove.isPending} onClick={() => remove.mutate(p.id)}>Bỏ {p.employee_code} khỏi nháp</button>
-          : <Link href={`/employees/${p.employee_id}/kpis?cycle_id=${id}`}>{p.can_manage_kpis ? "Quản lý KPI" : "Xem KPI"}</Link>}</td></tr>)}</tbody></table></div>
+          : <div className="row-actions"><Link href={`/employees/${p.employee_id}/kpis?cycle_id=${id}`}>{p.can_manage_kpis ? "Quản lý KPI" : "Xem KPI"}</Link><Link href={`/employees/${p.employee_id}/feedback?cycle_id=${id}`}>Tổng hợp phản hồi</Link>{user?.role === "HR" && <Link href={`/feedback-administration?participant_id=${p.id}&cycle_id=${id}`}>Phân công phản hồi</Link>}</div>}</td></tr>)}</tbody></table></div>
         {!participants.data.items.length && <p>Chưa có người tham gia phù hợp.</p>}
         <Pagination page={page} total={participants.data.total} pending={participants.isFetching} onPage={setPage} /></>}
       {remove.isError && <ReviewError error={remove.error} reload={() => {void refresh();}} />}

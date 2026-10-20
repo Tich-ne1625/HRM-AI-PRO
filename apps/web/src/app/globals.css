@@ -35,7 +35,7 @@ a {
 .auth-card button, .workspace button, [role="alert"] button { padding: .7rem 1rem; border-radius: .5rem; background: #1d4ed8; color: white; font-weight: 600; cursor: pointer; }
 .auth-card .secondary, .workspace .secondary { background: #f1f5f9; color: #1e293b; border: 1px solid #cbd5e1; }
 button:disabled { opacity: .55; cursor: wait; }
-:is(button, a, input, select):focus-visible { outline: 3px solid #60a5fa; outline-offset: 3px; }
+:is(button, a, input, select, textarea, [tabindex]):focus-visible { outline: 3px solid #60a5fa; outline-offset: 3px; }
 .auth-card [role="alert"] { color: #b91c1c; }
 .auth-card [role="status"] { color: #047857; }
 .auth-card a, .workspace-header a { color: #1d4ed8; text-underline-offset: .2em; }
@@ -72,4 +72,77 @@ td { font-size: .9rem; }
 .auth-card textarea { width: 100%; min-height: 6rem; padding: .65rem; border: 1px solid #cbd5e1; border-radius: .5rem; font: inherit; resize: vertical; }
 .auth-card fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
 .auth-card .confirmation { overflow-wrap: anywhere; }
+
+/* Shared workspace: comfortable reading widths, reusable panels, and a stable
+   navigation rail on desktop. Existing account, organization and KPI pages use it. */
+.workspace { min-height: 100dvh; color: #0f172a; }
+.workspace-main { min-width: 0; width: 100%; max-width: 92rem; }
+.workspace-header .brand { display: block; text-decoration: none; }
+.brand-caption { display: block; color: #64748b; font-size: .75rem; font-weight: 450; margin-top: .2rem; }
+.workspace-header nav { align-items: stretch; gap: .8rem; }
+.navigation-group { display: flex; gap: .35rem; flex-wrap: wrap; align-items: center; }
+.navigation-label { color: #64748b; font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
+.workspace-header nav a { display: block; padding: .55rem .7rem; border-radius: .5rem; text-decoration: none; font-size: .9rem; }
+.workspace-header nav a:hover { background: #f1f5f9; }
+.workspace-header nav a[aria-current="page"] { color: #1e40af; background: #eff6ff; font-weight: 700; box-shadow: inset 3px 0 #2563eb; }
+.workspace-main > .auth-card { max-width: none; }
+.workspace-main .auth-card { padding: clamp(1rem, 2.2vw, 2rem); min-width: 0; }
+.workspace-main form:not(.filters):not(.create-user-form) { max-width: 70rem; }
+.workspace-main fieldset { display: grid; gap: .8rem; }
+.workspace-main .table-scroll { max-width: 100%; overscroll-behavior-x: contain; border-radius: .6rem; }
+.workspace-main td { vertical-align: top; }
+.workspace-main tbody tr:hover { background: #f8fafc; }
+.workspace-main td .row-actions { min-width: 9rem; }
+.workspace-main .filters { grid-template-columns: minmax(0, 1fr) auto; gap: .5rem .8rem; }
+.workspace-main .filters > label { grid-column: 1 / -1; }
+.workspace-main .filters > input { min-width: 0; }
+.pagination { flex-wrap: wrap; gap: .6rem; }
+.pagination span { font-size: .85rem; color: #475569; }
+.row-actions { align-items: center; margin: .75rem 0; }
+.row-actions a { padding-block: .35rem; }
+.metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr)); gap: .8rem; margin: 1.5rem 0; }
+.metric { padding: 1rem; border: 1px solid #e2e8f0; border-radius: .75rem; background: #f8fafc; }
+.metric span { display: block; font-size: .85rem; color: #475569; }
+.metric strong { display: block; margin-top: .4rem; font-size: 1.5rem; }
+.feedback-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr)); gap: 1rem; }
+.inbox-card { border: 1px solid #e2e8f0; border-radius: .75rem; padding: 1.2rem; min-width: 0; overflow-wrap: anywhere; }
+.auth-card .inbox-card h2, .auth-card .inbox-card h3 { margin: .8rem 0; }
+.auth-card .inbox-card p:last-child { margin-bottom: 0; }
+.plain-comment { white-space: pre-wrap; overflow-wrap: anywhere; padding: 1rem; border-left: 3px solid #cbd5e1; background: #f8fafc; }
+.empty-state { padding: 2rem 1rem; border: 1px dashed #cbd5e1; border-radius: .75rem; text-align: center; }
+.reviewer-picker { display: grid; gap: .6rem; margin: 1rem 0; }
+.reviewer-picker .pagination { justify-content: flex-start; margin-top: .4rem; }
+.field-warning { color: #9a3412 !important; font-size: .8rem; }
+.feedback-error { margin-top: 1rem; border-left: 3px solid #dc2626; padding: .8rem 1rem; background: #fef2f2; border-radius: .4rem; }
+.skip-link { position: fixed; top: .5rem; left: .5rem; z-index: 100; transform: translateY(-200%); padding: .8rem; background: white; color: #1e40af; }
+.skip-link:focus { transform: translateY(0); }
+.navigation-toggle { display: none; }
+@media (max-width: 1099px) {
+  .navigation-toggle { display: inline-block; }
+  .workspace-header nav { flex-basis: 100%; }
+  .workspace-header nav[data-expanded="false"] { display: none; }
+}
+@media (min-width: 1100px) {
+  .workspace { display: grid; grid-template-columns: 15rem minmax(0, 1fr); align-items: start; }
+  .workspace-header { position: sticky; top: 0; height: 100dvh; overflow-y: auto; border-right: 1px solid #e2e8f0; border-bottom: 0; padding: 1.5rem 1rem; display: block; }
+  .workspace-header nav { display: grid; margin-top: 2rem; gap: 1.4rem; }
+  .navigation-group { display: grid; gap: .2rem; }
+  .navigation-label { margin: 0 .7rem .3rem; }
+  .workspace-main { margin: 0 auto; padding: 2rem clamp(1.25rem, 2.5vw, 3rem); }
+  .workspace-main > .form-grid { align-items: start; }
+}
+@media (max-width: 600px) {
+  .workspace-header { padding: 1rem; }
+  .workspace-header nav { display: grid; width: 100%; }
+  .navigation-group { gap: .2rem; }
+  .navigation-label { flex-basis: 100%; margin-top: .4rem; }
+  .workspace-header nav a { padding: .5rem .6rem; }
+  .workspace-main { margin: 1rem auto; }
+  .workspace-main .filters { grid-template-columns: minmax(0, 1fr); }
+  .workspace-main .filters > * { grid-column: 1; }
+  .pagination { justify-content: center; }
+  .pagination span { order: -1; flex-basis: 100%; text-align: center; }
+  .confirmation .row-actions > button { width: 100%; }
+  .create-user-form { grid-template-columns: minmax(0, 1fr); }
+}
 
