@@ -8,6 +8,7 @@ from app.core.database import get_db_session
 from app.core.policies import AuthContext, require_roles
 from app.modules.auth.router import require_csrf, require_same_origin
 from app.modules.organization.schemas import Page
+from app.modules.review_cycles.activation import CycleActivation
 from app.modules.review_cycles.models import CycleStatus
 from app.modules.review_cycles.schemas import (
     CycleCreate,
@@ -27,6 +28,27 @@ Reader = Annotated[
     AuthContext, Depends(require_roles(UserRole.HR, UserRole.MANAGER, UserRole.EMPLOYEE))
 ]
 Database = Annotated[Session, Depends(get_db_session)]
+
+
+@router.post(
+    "/{identifier}/activate", response_model=CycleView, dependencies=[Depends(require_same_origin)]
+)
+def activate_cycle(
+    identifier: UUID,
+    body: ExpectedVersion,
+    context: HR,
+    session: Database,
+    request: Request,
+    response: Response,
+) -> CycleView:
+    response.headers["Cache-Control"] = "no-store"
+    return CycleActivation(session).activate(
+        identifier,
+        body.expected_version,
+        context,
+        csrf=lambda row: require_csrf(request, row),
+        request_id=request.state.request_id,
+    )
 
 
 @router.get("", response_model=Page[CycleView])

@@ -71,13 +71,13 @@ Gate: cycle/scope tests + Phase 3 regression, Ruff/mypy. Commit dự kiến `fea
 
 File dự kiến: service/repository/schema review_cycles, settings policy reader, employee relationship snapshot query; `tests/integration/test_cycle_activation.py`, `test_cycle_concurrency.py`.
 
-- [ ] Test activation thiếu participant, inactive employee/reference, thiếu SELF hoặc manager account, inactive account, manager không hợp lệ; trả issue list có giới hạn và tổng số cho HR.
-- [ ] Implement POST activate với expected_version, đọc lại policy/account/cây hiện tại dưới khóa; snapshot cả cấp dưới không tham gia chu kỳ; không tạo feedback assignment.
-- [ ] Snapshot/policy/status/version/audit commit cùng transaction. Test lỗi participant cuối và audit failure không để lại snapshot hoặc ACTIVE một phần.
-- [ ] DB partial unique đảm bảo một ACTIVE; hai chu kỳ cùng kích hoạt chỉ một thành công, bên còn lại 409. Kích hoạt lặp không tạo thêm snapshot/audit thành công.
-- [ ] Race activation với scoring-default update, đổi manager, user link, reference retirement và account deactivation: kết quả tương ứng một thứ tự commit hợp lệ, không deadlock hoặc dữ liệu trộn.
-- [ ] Sau activation sửa tổ chức/defaults, chứng minh snapshot cũ giữ nguyên còn quyền đọc dùng quan hệ hiện tại. Account bị khóa sau activation không còn quyền authenticated.
-- [ ] DRAFT metadata không sửa sau ACTIVE; không đăng ký `/close` hoặc cơ chế hạ ACTIVE về DRAFT. UI giải thích giới hạn đến Phase 6.
+- [x] Test activation thiếu participant, inactive employee/reference, thiếu SELF hoặc manager account, inactive account, manager không hợp lệ; trả issue list có giới hạn và tổng số cho HR.
+- [x] Implement POST activate với expected_version, đọc lại policy/account/cây hiện tại dưới khóa; snapshot cả cấp dưới không tham gia chu kỳ; không tạo feedback assignment.
+- [x] Snapshot/policy/status/version/audit commit cùng transaction. Test lỗi participant cuối và audit failure không để lại snapshot hoặc ACTIVE một phần.
+- [x] DB partial unique đảm bảo một ACTIVE; hai chu kỳ cùng kích hoạt chỉ một thành công, bên còn lại 409. Kích hoạt lặp không tạo thêm snapshot/audit thành công.
+- [x] Race activation với scoring-default update, đổi manager, user link, reference retirement và account deactivation: kết quả tương ứng một thứ tự commit hợp lệ, không deadlock hoặc dữ liệu trộn.
+- [x] Sau activation sửa tổ chức/defaults, chứng minh snapshot cũ giữ nguyên còn quyền đọc dùng quan hệ hiện tại. Account bị khóa sau activation không còn quyền authenticated.
+- [x] DRAFT metadata không sửa sau ACTIVE; không đăng ký `/close` hoặc cơ chế hạ ACTIVE về DRAFT. UI giải thích giới hạn đến Phase 6.
 
 Gate: activation/atomicity/concurrency tests có hai session PostgreSQL độc lập, timeout bắt deadlock; Ruff/mypy. Commit dự kiến `feat(cycles): freeze policy and relationships on activation`.
 
@@ -166,3 +166,5 @@ B?ng ch?ng Task 1 (2026-10-20): baseline PostgreSQL 467/467 qua; test schema/val
 B?ng ch?ng Task 2 (2026-10-20): 14 test settings/catalog m?i qua; 76 test concurrency v? h?i quy users/organization/auth/policies qua, g?m ba race defaults/code/definition version. Exact Origin/CSRF, audit rollback, scoped empty lists, no-op v? stale version ???c ki?m tra. Ruff/mypy s?ch.
 
 B?ng ch?ng Task 3 (2026-10-20): 5 test draft/enrollment/audit rollback v? 4 test SQL scope/transfer/concurrency qua; count v? DTO kh?ng l? snapshot ri?ng t?. DRAFT ch? HR, s?a nh?p/enrollment versioned; 2 writer c?ng version c? m?t 200 v? m?t 409.
+
+B?ng ch?ng Task 4 (2026-10-20): 17 test activation/concurrency qua, g?m hai chu k? tranh ACTIVE, defaults/manager/link/reference thay ??i khi activation v? account deactivation ch?o module. Snapshot l?y quan h? c?p d??i k? c? ng??i kh?ng tham gia; audit failure rollback m?i participant/policy/status. Ruff/mypy s?ch.
