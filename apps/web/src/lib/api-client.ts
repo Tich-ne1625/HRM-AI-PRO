@@ -1,5 +1,6 @@
 export class ApiClientError extends Error {
-  constructor(public readonly status: number, public readonly code: string, message: string) {
+  constructor(public readonly status: number, public readonly code: string, message: string,
+    public readonly details: Record<string, unknown>[] = []) {
     super(message);
     this.name = "ApiClientError";
   }
@@ -36,7 +37,9 @@ async function errorFrom(response: Response): Promise<ApiClientError> {
     const error = body.error;
     if (error && typeof error === "object" && "code" in error && "message" in error &&
         typeof error.code === "string" && typeof error.message === "string") {
-      return new ApiClientError(response.status, error.code, error.message);
+      const details = "details" in error && Array.isArray(error.details)
+        ? error.details.filter((item): item is Record<string, unknown> => !!item && typeof item === "object" && !Array.isArray(item)) : [];
+      return new ApiClientError(response.status, error.code, error.message, details);
     }
   }
   return new ApiClientError(response.status, "request_failed", "Yêu cầu không thành công.");

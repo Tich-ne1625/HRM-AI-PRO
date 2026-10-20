@@ -101,13 +101,13 @@ Gate: KPI/schema/scope/concurrency tests + auth/organization regressions, Ruff/m
 
 File dự kiến: `apps/web/src/features/cycles/`, `features/kpis/`, `features/settings/`; routes dưới `src/app/(protected)/review-cycles/`, `kpis/`, `employees/[id]/kpis/`, `settings/scoring/`; navigation hiện có và feature behavior tests.
 
-- [ ] Tạo typed client cho cycle/participant/definition/allocation/policy, số Decimal là string; query key luôn có cycle/employee/filter/page phù hợp.
-- [ ] HR list/detail/create/edit DRAFT, employee selector tìm kiếm/phân trang, add/remove, activation confirmation + actionable server errors, policy preview/snapshot phân biệt rõ.
-- [ ] HR catalog định nghĩa tạo/sửa/retire; ADMIN settings form versioned. Không mở route HR chỉ vì role ADMIN hoặc ghi mặc định từ form HR.
-- [ ] Allocation editor chọn từ options scoped; tổng weight tính chính xác bằng đơn vị phần trăm nhỏ nhất hoặc Decimal string helper, không cộng float; cho chỉnh nháp chưa đủ 100 nhưng không gửi PUT đến khi hợp lệ.
-- [ ] Actual editor phân biệt null/0; cảnh báo đổi target xóa actual. Employee/manager-self chỉ đọc, cycle ID hiển thị rõ, không nút đóng chu kỳ hoặc điểm giả.
-- [ ] Loading/error/empty, labels/keyboard, pending, giữ form khi API lỗi; 409 không tự retry bằng version mới. Invalidate các query bị ảnh hưởng khi thành công; giữ auth cache isolation.
-- [ ] Behavior tests: vai trò, chọn nhiều trang không mất lựa chọn, thiếu điều kiện activation, tổng weight, version conflict giữ input, mutation error giữ form và query invalidation sau thành công.
+- [x] Tạo typed client cho cycle/participant/definition/allocation/policy, số Decimal là string; query key luôn có cycle/employee/filter/page phù hợp.
+- [x] HR list/detail/create/edit DRAFT, employee selector tìm kiếm/phân trang, add/remove, activation confirmation + actionable server errors, policy preview/snapshot phân biệt rõ.
+- [x] HR catalog định nghĩa tạo/sửa/retire; ADMIN settings form versioned. Không mở route HR chỉ vì role ADMIN hoặc ghi mặc định từ form HR.
+- [x] Allocation editor chọn từ options scoped; tổng weight tính chính xác bằng đơn vị phần trăm nhỏ nhất hoặc Decimal string helper, không cộng float; cho chỉnh nháp chưa đủ 100 nhưng không gửi PUT đến khi hợp lệ.
+- [x] Actual editor phân biệt null/0; cảnh báo đổi target xóa actual. Employee/manager-self chỉ đọc, cycle ID hiển thị rõ, không nút đóng chu kỳ hoặc điểm giả.
+- [x] Loading/error/empty, labels/keyboard, pending, giữ form khi API lỗi; 409 không tự retry bằng version mới. Invalidate các query bị ảnh hưởng khi thành công; giữ auth cache isolation.
+- [x] Behavior tests: vai trò, chọn nhiều trang không mất lựa chọn, thiếu điều kiện activation, tổng weight, version conflict giữ input, mutation error giữ form và query invalidation sau thành công.
 
 Gate: frontend tests, ESLint, TypeScript, production build; rà luồng trên màn hình hẹp và bàn phím. Commit dự kiến `feat(web): add Vietnamese cycle and KPI workflows`.
 
@@ -170,3 +170,5 @@ B?ng ch?ng Task 3 (2026-10-20): 5 test draft/enrollment/audit rollback v? 4 test
 B?ng ch?ng Task 4 (2026-10-20): 17 test activation/concurrency qua, g?m hai chu k? tranh ACTIVE, defaults/manager/link/reference thay ??i khi activation v? account deactivation ch?o module. Snapshot l?y quan h? c?p d??i k? c? ng??i kh?ng tham gia; audit failure rollback m?i participant/policy/status. Ruff/mypy s?ch.
 
 B?ng ch?ng Task 5 (2026-10-20): 14 test allocation/actual, 7 test KPI concurrency v? 6 test scope qua. Event/barrier x?c nh?n request ?ang ch? ph?i t? ch?i sau logout, disable, chuy?n manager ho?c ??i role; manager kh?ng ghi self/indirect. C?c writer evidence d?ng c?ng participant/version, audit failure kh?i ph?c d?ng v? version. Ruff/mypy s?ch.
+
+B?ng ch?ng Task 6 (2026-10-20): 69 frontend test qua; ESLint/TypeScript v? production build s?ch. Edge headless tr?n stack Docker ri?ng x?c nh?n login b?ng Enter, HR desktop/390px, ?i?u h??ng b?n ph?m, MANAGER l?u actual qua giao di?n, EMPLOYEE ch? ??c v? ADMIN settings; kh?ng tr?n viewport. Gi?i h?n Vitest 2 worker gi?p tr?nh qu? t?i jsdom tr?n m?y/CI.

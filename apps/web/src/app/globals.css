@@ -69,3 +69,7 @@ td { font-size: .9rem; }
 .auth-card hr { border: 0; border-top: 1px solid #e2e8f0; margin: 2rem 0; }
 .workspace-header nav { flex-wrap: wrap; gap: .8rem 1.2rem; }
 
+.auth-card textarea { width: 100%; min-height: 6rem; padding: .65rem; border: 1px solid #cbd5e1; border-radius: .5rem; font: inherit; resize: vertical; }
+.auth-card fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+.auth-card .confirmation { overflow-wrap: anywhere; }
+

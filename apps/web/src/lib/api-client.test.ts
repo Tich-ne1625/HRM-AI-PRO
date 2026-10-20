@@ -35,6 +35,17 @@ describe("cookie API client", () => {
     });
   });
 
+  it("retains structured validation issues and discards invalid detail entries", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(JSON.stringify({
+      error: {code: "activation_requirements_not_met", message: "Requirements", details: [
+        {employee_id: "employee", code: "self_account_required"}, null, "invalid", [],
+      ]},
+    }), {status: 409})));
+    await expect(apiFetch("/api/v1/review-cycles/cycle/activate", {method: "POST", body: "{}"})).rejects.toMatchObject({
+      status: 409, details: [{employee_id: "employee", code: "self_account_required"}],
+    });
+  });
+
   it("shares one refresh among ten simultaneous 401 responses and retries each once", async () => {
     let reads = 0;
     let refreshes = 0;

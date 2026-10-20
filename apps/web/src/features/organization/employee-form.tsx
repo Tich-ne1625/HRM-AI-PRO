@@ -30,6 +30,7 @@ export function EmployeeForm({ initial, onSaved }: { initial?: Employee; onSaved
   const lookup = useQuery({ queryKey: ["organization", "account-lookup", email], queryFn: () => organizationApi.lookup(email), enabled: email !== "" });
   const mutation = useMutation({ mutationFn: (input: EmployeeInput) => organizationApi.saveEmployee(initial?.id ?? null, input), onSuccess: () => {
     void cache.invalidateQueries({ queryKey: ["organization"] });
+    void cache.invalidateQueries({ queryKey: ["reviews"] });
     void cache.invalidateQueries({ queryKey: ["users"] });
     void cache.invalidateQueries({ queryKey: ["auth"] }); onSaved();
   } });
