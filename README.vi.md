@@ -18,7 +18,7 @@ Phase 1 đã hoàn thành:
 - Docker Compose thực hiện migration trước khi khởi động API và web.
 - GitHub Actions kiểm tra backend, frontend, image, migration và khả năng giữ dữ liệu sau khi khởi động lại.
 
-Phase 2 đã hoàn tất và qua CI: xác thực cookie, đổi mật khẩu, phân quyền và quản trị tài khoản. Phase 3 cũng đã hoàn tất và qua CI, gồm API và giao diện tiếng Việt cho phòng ban, chức danh, hồ sơ nhân viên, cây quản lý và liên kết tài khoản; xem bằng chứng trong [hướng dẫn triển khai](docs/deployment.md). `employee_id` trả mã hồ sơ khi đã liên kết, hoặc `null` nếu chưa có. Chu kỳ/KPI, phản hồi, tính điểm, Gemini và dashboard thuộc các phase sau.
+Phase 2 đã hoàn tất và qua CI: xác thực cookie, đổi mật khẩu, phân quyền và quản trị tài khoản. Phase 3 đã hoàn tất và qua CI, gồm phòng ban, chức danh, hồ sơ nhân viên, cây quản lý và liên kết tài khoản. Phase 4 cũng đã nghiệm thu CI: chu kỳ đánh giá, danh sách tham gia, định nghĩa/phân bổ KPI, nhập kết quả thực tế và cấu hình mặc định. Xem bằng chứng trong [hướng dẫn triển khai](docs/deployment.md). `employee_id` trả mã hồ sơ khi đã liên kết, hoặc `null` nếu chưa có. Phản hồi 360, tính điểm, Gemini và dashboard chưa triển khai.
 
 ## Công nghệ
 
@@ -130,7 +130,7 @@ alembic revision --autogenerate -m "mo ta thay doi schema"
 alembic upgrade head
 ```
 
-Luôn kiểm tra migration được sinh ra trước khi chạy. Head hiện tại là `20261019_0003`: sau baseline `20261003_0001` và auth `20261003_0002`, revision mới tạo `departments`, `positions`, `employees`. Nâng cấp database hiện hữu bằng `alembic upgrade head`; sao lưu dữ liệu cần giữ trước khi migration.
+Luôn kiểm tra migration được sinh ra trước khi chạy. Head hiện tại là `20261020_0004`, thêm schema chu kỳ/KPI và cấu hình mặc định; nối sau organization `20261019_0003`, auth `20261003_0002` và baseline `20261003_0001`. Nâng cấp database hiện hữu bằng `alembic upgrade head`; sao lưu dữ liệu cần giữ trước khi migration.
 
 ## Kiểm thử và kiểm tra chất lượng
 
@@ -197,6 +197,25 @@ Trên PowerShell nếu `npm.ps1` bị chặn, dùng `npm.cmd` thay cho `npm`; kh
 
 Ngừng hoạt động phòng ban/chức danh cần xác nhận và không xóa hồ sơ cũ. Các hồ sơ đang tham chiếu vẫn đọc/sửa được; không được gán mới reference đã ngừng hoạt động. Trạng thái nhân viên `ACTIVE`/`INACTIVE` độc lập với trạng thái đăng nhập của user: HR đổi trạng thái làm việc **không** tự khóa tài khoản; ADMIN quản lý quyền đăng nhập.
 
+## Dùng chu kỳ đánh giá và KPI (Phase 4)
+
+Nếu đang chạy bản cũ bằng Docker, từ thư mục `hrm-ai` chạy:
+
+```powershell
+docker compose --env-file .env up --build --wait
+```
+
+Lệnh build lại và áp migration `20261020_0004`. Sao lưu dữ liệu cần giữ trước khi nâng cấp; không cần tạo lại ADMIN hoặc xóa volume.
+
+1. **ADMIN** mở **Cấu hình chấm điểm** (`/settings/scoring`): mặc định KPI 70%, phản hồi 30%, cap 100.00. Chỉ sửa nếu cần; tổng hai trọng số phải đúng 100.00%. Sửa mặc định không đổi chu kỳ đã kích hoạt. ADMIN không có quyền HR.
+2. **HR** mở **Danh mục KPI** (`/kpis`), thêm mã/tên/đơn vị và chọn “Càng cao càng tốt” hoặc “Càng thấp càng tốt”. Ngừng sử dụng không xóa KPI đã gán; định nghĩa đã ngừng không được gán mới.
+3. **HR** mở **Chu kỳ đánh giá** (`/review-cycles`), tạo nháp với tên/ngày, mở chi tiết rồi tìm/chọn người tham gia. Lựa chọn giữ khi đổi trang; mỗi lượt thêm tối đa 100 người. Nhân viên phải đang làm việc, có phòng ban/chức danh hoạt động, có tài khoản đang hoạt động và có người quản lý đang làm việc với tài khoản active. Người chưa có quản lý chưa đủ điều kiện theo chính sách SELF + MANAGER bắt buộc.
+4. Bấm **Kích hoạt chu kỳ** rồi xác nhận. Lỗi chỉ rõ hồ sơ cần kiểm tra nếu thiếu điều kiện. Kích hoạt đóng băng danh sách, thông tin tổ chức, quan hệ lịch sử và policy; không sửa danh sách sau đó. Chỉ có một ACTIVE. Chưa có thao tác đóng chu kỳ vì chốt đánh giá thuộc Phase 6; ngày kết thúc không tự đóng.
+5. Từ danh sách người tham gia, **HR hoặc quản lý trực tiếp hiện tại** mở **Quản lý KPI**. Bấm **Chỉnh phân bổ KPI**, tìm/chọn KPI, nhập target dương và từng trọng số dương, tổng đúng **100.00%**, rồi **Lưu toàn bộ phân bổ**. Danh sách chưa đủ 100% chỉ là nháp trên màn hình. Tối đa 100 KPI/người/chu kỳ.
+6. Bấm **Nhập thực tế** ở từng KPI để nhập actual không âm. `0.0000` là kết quả hợp lệ; để trống để xóa. Đổi target của KPI đã có actual cần xác nhận và xóa actual liên quan để nhập lại. Đổi weight giữ actual; sửa danh mục không đổi snapshot của KPI đã gán.
+7. **EMPLOYEE** mở chu kỳ của mình rồi **Xem KPI**, không sửa được. MANAGER đọc self/direct reports hiện tại nhưng chỉ ghi cho direct report đang làm việc, không tự ghi KPI của mình. Chuyển quản lý đổi quyền hiện tại và giữ nguyên lịch sử tổ chức của kỳ.
+8. Nếu báo **dữ liệu đã thay đổi**, thông tin đang nhập được giữ khi lỗi. Chọn **Tải bản mới**, kiểm tra rồi nhập lại thay đổi; không tự gửi lại bằng version mới. Chưa có allocation/actual sẽ hiện “Chưa phân bổ KPI”/“Chưa nhập”; không có điểm hiệu suất hoặc AI giả.
+
 ## Tài liệu liên quan
 
 - [Kiến trúc hệ thống](docs/architecture.md).
@@ -209,4 +228,4 @@ Ngừng hoạt động phòng ban/chức danh cần xác nhận và không xóa 
 
 ## Các phase tiếp theo
 
-Theo dõi bằng chứng và checklist trong [kế hoạch Phase 3](docs/superpowers/plans/2026-10-19-phase-3-organization.md), cùng [hợp đồng dữ liệu/quyền](docs/phase-3-contract.md). Công đoạn tiếp theo là Phase 4: chu kỳ đánh giá, danh sách tham gia và KPI; đã có [kế hoạch chi tiết](docs/superpowers/plans/2026-10-19-phase-4-cycles-kpis.md) và [hợp đồng đề xuất](docs/phase-4-contract.md), chưa bắt đầu triển khai. Thao tác đóng chu kỳ phụ thuộc chốt đánh giá ở Phase 6. Phản hồi, tính điểm, Gemini, dashboard, seed và Kubernetes chưa được triển khai.
+Phase 4 đã hoàn tất theo [kế hoạch chi tiết](docs/superpowers/plans/2026-10-19-phase-4-cycles-kpis.md) và [hợp đồng nghiệp vụ](docs/phase-4-contract.md), nghiệm thu CI ngày 2026-10-20. Công đoạn tiếp theo là Phase 5: phân công và thu thập phản hồi 360. Đóng chu kỳ phụ thuộc chốt đánh giá ở Phase 6. Phản hồi, tính điểm, Gemini, dashboard, seed và Kubernetes chưa được triển khai.

@@ -1,17 +1,17 @@
 # InsightHR architecture proposal
 
 Date: 2026-10-03  
-Status: Approved; Phases 1–3 completed and CI-verified as of 2026-10-19. See deployment.md for acceptance evidence.
+Status: Approved; Phases 1–4 completed and CI-verified as of 2026-10-20. See deployment.md for acceptance evidence.
 
 ## Implementation status
 
-Phase 1 includes the FastAPI/Next.js foundation, PostgreSQL/Alembic readiness, Docker Compose and CI. Phase 2 implements authentication and account administration. Phase 3 adds department/position/employee schema and APIs, SQL-scoped reads, HR-only writes, user–employee linkage, guarded reporting-tree changes and Vietnamese web screens. Current identity reflects employee links. Review cycles, KPIs, feedback, scoring, Gemini and dashboards remain planned. Implementation/acceptance evidence is in the phase plans, the Phase 3 contract and `docs/deployment.md`.
+Phase 1 includes the FastAPI/Next.js foundation, PostgreSQL/Alembic readiness, Docker Compose and CI. Phase 2 implements authentication and account administration. Phase 3 adds department/position/employee schema and APIs, SQL-scoped reads, HR-only writes, user–employee linkage, guarded reporting-tree changes and Vietnamese web screens. Current identity reflects employee links. Phase 4 implements review-cycle drafts/enrollment/activation, frozen policies and reporting relationships, scoped KPI definitions, complete allocations/actuals, versioned defaults and Vietnamese screens; CI acceptance passed on 2026-10-20. Feedback, scoring, Gemini and dashboards remain planned. Implementation/acceptance evidence is in the phase plans, contracts and `docs/deployment.md`.
 
 ## Purpose and existing workspace
 
 InsightHR is a university capstone for employee performance management. The demonstration must connect employee records, review cycles, KPI assignments, authorized 360-degree feedback, reproducible performance calculations, and explicitly requested advisory Gemini analyses.
 
-The inspected workspace is empty and is not a Git repository. There is no existing application architecture to preserve. This proposal establishes the requested `hrm-ai/` project without introducing application code or installing dependencies.
+At the initial design on 2026-10-03, the workspace was empty with no existing application architecture to preserve. This proposal established `hrm-ai/`; its current implementation is summarized above.
 
 Scope excludes payroll, attendance, recruitment, CV parsing, chat, microservices, Kafka, Redis, vector databases, and Helm. Use fictional data in demos. No external service is required for numeric scoring.
 
@@ -376,4 +376,4 @@ The future `.env.example` includes PostgreSQL settings, access-signing secret, c
 
 The proposal adopts these assumptions: ADMIN has system privileges without implicit HR access; KPI cap defaults to 100; feedback converts ratings with `rating / 5 * 100`; submitted reviewers count equally; SELF and MANAGER are required; a single active cycle is allowed initially; finalization locks participant evidence; HR alone requests AI generation. These are proposed business policies, not requirements already asserted by the brief.
 
-The [Phase 3 plan](superpowers/plans/2026-10-19-phase-3-organization.md) and [contract](phase-3-contract.md) record organization decisions and gates. Next is Phase 4: review-cycle lifecycle, participant/relationship snapshots and complete KPI allocations/actuals. Its [detailed plan](superpowers/plans/2026-10-19-phase-4-cycles-kpis.md) and [proposed contract](phase-4-contract.md) were prepared on 2026-10-19; implementation started on 2026-10-20 with verified schema/migration; Phase 4 workflow acceptance remains pending. Cycle closing remains dependent on review finalization in Phase 6. Later domain artifacts remain proposals until their own phase is delivered.
+The [Phase 3 plan](superpowers/plans/2026-10-19-phase-3-organization.md) and [contract](phase-3-contract.md) record organization decisions and gates. Phase 4 implements review-cycle drafts/activation, participant/relationship snapshots and complete KPI allocations/actuals. Its [detailed plan](superpowers/plans/2026-10-19-phase-4-cycles-kpis.md) and [contract](phase-4-contract.md) were prepared on 2026-10-19; implementation and CI acceptance completed on 2026-10-20. Phase 5 feedback is next. Cycle closing remains dependent on review finalization in Phase 6. Later domain artifacts remain proposals until their own phase is delivered.

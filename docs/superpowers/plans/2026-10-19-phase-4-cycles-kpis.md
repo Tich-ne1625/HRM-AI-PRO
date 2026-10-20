@@ -1,6 +1,6 @@
 # Kế hoạch Phase 4 — Chu kỳ đánh giá và KPI
 
-Ngày: 2026-10-19. Trạng thái: đã lập kế hoạch; chưa bắt đầu triển khai Phase 4.
+Ngày lập: 2026-10-19. Trạng thái: hoàn tất Task 1–8 và nghiệm thu CI Linux ngày 2026-10-20. Runtime được xác minh tại `adcbabe1a77e73042aea7e67552ea510ae450832`.
 
 Nguồn: [kiến trúc](../../architecture.md), [hợp đồng Phase 4](../../phase-4-contract.md), [nghiệm thu Phase 3](2026-10-19-phase-3-organization.md), [vận hành và bằng chứng CI](../../deployment.md). Hợp đồng Phase 4 là nơi quy định nghiệp vụ/API; kế hoạch này quy định trình tự, file dự kiến và gate. Nếu phát hiện mâu thuẫn, sửa tài liệu và test trước khi viết tiếp thay vì tự bỏ điều kiện kiến trúc.
 
@@ -129,13 +129,13 @@ Gate: không còn lỗi phân quyền, lost update, snapshot không nhất quán
 
 File dự kiến: `scripts/smoke_auth.py` (hoặc script domain riêng được gọi từ cùng workflow), `.github/workflows/phase1-ci.yml`, container-contract tests, README Việt/Anh, `docs/{api,database,deployment,architecture}.md`, kế hoạch/hợp đồng này.
 
-- [ ] Full backend suite với TEST_DATABASE_URL đúng DB test, không skip integration; Ruff/mypy. Frontend toàn bộ tests/lint/typecheck/build. Không nâng dependency nếu không có lý do gắn với task.
-- [ ] Docker Compose config + Linux CI clean stack áp migration mới, API ready theo head mới, proxy HTTP thật cho role/scoped cycle/allocation/actual flow; không chỉ mock route.
-- [ ] Update container migration expectations theo sole head thực tế; images vẫn nonroot, runtime không chứa tooling/secrets. Password tạo trong memory/stdin theo smoke hiện tại.
-- [ ] Restart PostgreSQL, đọc revision và persisted cycle/participant/allocation/actual trước khi migration chạy lại; không xóa volume chứa dữ liệu làm việc. Kiểm tra fresh install và upgrade từ Phase 3 bằng môi trường dùng riêng.
-- [ ] Nếu local Docker/WSL vẫn unavailable, ghi đúng giới hạn và dùng CI Linux làm bằng chứng; không tự thay đổi cấu hình Windows để chạy Docker.
-- [ ] README có walkthrough HR/manager/employee/ADMIN, URL, trạng thái “chưa phân bổ/chưa nhập”, xử lý 409 và giới hạn một ACTIVE chưa đóng được đến Phase 6. API/database mô tả artifact đã triển khai, không đưa plan vào phần implemented.
-- [ ] Ghi commit + URL CI + kết quả thật, review diff và git status. Chỉ đánh dấu Phase 4 hoàn thành sau các gate trên; không suy ra Phase 5 đã làm vì đã có snapshot.
+- [x] Full backend suite với TEST_DATABASE_URL đúng DB test, không skip integration; Ruff/mypy. Frontend toàn bộ tests/lint/typecheck/build. Không nâng dependency nếu không có lý do gắn với task.
+- [x] Docker Compose config + Linux CI clean stack áp migration mới, API ready theo head mới, proxy HTTP thật cho role/scoped cycle/allocation/actual flow; không chỉ mock route.
+- [x] Update container migration expectations theo sole head thực tế; images vẫn nonroot, runtime không chứa tooling/secrets. Password tạo trong memory/stdin theo smoke hiện tại.
+- [x] Restart PostgreSQL, đọc revision và persisted cycle/participant/allocation/actual trước khi migration chạy lại; không xóa volume chứa dữ liệu làm việc. Kiểm tra fresh install và upgrade từ Phase 3 bằng môi trường dùng riêng.
+- [x] Nếu local Docker/WSL vẫn unavailable, ghi đúng giới hạn và dùng CI Linux làm bằng chứng; không tự thay đổi cấu hình Windows để chạy Docker.
+- [x] README có walkthrough HR/manager/employee/ADMIN, URL, trạng thái “chưa phân bổ/chưa nhập”, xử lý 409 và giới hạn một ACTIVE chưa đóng được đến Phase 6. API/database mô tả artifact đã triển khai, không đưa plan vào phần implemented.
+- [x] Ghi commit + URL CI + kết quả thật, review diff và git status. Chỉ đánh dấu Phase 4 hoàn thành sau các gate trên; không suy ra Phase 5 đã làm vì đã có snapshot.
 
 Gate cuối: backend/frontend/docker-smoke thành công và walkthrough tái lập được; không test nào bị skip ngoài lý do được ghi rõ. Commit dự kiến `docs: complete Phase 4 acceptance and runbook`.
 
@@ -161,16 +161,15 @@ docker compose --env-file .env.example config --quiet
 
 Lệnh upgrade/downgrade và smoke tạo dữ liệu phải chọn rõ môi trường dùng riêng; không thêm lệnh xóa volume hàng loạt vào quy trình bình thường. Baseline Phase 3 vẫn là điểm đối chiếu hồi quy cho auth, role và tổ chức.
 
-B?ng ch?ng Task 1 (2026-10-20): baseline PostgreSQL 467/467 qua; test schema/validation m?i v? h?i quy schema auth/organization/readiness 47/47 qua; sole head `20261020_0004`, metadata parity v? downgrade/upgrade b?o to?n d? li?u Phase 3.
+## Bằng chứng nghiệm thu ngày 2026-10-20
 
-B?ng ch?ng Task 2 (2026-10-20): 14 test settings/catalog m?i qua; 76 test concurrency v? h?i quy users/organization/auth/policies qua, g?m ba race defaults/code/definition version. Exact Origin/CSRF, audit rollback, scoped empty lists, no-op v? stale version ???c ki?m tra. Ruff/mypy s?ch.
+- Task 1, commit `025b0b6`: baseline PostgreSQL 467/467 qua; 47 test schema/validation và hồi quy schema auth/organization/readiness qua. Sole head `20261020_0004`; metadata parity và downgrade/upgrade bảo toàn dữ liệu Phase 3.
+- Task 2, commit `d3623c8`: 14 test settings/catalog mới và 76 test concurrency/hồi quy users/organization/auth/policies qua. Kiểm tra Origin/CSRF, audit rollback, scoped empty lists, no-op và stale version.
+- Task 3, commit `8a080dd`: 5 test draft/enrollment/audit rollback và 4 test SQL scope/transfer/concurrency qua. Hai writer cùng version có một 200 và một 409; count và DTO không lộ snapshot riêng tư.
+- Task 4, commit `edc459e`: 17 test activation/concurrency qua, gồm hai chu kỳ tranh ACTIVE, defaults/manager/link/reference thay đổi khi activation và account deactivation chéo module. Audit failure rollback toàn bộ participant/policy/status.
+- Task 5, commit `93300a0`: 14 test allocation/actual, 7 test KPI concurrency và 6 test scope qua. Request đang chờ bị từ chối sau logout, disable, chuyển manager hoặc đổi role. Audit failure khôi phục dòng và version.
+- Task 6, commit `641094d`: 69 frontend test, ESLint/TypeScript và production build qua. Edge headless xác nhận login bằng Enter, HR desktop/390px, điều hướng bàn phím, MANAGER lưu actual qua giao diện, EMPLOYEE chỉ đọc và ADMIN settings; không tràn viewport. Vitest giới hạn 2 worker để tránh quá tải jsdom.
+- Task 7, commit `cd559d6`: review trực tiếp, không tự nhận reviewer độc lập. 15 race PostgreSQL qua đủ 5 lượt (22.04s/30.25s/20.79s/31.10s/22.44s). Full suite local trước bổ sung security: 566 qua; 5 test security/real-account bổ sung qua, final collection 570. Kiểm tra cả 10 mutation path với Origin/CSRF/revoked family, SQL scope, audit allowlist và lock order.
+- Task 8, runtime commit `adcbabe1a77e73042aea7e67552ea510ae450832`: [InsightHR CI 39356761739](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/39356761739) thành công cả **backend (570 test), frontend (69 test) và docker-smoke**. Local Docker cũng qua build/nonroot/runtime inspection, proxy HTTP, Edge và PostgreSQL-only restart/persistence trước khi migration chạy lại. Stack nghiệm thu dùng cổng 13004/18004, không thay stack người dùng 3000/8000, và đã được dừng sau kiểm tra.
 
-B?ng ch?ng Task 3 (2026-10-20): 5 test draft/enrollment/audit rollback v? 4 test SQL scope/transfer/concurrency qua; count v? DTO kh?ng l? snapshot ri?ng t?. DRAFT ch? HR, s?a nh?p/enrollment versioned; 2 writer c?ng version c? m?t 200 v? m?t 409.
-
-B?ng ch?ng Task 4 (2026-10-20): 17 test activation/concurrency qua, g?m hai chu k? tranh ACTIVE, defaults/manager/link/reference thay ??i khi activation v? account deactivation ch?o module. Snapshot l?y quan h? c?p d??i k? c? ng??i kh?ng tham gia; audit failure rollback m?i participant/policy/status. Ruff/mypy s?ch.
-
-B?ng ch?ng Task 5 (2026-10-20): 14 test allocation/actual, 7 test KPI concurrency v? 6 test scope qua. Event/barrier x?c nh?n request ?ang ch? ph?i t? ch?i sau logout, disable, chuy?n manager ho?c ??i role; manager kh?ng ghi self/indirect. C?c writer evidence d?ng c?ng participant/version, audit failure kh?i ph?c d?ng v? version. Ruff/mypy s?ch.
-
-B?ng ch?ng Task 6 (2026-10-20): 69 frontend test qua; ESLint/TypeScript v? production build s?ch. Edge headless tr?n stack Docker ri?ng x?c nh?n login b?ng Enter, HR desktop/390px, ?i?u h??ng b?n ph?m, MANAGER l?u actual qua giao di?n, EMPLOYEE ch? ??c v? ADMIN settings; kh?ng tr?n viewport. Gi?i h?n Vitest 2 worker gi?p tr?nh qu? t?i jsdom tr?n m?y/CI.
-
-B?ng ch?ng Task 7 (2026-10-20): review tr?c ti?p, kh?ng t? nh?n reviewer ??c l?p. 15 race PostgreSQL qua ?? 5 l??t (22.04s/30.25s/20.79s/31.10s/22.44s). Full suite local tr??c b? sung security: 566 qua; 5 test security/real-account b? sung qua, final collection 570. M??i ???ng mutation ???c ki?m tra Origin/CSRF/revoked family; audit allowlist, SQL scope v? lock order kh?ng c? blocker ch?a x? l?. Smoke HTTP qua proxy Docker x?c nh?n bootstrap/t?i kho?n th?t ? t? ch?c ? activation ? manager allocation/actual ? employee read ? transfer/revocation.
+README Việt/Anh, API/database/deployment/architecture đã cập nhật. Phase 5 feedback chưa triển khai; đóng chu kỳ vẫn chờ finalization Phase 6.

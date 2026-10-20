@@ -8,7 +8,7 @@ The project is a modular monolith: a Next.js web application, a FastAPI backend,
 
 ## Current scope
 
-Foundation, authentication and Phase 3 organization are implemented and CI-verified. Organization/employee APIs and Vietnamese screens support account linkage, reporting-cycle prevention and SQL-scoped reads. `employee_id` is populated when linked, otherwise null. Acceptance evidence is recorded in [deployment.md](docs/deployment.md); KPI/review/AI features remain planned.
+Phases 1–4 are implemented and CI-verified: foundation, authentication, organization/employees and cycle/KPI workflows with Vietnamese screens. Current account linkage and SQL scopes enforce live access; cycle and assignment snapshots preserve history. Phase 4 includes definitions, complete allocations, actual entry and default scoring configuration. Acceptance evidence is in [deployment.md](docs/deployment.md). Feedback, scoring and AI remain planned.
 
 ## Technology stack
 
@@ -126,7 +126,7 @@ alembic revision --autogenerate -m "describe the schema change"
 alembic upgrade head
 ```
 
-Review every generated migration before running it. The sole head is `20261020_0004` (Phase 4 cycle/KPI schema), following `20261019_0003` (organization), `20261003_0002` (authentication) and baseline `20261003_0001`. Phase 4 workflows are being implemented. Back up data that must be kept before upgrades.
+Review every generated migration before running it. The sole head is `20261020_0004` (Phase 4 cycle/KPI schema), following `20261019_0003` (organization), `20261003_0002` (authentication) and baseline `20261003_0001`. Back up data that must be kept before upgrades.
 
 ## Tests and quality gates
 
@@ -158,7 +158,7 @@ Set `AUTH_ACCESS_SECRET` to a nondefault key of at least 32 characters outside d
 
 ## Future phases
 
-The [Phase 3 plan (Vietnamese)](docs/superpowers/plans/2026-10-19-phase-3-organization.md) tracks organization acceptance. Next is Phase 4: review cycles, participants and KPIs. Its [detailed plan](docs/superpowers/plans/2026-10-19-phase-4-cycles-kpis.md) and [proposed contract](docs/phase-4-contract.md) track work in progress; schema/migration is verified, while Phase 4 workflow acceptance is still pending. Closing cycles depends on review finalization in Phase 6. Feedback, scoring, Gemini, dashboards, seed data and Kubernetes follow [the architecture](docs/architecture.md).
+The [Phase 4 plan](docs/superpowers/plans/2026-10-19-phase-4-cycles-kpis.md) and [contract](docs/phase-4-contract.md) record implementation and CI acceptance on 2026-10-20. Phase 5 feedback assignments/submission are next. Closing cycles depends on review finalization in Phase 6. Feedback, scoring, Gemini, dashboards, seed data and Kubernetes follow [the architecture](docs/architecture.md).
 
 ## Organization walkthrough
 
@@ -168,3 +168,16 @@ HR manages all profiles. MANAGER reads self plus direct reports; EMPLOYEE reads 
 
 The [Phase 2 implementation plan](docs/superpowers/plans/2026-10-03-phase-2-authentication.md) records the authentication sequence and verification gates.
 
+
+## Cycle and KPI walkthrough (Phase 4)
+
+Rebuild an existing Compose stack with `docker compose --env-file .env up --build --wait` to apply `20261020_0004`, retaining its volume and accounts. Back up valuable data before upgrading.
+
+1. ADMIN may edit `/settings/scoring`: component weights must total 100.00; defaults affect future activations only. ADMIN has no HR access.
+2. HR creates definitions at `/kpis`, then creates a DRAFT at `/review-cycles`, selects active employees in paginated batches, and confirms activation. Employees and their active managers need active linked accounts; references must be active. Validation identifies profiles needing attention.
+3. Activation freezes policy and organization/relationship history. Only one ACTIVE is permitted. Closing depends on Phase 6 finalization and is intentionally unavailable; dates do not automatically close a cycle.
+4. From cycle participants, HR/current direct manager opens employee KPIs. Replace a complete nonempty allocation of at most 100 distinct definitions with positive targets/weights summing exactly to 100.00. Partial edits stay in the browser.
+5. Enter nonnegative actuals one row at a time; zero is valid and blank clears. Changing a target clears its actual after confirmation; changing weight retains it. Definition edits do not rewrite assignment snapshots.
+6. Employees read their own allocation; managers read self/current direct reports and cannot edit their own KPIs. Transfer changes live access while preserving historical snapshots. A 409 conflict retains input until explicit reload; reload fresh data and re-enter changes, without an automatic version retry.
+
+All business decimals are JSON strings. Feedback, calculation, finalization, AI, dashboards and demo seed remain outside Phase 4. See the [Vietnamese walkthrough](README.vi.md) and [contract](docs/phase-4-contract.md).

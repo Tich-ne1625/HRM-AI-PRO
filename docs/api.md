@@ -141,6 +141,31 @@ The same request ID is returned in the `X-Request-ID` response header. A caller-
 The reviewed endpoint map, pagination contract, role scopes, error meanings, and evidence-version concurrency rules are defined in [architecture.md](architecture.md). Documentation will add concrete request/response schemas as each phase implements them.
 
 
-## Phase 4 settings and KPI definitions (partial implementation)
+## Phase 4 cycles, KPI evidence and scoring defaults
 
-ADMIN-only `GET/PATCH /api/v1/settings/scoring` returns `{version,policy}`; PATCH requires `{expected_version,policy}` and changes future activation defaults only. HR-only `POST /api/v1/kpis` creates a definition; `PATCH /api/v1/kpis/{id}` requires expected_version and supported changes, including is_active retirement. `GET /api/v1/kpis` is paginated: HR sees all, MANAGER/EMPLOYEE see definitions assigned within their current employee scope, and ADMIN has no implicit HR access. Code/name search is literal; sorting is allowlisted. All mutations use the existing Origin/family-CSRF policy and atomic audit. Conflicts return stale_version or duplicate_code; invalid decimal policy inputs return 422. Cycle/assignment endpoints remain under implementation; see the [contract](phase-4-contract.md).
+All endpoints below are implemented under `/api/v1`, use the existing error envelope and no-store responses. POST resource creation is 201; other successes are 200. Mutations require exact Origin, family-bound CSRF, current role/status/family revalidation and atomic audit. No endpoint computes a score.
+
+| Method/path | Contract |
+| --- | --- |
+| GET/PATCH `/settings/scoring` | ADMIN only; `{version,policy}`. PATCH `{expected_version,policy}`; weights total 100.00, cap positive or null; affects future activations only |
+| GET/POST `/review-cycles` | HR sees all; other domain roles see ACTIVE/CLOSED with self/current direct report participation. POST HR `{name,start_date,end_date}` creates DRAFT |
+| GET/PATCH `/review-cycles/{id}` | Scoped detail includes policy preview/snapshot, source version, scoped participant_count and can_edit/can_activate. PATCH HR metadata + expected_version, DRAFT only |
+| GET/POST `/review-cycles/{id}/participants` | GET paginated scoped DTO; POST HR `{expected_version,employee_ids}` adds 1?100 distinct active employees atomically in DRAFT |
+| DELETE `/review-cycles/{id}/participants/{participant_id}` | HR, DRAFT with no evidence; JSON `{expected_version}`; returns `{version,count:1}` |
+| POST `/review-cycles/{id}/activate` | HR `{expected_version}`; validates eligibility, freezes policy/organization/relationships, increments versions and activates atomically |
+| GET/POST `/kpis`; PATCH `/kpis/{id}` | HR manages definitions; GET other domain roles only definitions assigned within live scope. PATCH expected_version + supported changes; retirement via is_active |
+| GET `/employees/{id}/kpi-options?cycle_id=...` | HR/eligible current direct manager only, ACTIVE/unfinalized participant; paginated active definitions available to assign |
+| GET/PUT `/employees/{id}/kpis?cycle_id=...` | GET scoped aggregate; PUT HR/current eligible direct manager `{expected_evidence_version,items:[{definition_id,target,weight}]}` atomically replaces complete allocation |
+| PATCH `/employee-kpis/{id}` | HR/current eligible direct manager `{expected_evidence_version,actual}`; actual null clears; target/weight/snapshot are forbidden |
+
+Allocation response is `{participant,cycle_status,items}`. The participant DTO exposes id/cycle_id/employee_id, employee_code/display_name, department_id/name, position_title, evidence_version, is_snapshot and can_manage_kpis. It never exposes the private user/manager/direct-report snapshot. Items expose id/definition_id, a definition snapshot (schema_version/version/code/name/description/unit/direction), target/actual/weight. No score fields are fabricated. Nonexistent and out-of-scope detail requests use the same 404 code for that resource type.
+
+Lists return `{items,total,page,page_size}` with page >=1, page_size 1?100 and UUID tie-breakers. Cycles: status/q (max 100), ascending sort start_date/name/created_at. Participants: q and department_id refer to snapshots after activation and live employee fields in DRAFT; sort employee_code. Definitions/options: q/is_active/direction, sort code/name/created_at; options only allow is_active=true. Search is literal. Definition/code uniqueness and retired-definition conflicts return 409. All count queries have the same SQL scope as item queries; cycle participant_count for a manager is not an organization total.
+
+Quantity/percentage inputs and outputs are decimal strings. Target >0; actual >=0 or null; each allocation weight in (0,100], total exactly 100.00. Quantity NUMERIC(14,4), weight NUMERIC(5,2), policy cap NUMERIC(7,2). Booleans, numeric JSON values, exponents, NaN/Infinity, negative or excessive precision are rejected with 422 rather than rounded. Body extra fields and empty PATCH changes are rejected. A no-op still checks identity, state and version, without incrementing versions/audit.
+
+PUT preserves each retained definition's assignment UUID and snapshot. Same target retains actual; target change clears it; weight changes retain it. Removed then re-added definitions get a new snapshot. Retired definitions can remain and receive actuals, but cannot be newly assigned. A new LOWER_IS_BETTER requires a finite cycle cap. Evidence writes serialize on the participant and increment one shared evidence_version. Do not retry automatically with a fresh version after 409.
+
+Errors: 409 stale_version/stale_evidence_version, duplicate_code, participant_already_enrolled, cycle_not_draft/cycle_not_active, active_cycle_exists, activation_requirements_not_met, kpi_definition_inactive/kpi_policy_incompatible, participant_finalized; 404 cycle_not_found/participant_not_found/kpi_not_found/employee_kpi_not_found/employee_not_found; 422 validation_error. Activation details list at most 100 `{employee_id,code}` issues plus total issue_count, only for HR. Missing system singleton returns 503 configuration_unavailable. No `/close` endpoint until finalization is implemented in Phase 6.
+
+Policy defaults are `{schema_version:1,kpi_weight:"70.00",feedback_weight:"30.00",kpi_cap:"100.00"}`. Review history, role rules and allowed state transitions are documented in the [Phase 4 contract](phase-4-contract.md).

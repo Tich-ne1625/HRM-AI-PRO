@@ -1,8 +1,8 @@
-# Hợp đồng đề xuất Phase 4 — Chu kỳ đánh giá và KPI
+# Hợp đồng Phase 4 — Chu kỳ đánh giá và KPI
 
-Ngày lập: 2026-10-19. Trạng thái: kế hoạch, chưa triển khai runtime hoặc migration. Chi tiết công việc tại [kế hoạch Phase 4](superpowers/plans/2026-10-19-phase-4-cycles-kpis.md).
+Ngày lập: 2026-10-19. Trạng thái: schema, API, giao diện và nghiệm thu CI đã hoàn tất ngày 2026-10-20. Chi tiết công việc và bằng chứng tại [kế hoạch Phase 4](superpowers/plans/2026-10-19-phase-4-cycles-kpis.md).
 
-Tài liệu cụ thể hóa Phase 4 trong [kiến trúc tổng thể](architecture.md), giữ nguyên modular monolith, cookie/CSRF, phân quyền theo dữ liệu và audit cùng giao dịch. Các lựa chọn nghiệp vụ dưới đây là cơ sở triển khai đề xuất, chưa phải tính năng đang chạy.
+Tài liệu cụ thể hóa Phase 4 trong [kiến trúc tổng thể](architecture.md), giữ nguyên modular monolith, cookie/CSRF, phân quyền theo dữ liệu và audit cùng giao dịch. Các quy tắc dưới đây đã được triển khai và kiểm chứng theo kế hoạch.
 
 ## 1. Kết quả và ranh giới
 
@@ -12,9 +12,9 @@ Phase này không tính điểm KPI hoặc điểm tổng, không nhận phản 
 
 Kiến trúc quy định chu kỳ chỉ CLOSED khi mọi đánh giá đã finalized. Vì finalization thuộc Phase 6, Phase 4 **không cung cấp thao tác đóng chu kỳ**, cũng không thêm lối tắt đóng cưỡng bức để demo. Hệ thống ban đầu chỉ có tối đa một chu kỳ ACTIVE; việc mở chu kỳ ACTIVE thứ hai phải đợi luồng đóng hợp lệ ở Phase 6. Ngày kết thúc không tự đóng chu kỳ.
 
-## 2. Dữ liệu dự kiến
+## 2. Dữ liệu đã triển khai
 
-Một migration mới nối sau sole head `20261019_0003`; mã revision được chọn khi bắt đầu triển khai. UUID, timestamp UTC, FK RESTRICT, không xóa lịch sử đã kích hoạt.
+Migration `20261020_0004` nối sau `20261019_0003` và là sole head hiện tại. UUID, timestamp UTC, FK RESTRICT, không xóa lịch sử đã kích hoạt.
 
 | Bảng | Trường và ràng buộc chính |
 | --- | --- |
@@ -81,7 +81,7 @@ Manager cần tra cứu định nghĩa chưa từng được gán để phân b�
 - Khi hai người sửa cùng participant, chỉ một request với version cũ thắng; request còn lại trả 409 `stale_evidence_version`. UI giữ dữ liệu đang nhập, báo xung đột, cho tải bản mới và nhập lại; không tự retry mutation bằng version mới.
 - Phase 5–7 phải dùng cùng participant lock/version cho feedback, tính điểm và kiểm tra stale. Chưa tạo bảng PerformanceReview/AI hoặc logic invalidation giả trong Phase 4.
 
-## 7. API dự kiến
+## 7. API đã triển khai
 
 Tất cả prefix `/api/v1`, cùng envelope lỗi Phase 2/3. GET/POST/PATCH/PUT/DELETE thành công trả no-store; POST tạo resource trả 201, thao tác còn lại trả 200 (xóa participant nháp trả cycle version mới). Mutation yêu cầu exact Origin, CSRF gắn family còn active và kiểm tra lại quyền trong transaction.
 
@@ -131,10 +131,10 @@ Audit tối thiểu: `scoring_defaults.updated`, `review_cycle.created/updated/a
 
 ## 9. Giao diện và bàn giao
 
-Các route dự kiến: `/review-cycles`, `/review-cycles/{id}`, `/kpis`, `/employees/{id}/kpis?cycle_id=...`, `/settings/scoring`. Giao diện tiếng Việt, dùng API client/TanStack Query/RHF/Zod hiện có. Không thêm dependency hoặc UI framework chỉ để làm phase này.
+Các route đã triển khai: `/review-cycles`, `/review-cycles/{id}`, `/kpis`, `/employees/{id}/kpis?cycle_id=...`, `/settings/scoring`. Giao diện tiếng Việt, dùng API client/TanStack Query/RHF/Zod hiện có. Không thêm dependency hoặc UI framework chỉ để làm phase này.
 
 HR có màn hình nháp, selector nhân viên tìm kiếm/phân trang, xác nhận activation nêu rõ các trường sẽ đóng băng. Không tự nhập UUID. Manager chọn KPI qua options có scope, chỉnh toàn bộ tỷ trọng với tổng hiện tại, chỉ lưu khi đủ 100.00; đổi target cảnh báo xóa actual. Actual chưa có hiển thị “Chưa nhập”, 0.0000 là kết quả hợp lệ. Người chỉ có quyền đọc không thấy form ghi.
 
 Hiển thị rõ kỳ đánh giá đang chọn; không tự dùng một cycle lịch sử mơ hồ. Dùng server capabilities để hỗ trợ UI, backend vẫn kiểm tra độc lập. Có loading/error/empty, field errors, keyboard labels, pending, xác nhận retirement và xung đột version. Giữ form khi lỗi; invalidate cycle/participant/KPI/options liên quan sau ghi thành công và xóa cache khi đổi tài khoản theo cơ chế auth hiện có.
 
-Nghiệm thu phải chứng minh luồng HR + manager + employee thật, scope sau transfer, stale version, race PostgreSQL, audit rollback, migration và Docker/proxy/persistence. Phase 4 chỉ được ghi hoàn tất sau các gate trong kế hoạch; hiện trạng vẫn là Phase 1–3 hoàn thành.
+Nghiệm thu đã chứng minh luồng HR + manager + employee thật, scope sau transfer, stale version, race PostgreSQL, audit rollback, migration và Docker/proxy/persistence. Phase 1–4 đã hoàn thành và nghiệm thu CI; feedback và scoring thuộc các phase tiếp theo.

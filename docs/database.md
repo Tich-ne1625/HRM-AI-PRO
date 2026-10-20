@@ -62,13 +62,28 @@ Do not edit a migration that has already been used by another environment. Add a
 
 ## Test isolation
 
-Integration tests require `TEST_DATABASE_URL` pointing to a disposable PostgreSQL database whose name ends with `_test`. Fixtures drop only known user/session/audit tables in FK-safe order and `alembic_version`, then migrate to the sole head. Never point them at data that must be kept. Concurrency tests use independent SQLAlchemy sessions and barriers; all database connections set UTC session time zone.
+Integration tests require `TEST_DATABASE_URL` pointing to a disposable PostgreSQL database whose name ends with `_test`. Fixtures drop only known application tables in FK-safe order (KPI evidence/definitions, participants/cycles/config, organization, audit/sessions/users) and `alembic_version`, then migrate to the sole head. Never point them at data that must be kept. Concurrency tests use independent SQLAlchemy sessions and barriers; all database connections set UTC session time zone.
 
 ## Planned domain model
 
 The remaining tables, constraints, snapshots, concurrency rules and ERD are in [architecture.md](architecture.md). Only the phase that owns a feature introduces its tables.
 
 
-## Phase 4 schema (implementation in progress)
+## Phase 4 cycle and KPI schema
 
-Revision `20261020_0004` adds `system_config`, `review_cycles`, `cycle_participants`, `kpi_definitions` and `employee_kpis`. The migration inserts only singleton scoring defaults (70/30, cap 100.00); it creates no accounts or demo records. Partial unique indexing permits at most one ACTIVE cycle, dates and numeric evidence have CHECK constraints, and history references use RESTRICT. Quantities are NUMERIC(14,4), allocation weights NUMERIC(5,2). Nullable JSON snapshots use SQL NULL in DRAFT. Participant evidence versions coordinate later evidence writers. Snapshot DTO and lifecycle behavior follow the [Phase 4 contract](phase-4-contract.md); schema availability does not mean the workflows or scoring are complete. PostgreSQL tests cover metadata parity, a clean install, constraints, and downgrade/upgrade preserving Phase 3 records.
+Revision `20261020_0004` adds `system_config`, `review_cycles`, `cycle_participants`, `kpi_definitions` and `employee_kpis`. The migration inserts only singleton scoring defaults (70/30, cap 100.00); it creates no accounts or demo records. Partial unique indexing permits at most one ACTIVE cycle, dates and numeric evidence have CHECK constraints, and history references use RESTRICT. Quantities are NUMERIC(14,4), allocation weights NUMERIC(5,2). Nullable JSON snapshots use SQL NULL in DRAFT. Participant evidence versions coordinate later evidence writers. Snapshot DTO and lifecycle behavior follow the [Phase 4 contract](phase-4-contract.md); cycle/KPI workflows are implemented, while scoring/finalization remain Phase 6. PostgreSQL tests cover metadata parity, a clean install, constraints, and downgrade/upgrade preserving Phase 3 records.
+
+
+| Table | Fields and consistency rules |
+| --- | --- |
+| `system_config` | Integer singleton id=1, version >=1, object JSONB scoring_policy and UTC timestamps; initial policy schema_version=1, 70.00/30.00/cap 100.00 |
+| `review_cycles` | UUID, name VARCHAR(200), date period, constrained DRAFT/ACTIVE/CLOSED, version >=1; frozen policy JSONB + policy_source_version + activated_at required outside DRAFT, all SQL NULL in DRAFT; partial UNIQUE status where ACTIVE |
+| `cycle_participants` | UUID, cycle/employee FK RESTRICT, UNIQUE(cycle_id,employee_id), evidence_version >=1, private snapshot JSONB nullable in DRAFT, finalized_at nullable; employee index for scoped lookup |
+| `kpi_definitions` | UUID, unique normalized code VARCHAR(32), nonblank name VARCHAR(200)/unit VARCHAR(50), description VARCHAR(2000), constrained direction, is_active, version >=1, UTC timestamps |
+| `employee_kpis` | UUID, participant/definition FK RESTRICT, UNIQUE(participant_id,definition_id), object definition_snapshot, positive target NUMERIC(14,4), nullable nonnegative actual NUMERIC(14,4), weight NUMERIC(5,2) in (0,100], UTC timestamps; NaN rejected by numeric checks |
+
+Participant snapshots have a schema version, employee and department/position identity/labels, employee/user IDs for SELF and manager, and the direct-report relationships at activation (including people outside participation). Private snapshots are parsed into public allowlisted DTOs, never serialized wholesale. Organization/default changes do not mutate activated snapshots. Live access still follows current account linkage and manager relations.
+
+Aggregate allocation weight is a service invariant, not a per-row CHECK: lock the participant, require expected_evidence_version, validate full unique allocation with exactly 100.00, reconcile and audit in one transaction. All evidence writers in future phases must reuse this lock/version. Assignment snapshots only refresh after removal/reassignment; changing a target clears actual, weight changes retain it. No PerformanceReview, FeedbackAssignment or AI tables are introduced here.
+
+Every Phase 4 writer follows guard 730031 → sorted active ADMIN/user locks → active family → config if needed → cycle → participants → definitions/assignments. Activation locks SELF/manager accounts against deactivation and reads graph/defaults consistently. User administration retains its established admin-first order and does not wait on this guard. Phase 4 audit allowlist permits only field names, codes, states, UUIDs, counts and versions. Audit failure rolls back evidence, removed rows and version changes.
