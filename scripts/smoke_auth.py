@@ -25,7 +25,7 @@ class Browser:
         path: str,
         *,
         method: str = "GET",
-        body: dict[str, str | None] | None = None,
+        body: dict[str, object] | None = None,
         expected: int = 200,
         csrf: bool = True,
     ) -> dict:
@@ -48,6 +48,10 @@ class Browser:
 
 
 def organization_smoke(admin: Browser, hr: Browser, suffix: str) -> None:
+    if hr.request("/api/v1/review-cycles?status=ACTIVE")["total"]:
+        raise RuntimeError(
+            "Phase 4 smoke requires a fresh disposable project without an ACTIVE cycle"
+        )
     password = secrets.token_urlsafe(24)
     accounts = {}
     browsers = {}
@@ -61,7 +65,9 @@ def organization_smoke(admin: Browser, hr: Browser, suffix: str) -> None:
         )["id"]
         browser = Browser(hr.base, hr.origin)
         browser.request(
-            "/api/v1/auth/login", method="POST", body={"email": email, "password": password}
+            "/api/v1/auth/login",
+            method="POST",
+            body={"email": email, "password": password},
         )
         browsers[name] = browser
     department = hr.request(
@@ -110,9 +116,134 @@ def organization_smoke(admin: Browser, hr: Browser, suffix: str) -> None:
         expected=409,
         body={"manager_id": report["id"]},
     )
+    review_cycle_smoke(admin, hr, browsers["manager"], browsers["employee"], report, suffix)
     hr.request("/api/v1/employees/" + report["id"], method="PATCH", body={"manager_id": None})
     browsers["manager"].request("/api/v1/employees/" + report["id"], expected=404)
+    assert browsers["manager"].request("/api/v1/review-cycles", expected=200)["total"] == 0
     print("Organization HTTP smoke passed: references, linking, scope, cycle rejection, transfer.")
+
+
+def review_cycle_smoke(
+    admin: Browser,
+    hr: Browser,
+    manager: Browser,
+    employee: Browser,
+    report: dict,
+    suffix: str,
+) -> None:
+    defaults = admin.request("/api/v1/settings/scoring")
+    admin.request(
+        "/api/v1/settings/scoring",
+        method="PATCH",
+        body={
+            "expected_version": defaults["version"],
+            "policy": {
+                "kpi_weight": "70.00",
+                "feedback_weight": "30.00",
+                "kpi_cap": "120.00",
+            },
+        },
+    )
+    hr.request("/api/v1/settings/scoring", expected=403)
+    admin.request("/api/v1/review-cycles", expected=403)
+    cycle = hr.request(
+        "/api/v1/review-cycles",
+        method="POST",
+        expected=201,
+        body={
+            "name": "Smoke cycle",
+            "start_date": "2026-10-01",
+            "end_date": "2026-12-31",
+        },
+    )
+    path = "/api/v1/review-cycles/" + cycle["id"]
+    hr.request(
+        path + "/participants",
+        method="POST",
+        body={
+            "expected_version": 1,
+            "employee_ids": [report["id"]],
+        },
+    )
+    activated = hr.request(path + "/activate", method="POST", body={"expected_version": 2})
+    assert activated["status"] == "ACTIVE" and activated["policy"]["kpi_cap"] == "120.00"
+    assert manager.request(path)["participant_count"] == 1
+    definition = hr.request(
+        "/api/v1/kpis",
+        method="POST",
+        expected=201,
+        body={
+            "code": f"SALES-{suffix}",
+            "name": "Smoke sales",
+            "unit": "VND",
+            "direction": "HIGHER_IS_BETTER",
+        },
+    )
+    allocation_path = f"/api/v1/employees/{report['id']}/kpis?cycle_id={cycle['id']}"
+    body = {
+        "expected_evidence_version": 2,
+        "items": [
+            {
+                "definition_id": definition["id"],
+                "target": "100.0000",
+                "weight": "100.00",
+            },
+        ],
+    }
+    manager.request(allocation_path, method="PUT", body=body, csrf=False, expected=403)
+    assigned = manager.request(allocation_path, method="PUT", body=body)
+    assert assigned["participant"]["evidence_version"] == 3
+    assert assigned["items"][0]["actual"] is None
+    actual_path = "/api/v1/employee-kpis/" + assigned["items"][0]["id"]
+    actual = manager.request(
+        actual_path,
+        method="PATCH",
+        body={
+            "expected_evidence_version": 3,
+            "actual": "0.0000",
+        },
+    )
+    assert actual["participant"]["evidence_version"] == 4
+    assert employee.request(allocation_path)["items"][0]["actual"] == "0.0000"
+    employee.request(
+        actual_path,
+        method="PATCH",
+        body={
+            "expected_evidence_version": 4,
+            "actual": "9.0000",
+        },
+        expected=403,
+    )
+    manager.request(
+        allocation_path,
+        method="PUT",
+        body={**body, "expected_evidence_version": 3},
+        expected=409,
+    )
+    hr.request(
+        "/api/v1/kpis/" + definition["id"],
+        method="PATCH",
+        body={
+            "expected_version": 1,
+            "name": "Changed catalog name",
+        },
+    )
+    assert employee.request(allocation_path)["items"][0]["definition"]["name"] == "Smoke sales"
+    latest = admin.request("/api/v1/settings/scoring")
+    admin.request(
+        "/api/v1/settings/scoring",
+        method="PATCH",
+        body={
+            "expected_version": latest["version"],
+            "policy": {"kpi_cap": "150.00"},
+        },
+    )
+    assert employee.request(path)["policy"]["kpi_cap"] == "120.00"
+    hr.request(path + "/close", method="POST", expected=404)
+    print(
+        "Cycle/KPI HTTP smoke passed: defaults, activation, snapshots, allocation, "
+        "actual zero, scope, CSRF and stale version."
+    )
 
 
 def main() -> None:
@@ -176,7 +307,10 @@ def main() -> None:
             "role": "HR",
         },
     )
-    current, other = Browser(args.base_url, args.origin), Browser(args.base_url, args.origin)
+    current, other = (
+        Browser(args.base_url, args.origin),
+        Browser(args.base_url, args.origin),
+    )
     for browser in (current, other):
         browser.request(
             "/api/v1/auth/login",
