@@ -229,3 +229,5 @@ Lệnh build lại và áp migration `20261020_0004`. Sao lưu dữ liệu cần
 ## Các phase tiếp theo
 
 Phase 4 đã hoàn tất theo [kế hoạch chi tiết](docs/superpowers/plans/2026-10-19-phase-4-cycles-kpis.md) và [hợp đồng nghiệp vụ](docs/phase-4-contract.md), nghiệm thu CI ngày 2026-10-20. Công đoạn tiếp theo là Phase 5: phân công và thu thập phản hồi 360. Đóng chu kỳ phụ thuộc chốt đánh giá ở Phase 6. Phản hồi, tính điểm, Gemini, dashboard, seed và Kubernetes chưa được triển khai.
+
+Phase 5 đã có [kế hoạch 8 task](docs/superpowers/plans/2026-10-20-phase-5-feedback.md) và [hợp đồng đề xuất](docs/phase-5-contract.md), đối chiếu với mã nguồn Phase 4 ngày 2026-10-20. Chưa bắt đầu code Phase 5. Kế hoạch tách quyền reviewer lịch sử với quyền xem tổng hợp hiện tại, giữ phản hồi bất biến sau gửi và che nhóm PEER/SUBORDINATE dưới ba người; không cam kết ẩn danh tuyệt đối.

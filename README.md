@@ -160,6 +160,8 @@ Set `AUTH_ACCESS_SECRET` to a nondefault key of at least 32 characters outside d
 
 The [Phase 4 plan](docs/superpowers/plans/2026-10-19-phase-4-cycles-kpis.md) and [contract](docs/phase-4-contract.md) record implementation and CI acceptance on 2026-10-20. Phase 5 feedback assignments/submission are next. Closing cycles depends on review finalization in Phase 6. Feedback, scoring, Gemini, dashboards, seed data and Kubernetes follow [the architecture](docs/architecture.md).
 
+The [Phase 5 plan](docs/superpowers/plans/2026-10-20-phase-5-feedback.md) and [proposed contract](docs/phase-5-contract.md) were prepared against the implemented Phase 4 on 2026-10-20. Phase 5 implementation has not started. The proposal separates historical assignment rights from live report scope, preserves submitted feedback, and suppresses small peer/subordinate groups without promising anonymity.
+
 ## Organization walkthrough
 
 As ADMIN, create HR, MANAGER and EMPLOYEE accounts in `/admin/users`. Sign out and sign in as HR: ADMIN does not inherit HR privileges. Create reference data in `/departments` and `/positions`, then employee profiles in `/employees`; select a manager and link an existing account through exact-email lookup before saving. Open a profile by clicking its name. Reference selectors support search/pagination; retiring a reference preserves existing links and prevents new assignment.
