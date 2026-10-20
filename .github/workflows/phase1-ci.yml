@@ -133,7 +133,7 @@ jobs:
       - name: Verify persistence across normal restart
         run: |
           revision_before="$(docker compose --project-name insighthr-ci --env-file .env.example exec -T postgres sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc "SELECT version_num FROM alembic_version"' | tr -d '[:space:]')"
-          test "$revision_before" = "20261019_0003"
+          test "$revision_before" = "20261020_0004"
           users_before="$(docker compose --project-name insighthr-ci --env-file .env.example exec -T postgres sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc "SELECT count(*) FROM users"' | tr -d '[:space:]')"
           test "$users_before" -ge 2
           employees_before="$(docker compose --project-name insighthr-ci --env-file .env.example exec -T postgres sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc "SELECT count(*) FROM employees"' | tr -d '[:space:]')"

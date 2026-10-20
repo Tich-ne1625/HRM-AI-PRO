@@ -14,7 +14,9 @@ from .conftest import ALEMBIC_INI
 def test_organization_revision_and_metadata_match(auth_engine):
     from app.models import Department, Employee, Position
 
-    assert ScriptDirectory.from_config(Config(str(ALEMBIC_INI))).get_heads() == ["20261019_0003"]
+    scripts = ScriptDirectory.from_config(Config(str(ALEMBIC_INI)))
+    assert len(scripts.get_heads()) == 1
+    assert "20261019_0003" in {revision.revision for revision in scripts.walk_revisions()}
     assert {Department.__tablename__, Employee.__tablename__, Position.__tablename__} == {
         "departments",
         "employees",

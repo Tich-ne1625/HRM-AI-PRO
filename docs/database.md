@@ -2,7 +2,7 @@
 
 ## Phase 3 organization schema
 
-Current sole head is `20261019_0003`, following authentication `20261003_0002` and baseline `20261003_0001`. Upgrade/downgrade and metadata parity are tested against PostgreSQL.
+Current sole head is `20261020_0004` (Phase 4 schema), following organization `20261019_0003`, authentication `20261003_0002` and baseline `20261003_0001`. Upgrade/downgrade and metadata parity are tested against PostgreSQL.
 
 | Table | Contract |
 | --- | --- |
@@ -68,3 +68,7 @@ Integration tests require `TEST_DATABASE_URL` pointing to a disposable PostgreSQ
 
 The remaining tables, constraints, snapshots, concurrency rules and ERD are in [architecture.md](architecture.md). Only the phase that owns a feature introduces its tables.
 
+
+## Phase 4 schema (implementation in progress)
+
+Revision `20261020_0004` adds `system_config`, `review_cycles`, `cycle_participants`, `kpi_definitions` and `employee_kpis`. The migration inserts only singleton scoring defaults (70/30, cap 100.00); it creates no accounts or demo records. Partial unique indexing permits at most one ACTIVE cycle, dates and numeric evidence have CHECK constraints, and history references use RESTRICT. Quantities are NUMERIC(14,4), allocation weights NUMERIC(5,2). Nullable JSON snapshots use SQL NULL in DRAFT. Participant evidence versions coordinate later evidence writers. Snapshot DTO and lifecycle behavior follow the [Phase 4 contract](phase-4-contract.md); schema availability does not mean the workflows or scoring are complete. PostgreSQL tests cover metadata parity, a clean install, constraints, and downgrade/upgrade preserving Phase 3 records.

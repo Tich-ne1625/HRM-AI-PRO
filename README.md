@@ -126,7 +126,7 @@ alembic revision --autogenerate -m "describe the schema change"
 alembic upgrade head
 ```
 
-Review every generated migration before running it. The sole head is `20261019_0003` (organization/employees), following `20261003_0002` (authentication) and baseline `20261003_0001`. Back up data that must be kept before upgrades.
+Review every generated migration before running it. The sole head is `20261020_0004` (Phase 4 cycle/KPI schema), following `20261019_0003` (organization), `20261003_0002` (authentication) and baseline `20261003_0001`. Phase 4 workflows are being implemented. Back up data that must be kept before upgrades.
 
 ## Tests and quality gates
 
@@ -158,7 +158,7 @@ Set `AUTH_ACCESS_SECRET` to a nondefault key of at least 32 characters outside d
 
 ## Future phases
 
-The [Phase 3 plan (Vietnamese)](docs/superpowers/plans/2026-10-19-phase-3-organization.md) tracks organization acceptance. Next is Phase 4: review cycles, participants and KPIs. Its [detailed plan](docs/superpowers/plans/2026-10-19-phase-4-cycles-kpis.md) and [proposed contract](docs/phase-4-contract.md) are ready; implementation has not started. Closing cycles depends on review finalization in Phase 6. Feedback, scoring, Gemini, dashboards, seed data and Kubernetes follow [the architecture](docs/architecture.md).
+The [Phase 3 plan (Vietnamese)](docs/superpowers/plans/2026-10-19-phase-3-organization.md) tracks organization acceptance. Next is Phase 4: review cycles, participants and KPIs. Its [detailed plan](docs/superpowers/plans/2026-10-19-phase-4-cycles-kpis.md) and [proposed contract](docs/phase-4-contract.md) track work in progress; schema/migration is verified, while Phase 4 workflow acceptance is still pending. Closing cycles depends on review finalization in Phase 6. Feedback, scoring, Gemini, dashboards, seed data and Kubernetes follow [the architecture](docs/architecture.md).
 
 ## Organization walkthrough
 

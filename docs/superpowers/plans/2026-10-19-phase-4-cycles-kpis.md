@@ -30,13 +30,13 @@ Thực hiện Task 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8. Task 7 bổ sung
 
 File dự kiến: `apps/api/app/modules/settings/{models,schemas}.py`, `modules/review_cycles/{models,schemas}.py`, `modules/kpis/{models,schemas}.py`; `app/models.py`; một file mới trong `apps/api/alembic/versions/`; `apps/api/tests/integration/test_review_cycle_schema.py`; fixture cleanup hiện có.
 
-- [ ] Chạy full backend với PostgreSQL test riêng trước sửa; xác minh test không bị skip do thiếu TEST_DATABASE_URL, ghi baseline và revision đang chạy. Không sử dụng DB làm việc làm test DB.
-- [ ] Viết test schema thất bại trước: singleton config; enum/CHECK; FK RESTRICT; unique employee/cycle và participant/definition; partial unique một ACTIVE; precision; sole migration chain; metadata parity.
-- [ ] Tạo năm bảng trong hợp đồng và CHECK/index cần thiết, initial policy 70/30 cap 100.00. Không tạo PerformanceReview, FeedbackAssignment hoặc dữ liệu demo.
-- [ ] Chốt DTO snapshot có version schema, UUID serialized rõ ràng; snapshot private tách DTO công khai. DRAFT chưa có snapshot chính thức.
-- [ ] Validation Decimal string, bounds/scale, control characters, extra fields, expected versions dương; không round/float ngầm.
-- [ ] Kiểm tra upgrade từ Phase 3 giữ nguyên users/employees/audits; upgrade từ DB sạch; downgrade/upgrade chỉ trong DB dùng riêng, `_test` guard vẫn hoạt động.
-- [ ] Xác minh tất cả model được import vào metadata; cập nhật fixture cleanup theo FK, không tắt constraint hoặc drop bảng tùy ý.
+- [x] Chạy full backend với PostgreSQL test riêng trước sửa; xác minh test không bị skip do thiếu TEST_DATABASE_URL, ghi baseline và revision đang chạy. Không sử dụng DB làm việc làm test DB.
+- [x] Viết test schema thất bại trước: singleton config; enum/CHECK; FK RESTRICT; unique employee/cycle và participant/definition; partial unique một ACTIVE; precision; sole migration chain; metadata parity.
+- [x] Tạo năm bảng trong hợp đồng và CHECK/index cần thiết, initial policy 70/30 cap 100.00. Không tạo PerformanceReview, FeedbackAssignment hoặc dữ liệu demo.
+- [x] Chốt DTO snapshot có version schema, UUID serialized rõ ràng; snapshot private tách DTO công khai. DRAFT chưa có snapshot chính thức.
+- [x] Validation Decimal string, bounds/scale, control characters, extra fields, expected versions dương; không round/float ngầm.
+- [x] Kiểm tra upgrade từ Phase 3 giữ nguyên users/employees/audits; upgrade từ DB sạch; downgrade/upgrade chỉ trong DB dùng riêng, `_test` guard vẫn hoạt động.
+- [x] Xác minh tất cả model được import vào metadata; cập nhật fixture cleanup theo FK, không tắt constraint hoặc drop bảng tùy ý.
 
 Gate: schema tests + readiness/auth smoke có PostgreSQL, Ruff/mypy; Alembic một head, không drift. Commit dự kiến `feat(cycles): add cycle and KPI schema`.
 
@@ -160,3 +160,5 @@ docker compose --env-file .env.example config --quiet
 ```
 
 Lệnh upgrade/downgrade và smoke tạo dữ liệu phải chọn rõ môi trường dùng riêng; không thêm lệnh xóa volume hàng loạt vào quy trình bình thường. Baseline Phase 3 vẫn là điểm đối chiếu hồi quy cho auth, role và tổ chức.
+
+B?ng ch?ng Task 1 (2026-10-20): baseline PostgreSQL 467/467 qua; test schema/validation m?i v? h?i quy schema auth/organization/readiness 47/47 qua; sole head `20261020_0004`, metadata parity v? downgrade/upgrade b?o to?n d? li?u Phase 3.
