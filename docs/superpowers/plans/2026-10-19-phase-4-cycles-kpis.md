@@ -85,15 +85,15 @@ Gate: activation/atomicity/concurrency tests có hai session PostgreSQL độc l
 
 File dự kiến: kpis repository/service/router/schemas, participant-lock helper; `tests/integration/test_employee_kpis.py`, `test_kpi_scope.py`, `test_kpi_concurrency.py`.
 
-- [ ] Test GET allocation, options lookup scoped và current manager writer; manager chỉ đọc self, không ghi self/indirect/outside scope; HR không cần employee profile.
-- [ ] Test allocation trống ban đầu; PUT rỗng/duplicate/weight sai tổng, zero/negative target, overprecision, bool/NaN/Infinity và quá 100 items đều bị từ chối.
-- [ ] PUT reconcile full allocation trong một transaction dưới participant lock/version; snapshot định nghĩa mới, giữ snapshot cũ; map retired/missing definition và cap incompatibility đúng lỗi.
-- [ ] Chứng minh giữ target giữ actual, đổi target clear actual, đổi weight giữ actual, bỏ/gán lại lấy snapshot mới. Audit failure khôi phục cả dòng bị xóa và evidence_version.
-- [ ] PATCH chỉ nhận actual + expected_evidence_version, actual 0 hợp lệ và null để clear; không nhận target/weight/snapshot/cycle_id tùy ý trong body.
-- [ ] Mọi evidence mutation tăng chung participant version một lần; stale version không cập nhật dữ liệu. No-op vẫn check quyền/version/status, không tăng version.
-- [ ] Race PUT/PUT, PUT/PATCH actual, hai actual trên hai dòng của cùng participant: chỉ một request cùng expected version thắng. Race khác participant không tạo deadlock; chấp nhận serialize guard ở quy mô đồ án.
-- [ ] Test transfer/deactivation trong lúc chờ guard; revalidate current actor/family/direct-report trước mutation. Chứng minh không có đường nhận scope từ body.
-- [ ] DRAFT/CLOSED/finalized participant không ghi được; retirement định nghĩa không phá actual của dòng đã gán. Không trả score hoặc gọi calculator.
+- [x] Test GET allocation, options lookup scoped và current manager writer; manager chỉ đọc self, không ghi self/indirect/outside scope; HR không cần employee profile.
+- [x] Test allocation trống ban đầu; PUT rỗng/duplicate/weight sai tổng, zero/negative target, overprecision, bool/NaN/Infinity và quá 100 items đều bị từ chối.
+- [x] PUT reconcile full allocation trong một transaction dưới participant lock/version; snapshot định nghĩa mới, giữ snapshot cũ; map retired/missing definition và cap incompatibility đúng lỗi.
+- [x] Chứng minh giữ target giữ actual, đổi target clear actual, đổi weight giữ actual, bỏ/gán lại lấy snapshot mới. Audit failure khôi phục cả dòng bị xóa và evidence_version.
+- [x] PATCH chỉ nhận actual + expected_evidence_version, actual 0 hợp lệ và null để clear; không nhận target/weight/snapshot/cycle_id tùy ý trong body.
+- [x] Mọi evidence mutation tăng chung participant version một lần; stale version không cập nhật dữ liệu. No-op vẫn check quyền/version/status, không tăng version.
+- [x] Race PUT/PUT, PUT/PATCH actual, hai actual trên hai dòng của cùng participant: chỉ một request cùng expected version thắng. Race khác participant không tạo deadlock; chấp nhận serialize guard ở quy mô đồ án.
+- [x] Test transfer/deactivation trong lúc chờ guard; revalidate current actor/family/direct-report trước mutation. Chứng minh không có đường nhận scope từ body.
+- [x] DRAFT/CLOSED/finalized participant không ghi được; retirement định nghĩa không phá actual của dòng đã gán. Không trả score hoặc gọi calculator.
 
 Gate: KPI/schema/scope/concurrency tests + auth/organization regressions, Ruff/mypy. Commit dự kiến `feat(kpis): add atomic allocations and actual entry`.
 
@@ -168,3 +168,5 @@ B?ng ch?ng Task 2 (2026-10-20): 14 test settings/catalog m?i qua; 76 test concur
 B?ng ch?ng Task 3 (2026-10-20): 5 test draft/enrollment/audit rollback v? 4 test SQL scope/transfer/concurrency qua; count v? DTO kh?ng l? snapshot ri?ng t?. DRAFT ch? HR, s?a nh?p/enrollment versioned; 2 writer c?ng version c? m?t 200 v? m?t 409.
 
 B?ng ch?ng Task 4 (2026-10-20): 17 test activation/concurrency qua, g?m hai chu k? tranh ACTIVE, defaults/manager/link/reference thay ??i khi activation v? account deactivation ch?o module. Snapshot l?y quan h? c?p d??i k? c? ng??i kh?ng tham gia; audit failure rollback m?i participant/policy/status. Ruff/mypy s?ch.
+
+B?ng ch?ng Task 5 (2026-10-20): 14 test allocation/actual, 7 test KPI concurrency v? 6 test scope qua. Event/barrier x?c nh?n request ?ang ch? ph?i t? ch?i sau logout, disable, chuy?n manager ho?c ??i role; manager kh?ng ghi self/indirect. C?c writer evidence d?ng c?ng participant/version, audit failure kh?i ph?c d?ng v? version. Ruff/mypy s?ch.
