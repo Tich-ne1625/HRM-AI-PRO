@@ -179,7 +179,7 @@ Implemented endpoints, currently undergoing final acceptance, use `/api/v1`, no-
 | GET `/feedback-assignments` | Default `view=mine`, all roles, SQL owner scope. `view=administration` is HR-only with a separate raw DTO. Filters: cycle_id, participant_id, status, relationship; page >=1, page_size 1–100, sort due_at/created_at with UUID ties |
 | GET `/feedback-assignments/{id}` | Exact reviewer or HR; outside and missing return the same 404. HR receives administrative fields; own mode never exposes another reviewer |
 | GET `/feedback-context?participant_id=...` | HR-only participant labels, cycle status, evidence version and required coverage, even before any assignment exists |
-| GET `/feedback-coverage?participant_id=...` | HR-only readiness, missing submitted SELF/MANAGER, pending required and blocked required counts |
+| GET `/feedback-coverage?participant_id=...` | HR-only readiness, missing submitted SELF/MANAGER, pending/blocked required counts and corresponding assignment IDs; public summaries expose only readiness |
 | GET `/feedback-reviewer-options?participant_id=...&relationship=...` | HR-only historical/current eligibility, pagination, literal code/name q <=100; no email. Includes disabled historical accounts and cancelled assignments to guide recovery |
 | POST `/feedback-assignments` | HR `{participant_id,reviewer_id,relationship,required,due_at,expected_evidence_version}`; 201 |
 | PATCH `/feedback-assignments/{id}` | HR versions plus required/deadline; CANCELLED requires explicit status=OPEN, preserving original identity and eligibility snapshot |

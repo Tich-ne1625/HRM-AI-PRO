@@ -8,6 +8,10 @@ Baseline mới trên PostgreSQL riêng `_test`: **570 passed**, không skip, 533
 
 Full regression local sau triển khai: **657 passed**, không skip, 681,34 giây. Ruff/mypy sạch (77 source files), sole head `20261020_0005`, web 83 test/lint/types/build qua trước ba test UI bổ sung. Các test audit/deadline cuối và race-repeat đang chạy; chưa thay thế nghiệm thu CI tại commit runtime cuối. [Review trực tiếp](../../phase-5-review.md) ghi rõ phương pháp và giới hạn, không nhận là reviewer độc lập.
 
+CI đầu tiên tại runtime `5a9f77565f0d27822e947679233d2ccc75ce46c6`: backend/frontend/docker-smoke đều thành công, [run 39369313123](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/39369313123). Sau full local 657, các ca audit bổ sung và deadline sau chờ khóa đã qua; năm lượt cạnh tranh đều **26/26**, lần lượt 46,48 / 41,04 / 44,06 / 40,85 / 42,54 giây. Bộ 26 ca gồm 11 feedback và 15 cycle/KPI, dùng cùng guard/shared evidence version.
+
+Đối chiếu cuối bổ sung IDs pending/blocked chỉ trong HR coverage, test chứng minh không lọt vào summary; PEER/SUBORDINATE mặc định tùy chọn trong form và nhãn quá hạn ở inbox/quản trị. 33 test backend liên quan và 16 test UI feedback đều qua sau chỉnh sửa. Cần CI cuối trước khi đánh dấu hoàn tất toàn phase.
+
 Phân chia commit triển khai: schema/eligibility/administration/submission/summary và các test backend được bàn giao cùng một commit backend có đầy đủ luồng dùng được; UI/layout/cache một commit riêng; smoke/CI/runbook và bằng chứng nghiệm thu riêng. Các task vẫn được đối chiếu theo gate, không tách thành commit trung gian có endpoint hoặc test bị thiếu module phụ thuộc.
 
 Tham chiếu: [kiến trúc](../../architecture.md), [hợp đồng đề xuất Phase 5](../../phase-5-contract.md), [nghiệm thu Phase 4](2026-10-19-phase-4-cycles-kpis.md), [vận hành](../../deployment.md). Không coi các mục chưa đánh dấu là tính năng đã có.

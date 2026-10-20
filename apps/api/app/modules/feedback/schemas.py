@@ -145,6 +145,8 @@ class CoverageView(BaseModel):
     missing_relationships: list[Relationship]
     pending_required: int
     blocked_required: int
+    pending_assignment_ids: list[UUID]
+    blocked_assignment_ids: list[UUID]
 
 
 class RatingGroup(BaseModel):

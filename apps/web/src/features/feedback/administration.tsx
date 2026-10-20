@@ -9,7 +9,7 @@ import { z } from "zod";
 import { useAuth } from "../auth/auth-provider";
 import { Pagination } from "../organization/shared";
 import { feedbackApi, type Administration, type AdministrationContext, type Reason, type Relationship } from "./api";
-import { deadline, FeedbackError, relationships, statuses, SubmissionContent, useFeedbackRefresh, versions } from "./shared";
+import { deadline, FeedbackError, relationships, statuses, SubmissionContent, useDisplayClock, useFeedbackRefresh, versions } from "./shared";
 
 const deadlineSchema = z.string().refine((v) => !v || Number.isFinite(Date.parse(v)), "Thời hạn không hợp lệ.");
 const createSchema = z.object({ relationship: z.enum(["SELF", "MANAGER", "PEER", "SUBORDINATE"]),
@@ -24,6 +24,7 @@ export function FeedbackAdministration({ participantId, cycleId }: { participant
 }
 function AdministrationPage({ participantId, cycleId }: { participantId?: string; cycleId?: string }) {
   const { user } = useAuth();
+  const now = useDisplayClock();
   const [page, setPage] = useState(1), [selected, setSelected] = useState<Administration | null>(null);
   const [generation, setGeneration] = useState(0);
   const context = useQuery({ queryKey: ["feedback", "administration", "context", participantId, user?.id],
@@ -43,7 +44,7 @@ function AdministrationPage({ participantId, cycleId }: { participantId?: string
     {context.data && context.data.cycle_status === "ACTIVE" && !context.data.finalized && <section className="auth-card wide"><h2>Thêm phân công</h2><CreateForm key={`${participantId}-${generation}`} context={context.data} saved={saved} /></section>}
     <section className="auth-card wide"><div className="section-heading"><h2>Phân công và phản hồi gốc</h2>{rows.data && <span className="badge">{rows.data.total} phân công</span>}</div>
       {rows.isPending && <p role="status">Đang tải phân công…</p>}{rows.isError && <FeedbackError error={rows.error} reload={() => { void rows.refetch(); }} />}
-      {rows.data && <><div className="table-scroll" tabIndex={0} aria-label="Bảng phân công phản hồi"><table><caption>Danh sách trong phạm vi quản trị HR</caption><thead><tr><th>Nhân viên / Chu kỳ</th><th>Người đánh giá</th><th>Quan hệ</th><th>Trạng thái / Hạn</th><th>Thao tác</th></tr></thead><tbody>{rows.data.items.map((row) => <tr key={row.id}><td><Link href={`/feedback-administration?participant_id=${row.participant_id}&cycle_id=${row.cycle_id}`}>{row.employee_code} · {row.display_name}</Link><br /><small>{row.cycle_name}</small></td><td>{row.reviewer_name}{!row.reviewer_active && <p className="field-warning">Tài khoản bị khóa</p>}</td><td>{relationships[row.relationship]}<br /><small>{row.required ? "Bắt buộc" : "Tùy chọn"}</small></td><td><span className="badge">{statuses[row.status]}</span><br /><small>{deadline(row.due_at)}</small></td><td><button className="secondary" onClick={() => setSelected(row)}>Mở phân công {row.reviewer_name}</button></td></tr>)}</tbody></table></div>
+      {rows.data && <><div className="table-scroll" tabIndex={0} aria-label="Bảng phân công phản hồi"><table><caption>Danh sách trong phạm vi quản trị HR</caption><thead><tr><th>Nhân viên / Chu kỳ</th><th>Người đánh giá</th><th>Quan hệ</th><th>Trạng thái / Hạn</th><th>Thao tác</th></tr></thead><tbody>{rows.data.items.map((row) => <tr key={row.id}><td><Link href={`/feedback-administration?participant_id=${row.participant_id}&cycle_id=${row.cycle_id}`}>{row.employee_code} · {row.display_name}</Link><br /><small>{row.cycle_name}</small></td><td>{row.reviewer_name}{!row.reviewer_active && <p className="field-warning">Tài khoản bị khóa</p>}</td><td>{relationships[row.relationship]}<br /><small>{row.required ? "Bắt buộc" : "Tùy chọn"}</small></td><td><span className="badge">{statuses[row.status]}</span>{row.status === "OPEN" && row.due_at && now >= Date.parse(row.due_at) && <p className="field-warning">Đã quá hạn — cần gia hạn để gửi</p>}<br /><small>{deadline(row.due_at)}</small></td><td><button className="secondary" onClick={() => setSelected(row)}>Mở phân công {row.reviewer_name}</button></td></tr>)}</tbody></table></div>
         {!rows.data.items.length && <p className="empty-state">Chưa có phân công. HR cần giao SELF và MANAGER trước khi đủ phản hồi bắt buộc.</p>}
         <Pagination page={page} total={rows.data.total} pending={rows.isFetching} onPage={setPage} /></>}
     </section>
@@ -68,7 +69,7 @@ function ReviewerPicker({ participantId, relationship, value, onChange, allowCan
 }
 function CreateForm({ context, saved }: { context: AdministrationContext; saved: () => Promise<void> }) {
   const [captured, setCaptured] = useState(context.evidence_version), [reloadError, setReloadError] = useState<Error | null>(null);
-  const form = useForm<z.infer<typeof createSchema>>({ resolver: zodResolver(createSchema), defaultValues: { relationship: "SELF", reviewer_id: "", required: true, due_at: "" } });
+  const form = useForm<z.infer<typeof createSchema>>({ resolver: zodResolver(createSchema), defaultValues: { relationship: "SELF", reviewer_id: "", required: false, due_at: "" } });
   const [relation, reviewer, isRequired] = useWatch({ control: form.control, name: ["relationship", "reviewer_id", "required"] });
   const mandatory = relation === "SELF" || relation === "MANAGER";
   const mutation = useMutation({ mutationFn: (values: z.infer<typeof createSchema>) => feedbackApi.create({ ...values,

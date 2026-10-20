@@ -37,6 +37,7 @@ def coverage(session: Session, participant_id: UUID) -> CoverageView:
             FeedbackAssignment.participant_id == participant_id,
             FeedbackAssignment.status != AssignmentStatus.CANCELLED,
         )
+        .order_by(FeedbackAssignment.id)
     ).all()
     missing = [
         rel
@@ -54,6 +55,14 @@ def coverage(session: Session, participant_id: UUID) -> CoverageView:
         missing_relationships=missing,
         pending_required=pending,
         blocked_required=blocked,
+        pending_assignment_ids=[
+            r.id for r, _ in rows if r.required and r.status != AssignmentStatus.SUBMITTED
+        ],
+        blocked_assignment_ids=[
+            r.id
+            for r, active in rows
+            if r.required and r.status == AssignmentStatus.OPEN and not active
+        ],
     )
 
 

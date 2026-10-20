@@ -129,3 +129,21 @@ def test_administration_list_query_count_is_bounded(world):
         assert len(queries) <= 7, f"N+1 query regression: {len(queries)} SELECTs"
     finally:
         event.remove(world.engine, "before_cursor_execute", record)
+
+
+def test_hr_coverage_lists_pending_and_blocked_ids_without_leaking_into_summary(world):
+    from app.models import User
+
+    cycle, participant = feedback_world(world)
+    row = create_assignment(world, participant, "manager", "MANAGER").json()
+    with Session(world.engine) as session, session.begin():
+        session.get(User, UUID(world.users["manager"])).is_active = False
+    context = (
+        world.client().get(f"/api/v1/feedback-context?participant_id={participant['id']}").json()
+    )
+    assert context["coverage"]["pending_assignment_ids"] == [row["id"]]
+    assert context["coverage"]["blocked_assignment_ids"] == [row["id"]]
+    path = f"/api/v1/employees/{world.employees['alice']}/feedback?cycle_id={cycle['id']}"
+    response = world.client("alice").get(path)
+    assert response.status_code == 200
+    assert "assignment_ids" not in response.text and row["id"] not in response.text

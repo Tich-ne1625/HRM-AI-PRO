@@ -18,7 +18,7 @@ export interface ReviewerOption {
   reviewer_id: string; employee_id: string; employee_code: string; display_name: string;
   is_active: boolean; existing_assignment_id: string | null; existing_status: Status | null;
 }
-export interface Coverage { ready: boolean; missing_relationships: Relationship[]; pending_required: number; blocked_required: number }
+export interface Coverage { ready: boolean; missing_relationships: Relationship[]; pending_required: number; blocked_required: number; pending_assignment_ids: string[]; blocked_assignment_ids: string[] }
 export interface AdministrationContext { participant_id: string; cycle_id: string; employee_id: string; employee_code: string; display_name: string; evidence_version: number; cycle_status: CycleStatus; finalized: boolean; coverage: Coverage }
 export interface Summary {
   participant_id: string; employee_id: string; cycle_id: string; evidence_version: number; ready: boolean;

@@ -114,7 +114,7 @@ Prefix `/api/v1`; kế thừa error envelope và no-store. GET không sinh assig
 | GET `/feedback-assignments/{id}` | Chính reviewer hoặc HR; DTO theo quyền ở server, outsider và missing cùng 404 |
 | GET `/feedback-reviewer-options?participant_id=...&relationship=...` | Chỉ HR; lookup eligibility có phân trang/tìm mã hoặc tên literal |
 | GET `/feedback-context?participant_id=...` | Chỉ HR; nhãn participant, trạng thái chu kỳ, evidence version và coverage cho form, kể cả khi chưa có assignment; dùng lại participant được chọn từ trang chu kỳ |
-| GET `/feedback-coverage?participant_id=...` | Chỉ HR; thiếu SELF/MANAGER đã gửi, số required chưa gửi và account bị khóa |
+| GET `/feedback-coverage?participant_id=...` | Chỉ HR; thiếu SELF/MANAGER đã gửi, số required chưa gửi/account bị khóa và IDs phân công tương ứng; summary công khai chỉ trả ready |
 | POST `/feedback-assignments` | HR `{participant_id,reviewer_id,relationship,required,due_at,expected_evidence_version}`; SELF/MANAGER bắt buộc required=true |
 | PATCH `/feedback-assignments/{id}` | HR `{expected_assignment_version,expected_evidence_version,...}`; chỉ required/due_at và phục hồi status=OPEN từ CANCELLED, không đổi identity/relationship |
 | DELETE `/feedback-assignments/{id}` | HR JSON versions + reason_code; hủy mềm OPEN optional |

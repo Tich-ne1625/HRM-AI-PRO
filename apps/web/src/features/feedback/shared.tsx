@@ -1,6 +1,7 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import { ApiClientError } from "../../lib/api-client";
 import type { Relationship, Status, Versions, Assignment } from "./api";
 
@@ -8,6 +9,11 @@ export const relationships: Record<Relationship, string> = { SELF: "Tự đánh 
 export const statuses: Record<Status, string> = { OPEN: "Chờ phản hồi", SUBMITTED: "Đã gửi", CANCELLED: "Đã hủy" };
 export const versions = (row: Assignment): Versions => ({ expected_assignment_version: row.version, expected_evidence_version: row.evidence_version });
 export const deadline = (value: string | null) => value ? new Intl.DateTimeFormat("vi-VN", { dateStyle: "medium", timeStyle: "short", timeZoneName: undefined }).format(new Date(value)) : "Không giới hạn thời gian trong chu kỳ";
+export function useDisplayClock() {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => { const timer = setInterval(() => setNow(Date.now()), 60_000); return () => clearInterval(timer); }, []);
+  return now;
+}
 export function FeedbackError({ error, reload }: { error: Error; reload?: () => void }) {
   const messages: Record<string, string> = {
     stale_assignment_version: "Phân công đã thay đổi. Tải lại và kiểm tra trước khi gửi tiếp.",

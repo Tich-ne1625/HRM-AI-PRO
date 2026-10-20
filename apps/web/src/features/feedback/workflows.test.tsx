@@ -171,3 +171,18 @@ it("HR replaces a peer only after confirmation and keeps required under server c
   await user.click(screen.getByRole("button", { name: "Xác nhận thao tác" }));
   await waitFor(() => expect(mocks.api.replace).toHaveBeenCalledWith("a1", { expected_assignment_version: 1, expected_evidence_version: 3, reviewer_id: "user", due_at: null, reason_code: "WRONG_SELECTION" }));
 });
+it("defaults a peer assignment to optional while self and manager stay required", async () => {
+  mocks.role = "HR"; const user = userEvent.setup(); mount(<FeedbackAdministration participantId="p1" />);
+  await user.selectOptions(await screen.findByLabelText("Quan hệ người đánh giá"), "PEER");
+  await screen.findByRole("option", { name: "NV01 · An" });
+  expect((screen.getByLabelText("Bắt buộc hoàn thành") as HTMLInputElement).checked).toBe(false);
+  await user.selectOptions(screen.getByLabelText("Người đánh giá hợp lệ"), "user");
+  await user.click(screen.getByRole("button", { name: "Giao phản hồi" }));
+  await waitFor(() => expect(mocks.api.create).toHaveBeenCalledWith(expect.objectContaining({ relationship: "PEER", required: false })));
+});
+it("shows overdue assignments in the inbox without offering an automatic retry", async () => {
+  mocks.api.list.mockResolvedValue({ items: [{ ...assignment, due_at: "2020-01-01T00:00:00Z" }], total: 1, page: 1, page_size: 20 });
+  mount(<FeedbackInbox />);
+  await screen.findByText("Đã quá hạn — liên hệ HR gia hạn");
+  expect(mocks.api.submit).not.toHaveBeenCalled();
+});
