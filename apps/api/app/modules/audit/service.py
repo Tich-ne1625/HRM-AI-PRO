@@ -40,6 +40,20 @@ REVIEW_METADATA_KEYS = frozenset(
         "policy_source_version",
     }
 )
+FEEDBACK_METADATA_KEYS = frozenset(
+    {
+        "participant_id",
+        "reviewer_id",
+        "relationship",
+        "required",
+        "status",
+        "version",
+        "evidence_version",
+        "reason_code",
+        "replacement_id",
+        "previous_assignment_id",
+    }
+)
 
 
 class AuditWriter:
@@ -69,6 +83,8 @@ class AuditWriter:
             )
         ):
             allowed = REVIEW_METADATA_KEYS
+        if action.startswith(("assignment.", "feedback.")):
+            allowed = FEEDBACK_METADATA_KEYS
         if metadata.keys() - allowed:
             raise ValueError("Audit metadata contains an unsupported field")
         record = AuditLog(

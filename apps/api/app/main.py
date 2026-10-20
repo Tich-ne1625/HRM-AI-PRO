@@ -10,6 +10,7 @@ from app.core.database import get_engine, get_session_factory
 from app.core.errors import register_error_handling
 from app.modules.auth.router import router as auth_router
 from app.modules.employees.router import router as employees_router
+from app.modules.feedback.router import router as feedback_router
 from app.modules.health.router import router as health_router
 from app.modules.health.service import ReadinessService
 from app.modules.kpis.allocation_router import router as allocation_router
@@ -46,6 +47,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(kpis_router)
     app.include_router(cycles_router)
     app.include_router(allocation_router)
+    app.include_router(feedback_router)
     return app
 
 

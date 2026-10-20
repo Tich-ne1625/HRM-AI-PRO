@@ -30,7 +30,7 @@ def test_phase4_schema_metadata_and_singleton(auth_engine):
         )
     } <= set(inspect(auth_engine).get_table_names())
     scripts = ScriptDirectory.from_config(Config(str(ALEMBIC_INI)))
-    assert scripts.get_heads() == ["20261020_0004"]
+    assert scripts.get_heads() == ["20261020_0005"]
     with Session(auth_engine) as session:
         config = session.scalars(select(SystemConfig)).one()
         assert config.id == 1 and config.version == 1

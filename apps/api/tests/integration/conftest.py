@@ -24,6 +24,8 @@ def drop_test_tables(engine: Engine) -> None:
         raise ValueError("Cleanup requires an explicitly disposable _test database")
     with engine.begin() as connection:
         for table in (
+            "feedback",
+            "feedback_assignments",
             "employee_kpis",
             "kpi_definitions",
             "cycle_participants",
