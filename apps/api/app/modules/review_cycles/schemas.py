@@ -1,11 +1,14 @@
-from datetime import date
-from typing import Self
+from datetime import date, datetime
+from typing import Literal, Self
 from uuid import UUID
 
-from pydantic import Field, model_validator
+from pydantic import BaseModel, Field, model_validator
 
 from app.core.decimal_types import Version
+from app.modules.employees.models import EmploymentStatus
 from app.modules.organization.schemas import Input, Label, Patch
+from app.modules.review_cycles.models import CycleStatus
+from app.modules.settings.schemas import ScoringPolicy
 
 
 class CycleCreate(Input):
@@ -47,3 +50,62 @@ class Enrollment(ExpectedVersion):
         if len(set(self.employee_ids)) != len(self.employee_ids):
             raise ValueError("employee_ids must be unique")
         return self
+
+
+class RelationshipSnapshot(Input):
+    employee_id: UUID
+    user_id: UUID | None
+    employment_status: EmploymentStatus
+
+
+class ParticipantSnapshot(Input):
+    schema_version: Literal[1] = 1
+    employee_id: UUID
+    user_id: UUID
+    employee_code: str
+    display_name: str
+    department_id: UUID
+    department_code: str
+    department_name: str
+    position_id: UUID
+    position_code: str
+    position_title: str
+    manager_id: UUID
+    manager_user_id: UUID
+    manager_display_name: str
+    direct_reports: list[RelationshipSnapshot]
+
+
+class CycleView(BaseModel):
+    id: UUID
+    name: str
+    start_date: date
+    end_date: date
+    status: CycleStatus
+    version: int
+    policy: ScoringPolicy
+    policy_source_version: int
+    policy_is_preview: bool
+    participant_count: int
+    can_edit: bool
+    can_activate: bool
+    activated_at: datetime | None
+
+
+class ParticipantView(BaseModel):
+    id: UUID
+    cycle_id: UUID
+    employee_id: UUID
+    employee_code: str
+    display_name: str
+    department_id: UUID
+    department_name: str
+    position_title: str
+    evidence_version: int
+    is_snapshot: bool
+    can_manage_kpis: bool
+
+
+class EnrollmentResult(BaseModel):
+    version: int
+    count: int

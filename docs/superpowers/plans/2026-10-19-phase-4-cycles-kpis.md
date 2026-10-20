@@ -58,12 +58,12 @@ Gate: focused tests + auth/organization authorization regression, Ruff/mypy. Com
 
 File dự kiến: `modules/review_cycles/{repository,service,router}.py`; `app/main.py`; `tests/integration/test_review_cycles.py`, `test_cycle_scope.py`.
 
-- [ ] Test HR tạo/sửa DRAFT, start <= end, version conflict, batch enrollment atomic, duplicate trong payload/DB, employee inactive, batch size 1–100 và pagination nhiều batch.
-- [ ] Thêm GET/POST cycles, GET/PATCH detail, GET/POST participants, DELETE participant DRAFT theo contract. Client không tự đặt status hoặc snapshots.
-- [ ] DRAFT chỉ HR; ACTIVE/CLOSED manager/employee chỉ thấy cycle có participant trong phạm vi. Count cũng scope; không lộ danh sách quan hệ/user IDs từ JSON snapshot.
-- [ ] Test self/direct report/indirect report, UUID ngoài scope, unlinked account, ADMIN và chuyển manager. Phân biệt cycle_id/participant_id/employee_id trong operation ID và client types.
-- [ ] Cycle version tăng khi sửa metadata/enroll/remove thành công; no-op không tăng; error không để lại participant/audit/version dở dang.
-- [ ] Viết race enrollment/removal/update cùng version, test rollback audit khi xóa participant nháp. ACTIVE/CLOSED từ chối mọi chỉnh danh sách.
+- [x] Test HR tạo/sửa DRAFT, start <= end, version conflict, batch enrollment atomic, duplicate trong payload/DB, employee inactive, batch size 1–100 và pagination nhiều batch.
+- [x] Thêm GET/POST cycles, GET/PATCH detail, GET/POST participants, DELETE participant DRAFT theo contract. Client không tự đặt status hoặc snapshots.
+- [x] DRAFT chỉ HR; ACTIVE/CLOSED manager/employee chỉ thấy cycle có participant trong phạm vi. Count cũng scope; không lộ danh sách quan hệ/user IDs từ JSON snapshot.
+- [x] Test self/direct report/indirect report, UUID ngoài scope, unlinked account, ADMIN và chuyển manager. Phân biệt cycle_id/participant_id/employee_id trong operation ID và client types.
+- [x] Cycle version tăng khi sửa metadata/enroll/remove thành công; no-op không tăng; error không để lại participant/audit/version dở dang.
+- [x] Viết race enrollment/removal/update cùng version, test rollback audit khi xóa participant nháp. ACTIVE/CLOSED từ chối mọi chỉnh danh sách.
 
 Gate: cycle/scope tests + Phase 3 regression, Ruff/mypy. Commit dự kiến `feat(cycles): add draft enrollment and scoped reads`.
 
@@ -164,3 +164,5 @@ Lệnh upgrade/downgrade và smoke tạo dữ liệu phải chọn rõ môi trư
 B?ng ch?ng Task 1 (2026-10-20): baseline PostgreSQL 467/467 qua; test schema/validation m?i v? h?i quy schema auth/organization/readiness 47/47 qua; sole head `20261020_0004`, metadata parity v? downgrade/upgrade b?o to?n d? li?u Phase 3.
 
 B?ng ch?ng Task 2 (2026-10-20): 14 test settings/catalog m?i qua; 76 test concurrency v? h?i quy users/organization/auth/policies qua, g?m ba race defaults/code/definition version. Exact Origin/CSRF, audit rollback, scoped empty lists, no-op v? stale version ???c ki?m tra. Ruff/mypy s?ch.
+
+B?ng ch?ng Task 3 (2026-10-20): 5 test draft/enrollment/audit rollback v? 4 test SQL scope/transfer/concurrency qua; count v? DTO kh?ng l? snapshot ri?ng t?. DRAFT ch? HR, s?a nh?p/enrollment versioned; 2 writer c?ng version c? m?t 200 v? m?t 409.
