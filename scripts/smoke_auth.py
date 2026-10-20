@@ -42,7 +42,9 @@ class Browser:
             response = error
         with response:
             if response.status != expected:
-                raise RuntimeError(f"Unexpected status for {method} {path}: {response.status}")
+                raise RuntimeError(
+                    f"Unexpected status for {method} {path}: {response.status}"
+                )
             raw = response.read()
             return json.loads(raw) if raw else {}
 
@@ -55,7 +57,12 @@ def organization_smoke(admin: Browser, hr: Browser, suffix: str) -> None:
     password = secrets.token_urlsafe(24)
     accounts = {}
     browsers = {}
-    for name, role in (("manager", "MANAGER"), ("employee", "EMPLOYEE")):
+    for name, role in (
+        ("manager", "MANAGER"),
+        ("employee", "EMPLOYEE"),
+        ("peer", "EMPLOYEE"),
+        ("subordinate", "EMPLOYEE"),
+    ):
         email = f"{name}-{suffix}@example.com"
         accounts[name] = admin.request(
             "/api/v1/users",
@@ -106,8 +113,23 @@ def organization_smoke(admin: Browser, hr: Browser, suffix: str) -> None:
             "manager_id": leader["id"],
         },
     )
+    for name in ("peer", "subordinate"):
+        hr.request(
+            "/api/v1/employees",
+            method="POST",
+            expected=201,
+            body={
+                **base,
+                "employee_code": f"{name.upper()}-{suffix}",
+                "display_name": f"Smoke {name}",
+                "user_id": accounts[name],
+                "manager_id": report["id"] if name == "subordinate" else None,
+            },
+        )
     browsers["employee"].request("/api/v1/employees/" + leader["id"], expected=404)
-    assert browsers["employee"].request("/api/v1/auth/me")["employee_id"] == report["id"]
+    assert (
+        browsers["employee"].request("/api/v1/auth/me")["employee_id"] == report["id"]
+    )
     assert browsers["manager"].request("/api/v1/employees")["total"] == 2
     admin.request("/api/v1/employees", expected=403)
     hr.request(
@@ -116,11 +138,26 @@ def organization_smoke(admin: Browser, hr: Browser, suffix: str) -> None:
         expected=409,
         body={"manager_id": report["id"]},
     )
-    review_cycle_smoke(admin, hr, browsers["manager"], browsers["employee"], report, suffix)
-    hr.request("/api/v1/employees/" + report["id"], method="PATCH", body={"manager_id": None})
+    review_cycle_smoke(
+        admin,
+        hr,
+        browsers["manager"],
+        browsers["employee"],
+        report,
+        suffix,
+        extra_reviewers={name: browsers[name] for name in ("peer", "subordinate")},
+        organization_base=base,
+    )
+    hr.request(
+        "/api/v1/employees/" + report["id"], method="PATCH", body={"manager_id": None}
+    )
     browsers["manager"].request("/api/v1/employees/" + report["id"], expected=404)
-    assert browsers["manager"].request("/api/v1/review-cycles", expected=200)["total"] == 0
-    print("Organization HTTP smoke passed: references, linking, scope, cycle rejection, transfer.")
+    assert (
+        browsers["manager"].request("/api/v1/review-cycles", expected=200)["total"] == 0
+    )
+    print(
+        "Organization HTTP smoke passed: references, linking, scope, cycle rejection, transfer."
+    )
 
 
 def review_cycle_smoke(
@@ -130,6 +167,9 @@ def review_cycle_smoke(
     employee: Browser,
     report: dict,
     suffix: str,
+    *,
+    extra_reviewers: dict[str, Browser],
+    organization_base: dict,
 ) -> None:
     defaults = admin.request("/api/v1/settings/scoring")
     admin.request(
@@ -165,8 +205,12 @@ def review_cycle_smoke(
             "employee_ids": [report["id"]],
         },
     )
-    activated = hr.request(path + "/activate", method="POST", body={"expected_version": 2})
-    assert activated["status"] == "ACTIVE" and activated["policy"]["kpi_cap"] == "120.00"
+    activated = hr.request(
+        path + "/activate", method="POST", body={"expected_version": 2}
+    )
+    assert (
+        activated["status"] == "ACTIVE" and activated["policy"]["kpi_cap"] == "120.00"
+    )
     assert manager.request(path)["participant_count"] == 1
     definition = hr.request(
         "/api/v1/kpis",
@@ -228,7 +272,10 @@ def review_cycle_smoke(
             "name": "Changed catalog name",
         },
     )
-    assert employee.request(allocation_path)["items"][0]["definition"]["name"] == "Smoke sales"
+    assert (
+        employee.request(allocation_path)["items"][0]["definition"]["name"]
+        == "Smoke sales"
+    )
     latest = admin.request("/api/v1/settings/scoring")
     admin.request(
         "/api/v1/settings/scoring",
@@ -243,6 +290,120 @@ def review_cycle_smoke(
     print(
         "Cycle/KPI HTTP smoke passed: defaults, activation, snapshots, allocation, "
         "actual zero, scope, CSRF and stale version."
+    )
+    feedback_smoke(
+        admin,
+        hr,
+        manager,
+        employee,
+        extra_reviewers,
+        actual["participant"],
+        cycle,
+        organization_base,
+        suffix,
+    )
+
+
+def feedback_smoke(
+    admin: Browser,
+    hr: Browser,
+    manager: Browser,
+    employee: Browser,
+    extra: dict[str, Browser],
+    participant: dict,
+    cycle: dict,
+    organization_base: dict,
+    suffix: str,
+) -> None:
+    for name, browser in (("ADMIN", admin), ("HR", hr)):
+        identity = browser.request("/api/v1/auth/me")
+        hr.request(
+            "/api/v1/employees",
+            method="POST",
+            expected=201,
+            body={
+                **organization_base,
+                "employee_code": f"{name}-{suffix}",
+                "display_name": f"Smoke {name}",
+                "user_id": identity["id"],
+            },
+        )
+    for browser, relationship in (
+        (employee, "SELF"),
+        (manager, "MANAGER"),
+        (extra["peer"], "PEER"),
+        (extra["subordinate"], "SUBORDINATE"),
+        (admin, "PEER"),
+    ):
+        identity = browser.request("/api/v1/auth/me")
+        row = hr.request(
+            "/api/v1/feedback-assignments",
+            method="POST",
+            expected=201,
+            body={
+                "participant_id": participant["id"],
+                "reviewer_id": identity["id"],
+                "relationship": relationship,
+                "required": True,
+                "expected_evidence_version": participant["evidence_version"],
+            },
+        )
+        payload = {
+            "assignment_id": row["id"],
+            "expected_assignment_version": row["version"],
+            "expected_evidence_version": row["evidence_version"],
+            "rating": 4,
+            "comment": "Private smoke feedback",
+        }
+        browser.request(
+            "/api/v1/feedback", method="POST", body=payload, csrf=False, expected=403
+        )
+        sent = browser.request(
+            "/api/v1/feedback", method="POST", body=payload, expected=201
+        )
+        browser.request("/api/v1/feedback", method="POST", body=payload, expected=409)
+        participant["evidence_version"] = sent["evidence_version"]
+        own = browser.request("/api/v1/feedback-assignments")["items"]
+        assert len(own) == 1 and "reviewer_id" not in own[0]
+    # Retain a real CANCELLED row for restart/persistence acceptance.
+    optional = hr.request(
+        "/api/v1/feedback-assignments",
+        method="POST",
+        expected=201,
+        body={
+            "participant_id": participant["id"],
+            "reviewer_id": hr.request("/api/v1/auth/me")["id"],
+            "relationship": "PEER",
+            "required": False,
+            "expected_evidence_version": participant["evidence_version"],
+        },
+    )
+    hr.request(
+        "/api/v1/feedback-assignments/" + optional["id"],
+        method="DELETE",
+        body={
+            "expected_assignment_version": optional["version"],
+            "expected_evidence_version": optional["evidence_version"],
+            "reason_code": "WRONG_SELECTION",
+        },
+    )
+    path = f"/api/v1/employees/{participant['employee_id']}/feedback?cycle_id={cycle['id']}"
+    summary = employee.request(path)
+    assert summary["ready"] and summary["count"] == 5 and summary["mean"] == "4.00"
+    assert all(
+        g["suppressed"] and g["count"] is None
+        for g in summary["groups"]
+        if g["relationship"] in ("PEER", "SUBORDINATE")
+    )
+    manager_summary = manager.request(path)
+    assert manager_summary["own_submission"]["comment"] == "Private smoke feedback"
+    extra["peer"].request(path, expected=404)
+    admin.request(path, expected=403)
+    admin.request("/api/v1/feedback-assignments?view=administration", expected=403)
+    assert hr.request("/api/v1/feedback-assignments?view=administration")["total"] == 6
+    print(
+        "Feedback HTTP smoke passed: real SELF/MANAGER/PEER/SUBORDINATE/ADMIN reviewers, "
+        "CSRF, replay, HR raw scope, required coverage, suppression and retained cancellation."
     )
 
 

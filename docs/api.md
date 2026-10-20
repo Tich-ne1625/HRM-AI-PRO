@@ -169,3 +169,27 @@ PUT preserves each retained definition's assignment UUID and snapshot. Same targ
 Errors: 409 stale_version/stale_evidence_version, duplicate_code, participant_already_enrolled, cycle_not_draft/cycle_not_active, active_cycle_exists, activation_requirements_not_met, kpi_definition_inactive/kpi_policy_incompatible, participant_finalized; 404 cycle_not_found/participant_not_found/kpi_not_found/employee_kpi_not_found/employee_not_found; 422 validation_error. Activation details list at most 100 `{employee_id,code}` issues plus total issue_count, only for HR. Missing system singleton returns 503 configuration_unavailable. No `/close` endpoint until finalization is implemented in Phase 6.
 
 Policy defaults are `{schema_version:1,kpi_weight:"70.00",feedback_weight:"30.00",kpi_cap:"100.00"}`. Review history, role rules and allowed state transitions are documented in the [Phase 4 contract](phase-4-contract.md).
+
+## Phase 5 assignments and feedback
+
+Implemented endpoints, currently undergoing final acceptance, use `/api/v1`, no-store responses and the existing error envelope. Mutations require exact Origin, session-bound CSRF and authorization revalidation under locks. The [feedback contract](phase-5-contract.md) records all eligibility and recovery decisions.
+
+| Method/path | Scope and payload |
+| --- | --- |
+| GET `/feedback-assignments` | Default `view=mine`, all roles, SQL owner scope. `view=administration` is HR-only with a separate raw DTO. Filters: cycle_id, participant_id, status, relationship; page >=1, page_size 1–100, sort due_at/created_at with UUID ties |
+| GET `/feedback-assignments/{id}` | Exact reviewer or HR; outside and missing return the same 404. HR receives administrative fields; own mode never exposes another reviewer |
+| GET `/feedback-context?participant_id=...` | HR-only participant labels, cycle status, evidence version and required coverage, even before any assignment exists |
+| GET `/feedback-coverage?participant_id=...` | HR-only readiness, missing submitted SELF/MANAGER, pending required and blocked required counts |
+| GET `/feedback-reviewer-options?participant_id=...&relationship=...` | HR-only historical/current eligibility, pagination, literal code/name q <=100; no email. Includes disabled historical accounts and cancelled assignments to guide recovery |
+| POST `/feedback-assignments` | HR `{participant_id,reviewer_id,relationship,required,due_at,expected_evidence_version}`; 201 |
+| PATCH `/feedback-assignments/{id}` | HR versions plus required/deadline; CANCELLED requires explicit status=OPEN, preserving original identity and eligibility snapshot |
+| DELETE `/feedback-assignments/{id}` | HR versions + reason_code, optional OPEN only; soft cancellation |
+| POST `/feedback-assignments/{id}/replace` | HR versions + reviewer_id/due_at/reason_code, OPEN PEER/SUBORDINATE only; atomic cancel plus create/reopen preserving relationship/required |
+| POST `/feedback` | Exact reviewer `{assignment_id,expected_assignment_version,expected_evidence_version,rating,comment}`; 201 immutable submission |
+| GET `/employees/{id}/feedback?cycle_id=...` | HR/self/current direct manager live SQL scope; privacy-filtered summary, no client-selectable raw mode |
+
+Versions are strict positive integers. Ratings are strict integer 1–5, rejecting booleans/floats/strings. Comments normalize CRLF to LF and trim, allow LF/tab, reject remaining unsupported controls and are limited to 2,000 plain-text characters. Extra identity fields are forbidden. A deadline is null or an ISO datetime with an explicit timezone, normalized to UTC; numeric Unix/naive values are rejected. Assignment creation, deadline edits and reopening require a future deadline or null. Submissions check `now >= due_at` after acquiring locks, and require ACTIVE/unfinalized evidence. End_date does not close a cycle or impose an automatic deadline.
+
+All assignment changes and submissions increment one shared participant.evidence_version, with appropriate assignment.version increments. No-op validates lifecycle/authority/versions without incrementing/auditing. Submitted assignment fields are immutable. Replay returns 409 feedback_already_submitted without a second audit/version increment. A lost response can be checked through GET; do not automatically retry with fresh versions. Errors include stale_assignment_version/stale_evidence_version, deadline_passed, assignment_not_open, reviewer_ineligible/reviewer_inactive, assignment_already_exists, required_relationship_exists, required_coverage_conflict and assignment_limit_reached.
+
+Summary exposes count/Decimal HALF_UP mean as a two-decimal string (null if none), readiness, relationship groups and at most the caller's own authored submission. Each PEER/SUBORDINATE group with fewer than three submitted reviewers has exactly `{relationship,suppressed:true,count:null,mean:null}`. No other comments/reviewer identifiers/submission timestamps appear. HR raw access is explicit, and aggregate inference remains possible. No feedback_score/final_score or AI output is created.

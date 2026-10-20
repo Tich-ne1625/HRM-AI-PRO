@@ -2,7 +2,7 @@
 
 ## Phase 3 organization schema
 
-Current sole head is `20261020_0004` (Phase 4 schema), following organization `20261019_0003`, authentication `20261003_0002` and baseline `20261003_0001`. Upgrade/downgrade and metadata parity are tested against PostgreSQL.
+Current sole head is `20261020_0005` (feedback assignments/submissions), following cycle/KPI `20261020_0004`, organization `20261019_0003`, authentication `20261003_0002` and baseline `20261003_0001`. Upgrade/downgrade and metadata parity are tested against PostgreSQL.
 
 | Table | Contract |
 | --- | --- |
@@ -87,3 +87,11 @@ Participant snapshots have a schema version, employee and department/position id
 Aggregate allocation weight is a service invariant, not a per-row CHECK: lock the participant, require expected_evidence_version, validate full unique allocation with exactly 100.00, reconcile and audit in one transaction. All evidence writers in future phases must reuse this lock/version. Assignment snapshots only refresh after removal/reassignment; changing a target clears actual, weight changes retain it. No PerformanceReview, FeedbackAssignment or AI tables are introduced here.
 
 Every Phase 4 writer follows guard 730031 → sorted active ADMIN/user locks → active family → config if needed → cycle → participants → definitions/assignments. Activation locks SELF/manager accounts against deactivation and reads graph/defaults consistently. User administration retains its established admin-first order and does not wait on this guard. Phase 4 audit allowlist permits only field names, codes, states, UUIDs, counts and versions. Audit failure rolls back evidence, removed rows and version changes.
+
+## Phase 5 feedback schema
+
+Revision `20261020_0005` adds exactly `feedback_assignments` and `feedback`, without backfilling historical assignments. Assignment identity is UNIQUE(participant_id,reviewer_id), including cancelled rows. A partial unique index prevents multiple non-cancelled SELF/MANAGER assignments; CHECK constraints enforce mandatory required flags, positive versions, object eligibility snapshots and allowed statuses/relationships. Inbox indexing covers reviewer/status/deadline. `feedback.assignment_id` is UNIQUE with rating 1–5 and a 2,000-character comment. History FKs use RESTRICT.
+
+Assignment mutations and submissions lock guard → active ADMIN → sorted actor/reviewer users → session family → cycle → participant → assignment UUIDs. They increment the shared participant evidence version once, alongside assignment versions, within the audit transaction. Feedback and KPI writes therefore compete on the same version. Cancellation retains history; reopening retains identity/snapshot; replacement cancels and creates/reopens atomically. Submitted data has no mutation API. Phase 6 must use original rating sum/count, not the rounded display mean.
+
+SQL owner scope is independent of current organization/report access. HR raw presenters are distinct from public summaries; small-group suppression applies separately to PEER/SUBORDINATE. List presentation joins context in a bounded query count, with a regression test against N+1 reads. The [contract](phase-5-contract.md) specifies historical eligibility and account recovery limits. Phase 5 acceptance evidence is recorded in its plan.

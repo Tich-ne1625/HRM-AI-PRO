@@ -1,8 +1,8 @@
-# Hợp đồng đề xuất Phase 5 — Phản hồi 360
+# Hợp đồng Phase 5 — Phản hồi 360
 
-Ngày lập: 2026-10-20. Trạng thái: đã đối chiếu và lập kế hoạch, chưa triển khai Phase 5. Tham chiếu [kiến trúc](architecture.md), [hợp đồng Phase 4](phase-4-contract.md) và [kế hoạch triển khai](superpowers/plans/2026-10-20-phase-5-feedback.md).
+Ngày lập: 2026-10-20. Trạng thái: đang triển khai theo phê duyệt, chưa nghiệm thu CI. Tham chiếu [kiến trúc](architecture.md), [hợp đồng Phase 4](phase-4-contract.md) và [kế hoạch triển khai](superpowers/plans/2026-10-20-phase-5-feedback.md).
 
-Các quy tắc dưới đây cụ thể hóa thiết kế tổng thể để triển khai và review. Giới hạn, thời hạn và cách phục hồi phân công là lựa chọn đề xuất của Phase 5; không phải tính năng đang chạy.
+Các quy tắc dưới đây cụ thể hóa thiết kế tổng thể để triển khai và review. Trạng thái nghiệm thu và bằng chứng kiểm tra được cập nhật trong kế hoạch; không coi chức năng đang viết là đã nghiệm thu.
 
 ## 1. Điểm nối đã đối chiếu
 
@@ -113,6 +113,8 @@ Prefix `/api/v1`; kế thừa error envelope và no-store. GET không sinh assig
 | GET `/feedback-assignments?view=administration&participant_id=...` | Chỉ HR; raw theo participant/cycle, filter status/relationship; missing/blocked coverage trong DTO quản trị riêng |
 | GET `/feedback-assignments/{id}` | Chính reviewer hoặc HR; DTO theo quyền ở server, outsider và missing cùng 404 |
 | GET `/feedback-reviewer-options?participant_id=...&relationship=...` | Chỉ HR; lookup eligibility có phân trang/tìm mã hoặc tên literal |
+| GET `/feedback-context?participant_id=...` | Chỉ HR; nhãn participant, trạng thái chu kỳ, evidence version và coverage cho form, kể cả khi chưa có assignment; dùng lại participant được chọn từ trang chu kỳ |
+| GET `/feedback-coverage?participant_id=...` | Chỉ HR; thiếu SELF/MANAGER đã gửi, số required chưa gửi và account bị khóa |
 | POST `/feedback-assignments` | HR `{participant_id,reviewer_id,relationship,required,due_at,expected_evidence_version}`; SELF/MANAGER bắt buộc required=true |
 | PATCH `/feedback-assignments/{id}` | HR `{expected_assignment_version,expected_evidence_version,...}`; chỉ required/due_at và phục hồi status=OPEN từ CANCELLED, không đổi identity/relationship |
 | DELETE `/feedback-assignments/{id}` | HR JSON versions + reason_code; hủy mềm OPEN optional |

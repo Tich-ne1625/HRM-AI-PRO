@@ -1,6 +1,14 @@
 # Kế hoạch Phase 5 — Phân công và phản hồi 360
 
-Ngày lập: 2026-10-20. Trạng thái: đã đối chiếu Phase 4 và lập kế hoạch; chưa bắt đầu code Phase 5.
+Ngày lập: 2026-10-20. Trạng thái: đang triển khai theo phê duyệt; chưa nghiệm thu Phase 5.
+
+Yêu cầu giao diện khi bắt đầu: tận dụng các trang hiện có, phân bổ hợp lý trên desktop/mobile. Triển khai dùng chung navigation theo nhóm nghiệp vụ, menu thu gọn trên màn hẹp, bảng cuộn trong khung, form và panel co giãn; nối quản trị/tổng hợp phản hồi ngay từ người tham gia chu kỳ. Không thêm thư viện UI.
+
+Baseline mới trên PostgreSQL riêng `_test`: **570 passed**, không skip, 533,71 giây. Các kiểm tra đầu vào, eligibility, mean/suppression, luồng API/UI và N+1 đã được chạy RED trước khi thêm hoặc sửa phần tương ứng; các ca hồi quy bảo mật tiếp tục được bổ sung trong review.
+
+Full regression local sau triển khai: **657 passed**, không skip, 681,34 giây. Ruff/mypy sạch (77 source files), sole head `20261020_0005`, web 83 test/lint/types/build qua trước ba test UI bổ sung. Các test audit/deadline cuối và race-repeat đang chạy; chưa thay thế nghiệm thu CI tại commit runtime cuối. [Review trực tiếp](../../phase-5-review.md) ghi rõ phương pháp và giới hạn, không nhận là reviewer độc lập.
+
+Phân chia commit triển khai: schema/eligibility/administration/submission/summary và các test backend được bàn giao cùng một commit backend có đầy đủ luồng dùng được; UI/layout/cache một commit riêng; smoke/CI/runbook và bằng chứng nghiệm thu riêng. Các task vẫn được đối chiếu theo gate, không tách thành commit trung gian có endpoint hoặc test bị thiếu module phụ thuộc.
 
 Tham chiếu: [kiến trúc](../../architecture.md), [hợp đồng đề xuất Phase 5](../../phase-5-contract.md), [nghiệm thu Phase 4](2026-10-19-phase-4-cycles-kpis.md), [vận hành](../../deployment.md). Không coi các mục chưa đánh dấu là tính năng đã có.
 

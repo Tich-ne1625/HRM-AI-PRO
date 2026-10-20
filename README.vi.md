@@ -18,7 +18,7 @@ Phase 1 đã hoàn thành:
 - Docker Compose thực hiện migration trước khi khởi động API và web.
 - GitHub Actions kiểm tra backend, frontend, image, migration và khả năng giữ dữ liệu sau khi khởi động lại.
 
-Phase 2 đã hoàn tất và qua CI: xác thực cookie, đổi mật khẩu, phân quyền và quản trị tài khoản. Phase 3 đã hoàn tất và qua CI, gồm phòng ban, chức danh, hồ sơ nhân viên, cây quản lý và liên kết tài khoản. Phase 4 cũng đã nghiệm thu CI: chu kỳ đánh giá, danh sách tham gia, định nghĩa/phân bổ KPI, nhập kết quả thực tế và cấu hình mặc định. Xem bằng chứng trong [hướng dẫn triển khai](docs/deployment.md). `employee_id` trả mã hồ sơ khi đã liên kết, hoặc `null` nếu chưa có. Phản hồi 360, tính điểm, Gemini và dashboard chưa triển khai.
+Phase 2 đã hoàn tất và qua CI: xác thực cookie, đổi mật khẩu, phân quyền và quản trị tài khoản. Phase 3 đã hoàn tất và qua CI, gồm phòng ban, chức danh, hồ sơ nhân viên, cây quản lý và liên kết tài khoản. Phase 4 cũng đã nghiệm thu CI: chu kỳ đánh giá, danh sách tham gia, định nghĩa/phân bổ KPI, nhập kết quả thực tế và cấu hình mặc định. Phase 5 đã có mã nguồn phản hồi 360 và đang nghiệm thu. Xem bằng chứng trong [hướng dẫn triển khai](docs/deployment.md). `employee_id` trả mã hồ sơ khi đã liên kết, hoặc `null` nếu chưa có. Tính điểm, Gemini và dashboard chưa triển khai.
 
 ## Công nghệ
 
@@ -130,7 +130,7 @@ alembic revision --autogenerate -m "mo ta thay doi schema"
 alembic upgrade head
 ```
 
-Luôn kiểm tra migration được sinh ra trước khi chạy. Head hiện tại là `20261020_0004`, thêm schema chu kỳ/KPI và cấu hình mặc định; nối sau organization `20261019_0003`, auth `20261003_0002` và baseline `20261003_0001`. Nâng cấp database hiện hữu bằng `alembic upgrade head`; sao lưu dữ liệu cần giữ trước khi migration.
+Luôn kiểm tra migration được sinh ra trước khi chạy. Head hiện tại là `20261020_0005`, thêm phân công và phản hồi; nối sau chu kỳ/KPI `20261020_0004`, organization `20261019_0003`, auth `20261003_0002` và baseline `20261003_0001`. Nâng cấp database hiện hữu bằng `alembic upgrade head`; sao lưu dữ liệu cần giữ trước khi migration.
 
 ## Kiểm thử và kiểm tra chất lượng
 
@@ -205,7 +205,7 @@ Nếu đang chạy bản cũ bằng Docker, từ thư mục `hrm-ai` chạy:
 docker compose --env-file .env up --build --wait
 ```
 
-Lệnh build lại và áp migration `20261020_0004`. Sao lưu dữ liệu cần giữ trước khi nâng cấp; không cần tạo lại ADMIN hoặc xóa volume.
+Lệnh build lại và áp head hiện tại `20261020_0005`; chức năng chu kỳ/KPI được thêm từ `20261020_0004`. Sao lưu dữ liệu cần giữ trước khi nâng cấp; không cần tạo lại ADMIN hoặc xóa volume.
 
 1. **ADMIN** mở **Cấu hình chấm điểm** (`/settings/scoring`): mặc định KPI 70%, phản hồi 30%, cap 100.00. Chỉ sửa nếu cần; tổng hai trọng số phải đúng 100.00%. Sửa mặc định không đổi chu kỳ đã kích hoạt. ADMIN không có quyền HR.
 2. **HR** mở **Danh mục KPI** (`/kpis`), thêm mã/tên/đơn vị và chọn “Càng cao càng tốt” hoặc “Càng thấp càng tốt”. Ngừng sử dụng không xóa KPI đã gán; định nghĩa đã ngừng không được gán mới.
@@ -228,6 +228,19 @@ Lệnh build lại và áp migration `20261020_0004`. Sao lưu dữ liệu cần
 
 ## Các phase tiếp theo
 
-Phase 4 đã hoàn tất theo [kế hoạch chi tiết](docs/superpowers/plans/2026-10-19-phase-4-cycles-kpis.md) và [hợp đồng nghiệp vụ](docs/phase-4-contract.md), nghiệm thu CI ngày 2026-10-20. Công đoạn tiếp theo là Phase 5: phân công và thu thập phản hồi 360. Đóng chu kỳ phụ thuộc chốt đánh giá ở Phase 6. Phản hồi, tính điểm, Gemini, dashboard, seed và Kubernetes chưa được triển khai.
+Phase 4 đã hoàn tất theo [kế hoạch chi tiết](docs/superpowers/plans/2026-10-19-phase-4-cycles-kpis.md) và [hợp đồng nghiệp vụ](docs/phase-4-contract.md), nghiệm thu CI ngày 2026-10-20. Phase 5 phản hồi đang nghiệm thu; công đoạn tiếp theo là Phase 6 tính điểm/chốt đánh giá, bao gồm điều kiện đóng chu kỳ. Tính điểm, Gemini, dashboard, seed và Kubernetes chưa được triển khai.
 
-Phase 5 đã có [kế hoạch 8 task](docs/superpowers/plans/2026-10-20-phase-5-feedback.md) và [hợp đồng đề xuất](docs/phase-5-contract.md), đối chiếu với mã nguồn Phase 4 ngày 2026-10-20. Chưa bắt đầu code Phase 5. Kế hoạch tách quyền reviewer lịch sử với quyền xem tổng hợp hiện tại, giữ phản hồi bất biến sau gửi và che nhóm PEER/SUBORDINATE dưới ba người; không cam kết ẩn danh tuyệt đối.
+Phase 5 đang được triển khai theo [kế hoạch 8 task](docs/superpowers/plans/2026-10-20-phase-5-feedback.md) và [hợp đồng](docs/phase-5-contract.md). Phần phản hồi đang chạy các bước nghiệm thu; chưa đánh dấu hoàn tất CI.
+
+## Dùng phản hồi 360 (Phase 5)
+
+Sau khi cập nhật code, tại thư mục `hrm-ai` chạy `docker compose --env-file .env up --build --wait` để nâng schema lên `20261020_0005`, giữ nguyên tài khoản và dữ liệu. Trên màn hình hẹp, bấm **Mở menu** để chọn trang; màn hình lớn có điều hướng bên trái.
+
+1. **HR** vào **Chu kỳ đánh giá**, mở chu kỳ ACTIVE, chọn **Phân công phản hồi** ở dòng người tham gia. Trang này dùng lại nhân viên và chu kỳ vừa chọn.
+2. Trong **Thêm phân công**, chọn quan hệ và người đánh giá hợp lệ, đặt hạn nếu cần rồi **Giao phản hồi**. Cần giao cả **Tự đánh giá** và **Quản lý**; kích hoạt chu kỳ chưa tự tạo hai phân công này. Hai quan hệ luôn bắt buộc và dùng tài khoản đã ghi nhận lúc kích hoạt. Nếu tài khoản bị khóa, ADMIN cần khôi phục đúng tài khoản, không tự giao cho quản lý mới.
+3. **Người được giao**, gồm cả ADMIN nếu có phân công, mở **Phản hồi của tôi**, chọn phân công, nhập mức 1–5 và nhận xét tối đa 2.000 ký tự. Bấm **Kiểm tra và gửi**, xem lại rồi **Xác nhận gửi một lần**. Nội dung đã gửi không sửa/xóa được. HR có quyền đọc nhận xét gốc.
+4. Nếu quá hạn, liên hệ HR gia hạn. Không đặt hạn riêng vẫn chỉ gửi được khi chu kỳ ACTIVE và hồ sơ chưa chốt. Nếu báo dữ liệu đã thay đổi, bấm **Tải phiên bản mới, giữ nội dung**, kiểm tra lại rồi xác nhận; ứng dụng không tự gửi lại bằng phiên bản mới.
+5. **HR** dùng **Mở phân công** để xem nội dung đã gửi hoặc sửa deadline/tính bắt buộc của phân công OPEN. Hủy chỉ áp dụng OPEN tùy chọn; muốn hủy một PEER/SUBORDINATE bắt buộc phải chủ động bỏ bắt buộc trước. **Thay người đánh giá** giữ quan hệ và tính bắt buộc trong một thao tác nguyên tử. Phân công đã hủy được khôi phục cùng người, không tạo dòng trùng. SELF/MANAGER không được thay người.
+6. **Nhân viên và quản lý trực tiếp hiện tại** mở **Tổng hợp phản hồi** từ chu kỳ. Nhóm đồng nghiệp/cấp dưới dưới ba người gửi sẽ ẩn thống kê riêng. Chỉ nhận xét do chính bạn viết được hiện lại cho bạn; nhận xét của người khác không xuất hiện. HR có trang dữ liệu gốc riêng; thống kê không cam kết ẩn danh tuyệt đối và mức trung bình chưa phải điểm hiệu suất.
+
+Sau khi đổi quản lý, người quản lý cũ mất quyền xem tổng hợp nhưng vẫn có thể xem/gửi phân công được giao cho chính tài khoản của họ. Quyền không chuyển sang tài khoản liên kết mới.

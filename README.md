@@ -8,7 +8,7 @@ The project is a modular monolith: a Next.js web application, a FastAPI backend,
 
 ## Current scope
 
-Phases 1–4 are implemented and CI-verified: foundation, authentication, organization/employees and cycle/KPI workflows with Vietnamese screens. Current account linkage and SQL scopes enforce live access; cycle and assignment snapshots preserve history. Phase 4 includes definitions, complete allocations, actual entry and default scoring configuration. Acceptance evidence is in [deployment.md](docs/deployment.md). Feedback, scoring and AI remain planned.
+Phases 1–4 are implemented and CI-verified: foundation, authentication, organization/employees and cycle/KPI workflows with Vietnamese screens. Current account linkage and SQL scopes enforce live access; cycle and assignment snapshots preserve history. Phase 4 includes definitions, complete allocations, actual entry and default scoring configuration. Phase 5 feedback is implemented and undergoing acceptance. Evidence is in [deployment.md](docs/deployment.md). Scoring and AI remain planned.
 
 ## Technology stack
 
@@ -126,7 +126,7 @@ alembic revision --autogenerate -m "describe the schema change"
 alembic upgrade head
 ```
 
-Review every generated migration before running it. The sole head is `20261020_0004` (Phase 4 cycle/KPI schema), following `20261019_0003` (organization), `20261003_0002` (authentication) and baseline `20261003_0001`. Back up data that must be kept before upgrades.
+Review every generated migration before running it. The sole head is `20261020_0005` (feedback), following `20261020_0004` (cycle/KPI), `20261019_0003` (organization), `20261003_0002` (authentication) and baseline `20261003_0001`. Back up data that must be kept before upgrades.
 
 ## Tests and quality gates
 
@@ -158,9 +158,21 @@ Set `AUTH_ACCESS_SECRET` to a nondefault key of at least 32 characters outside d
 
 ## Future phases
 
-The [Phase 4 plan](docs/superpowers/plans/2026-10-19-phase-4-cycles-kpis.md) and [contract](docs/phase-4-contract.md) record implementation and CI acceptance on 2026-10-20. Phase 5 feedback assignments/submission are next. Closing cycles depends on review finalization in Phase 6. Feedback, scoring, Gemini, dashboards, seed data and Kubernetes follow [the architecture](docs/architecture.md).
+The [Phase 4 plan](docs/superpowers/plans/2026-10-19-phase-4-cycles-kpis.md) and [contract](docs/phase-4-contract.md) record implementation and CI acceptance on 2026-10-20. Phase 5 feedback assignments/submission are undergoing acceptance. Closing cycles depends on review finalization in Phase 6. Scoring, Gemini, dashboards, seed data and Kubernetes follow [the architecture](docs/architecture.md).
 
-The [Phase 5 plan](docs/superpowers/plans/2026-10-20-phase-5-feedback.md) and [proposed contract](docs/phase-5-contract.md) were prepared against the implemented Phase 4 on 2026-10-20. Phase 5 implementation has not started. The proposal separates historical assignment rights from live report scope, preserves submitted feedback, and suppresses small peer/subordinate groups without promising anonymity.
+Phase 5 implementation is undergoing acceptance against the [plan](docs/superpowers/plans/2026-10-20-phase-5-feedback.md) and [contract](docs/phase-5-contract.md). CI acceptance is still pending. It separates historical reviewer rights from live report scope and suppresses small peer/subordinate groups without promising anonymity.
+
+## Feedback walkthrough (Phase 5)
+
+Rebuild with `docker compose --env-file .env up --build --wait` to apply `20261020_0005`, preserving accounts and Phase 4 evidence.
+
+1. HR opens an ACTIVE cycle and selects **Phân công phản hồi** beside a participant. Assign SELF and MANAGER explicitly; activation does not create these required assignments. Historical accounts cannot be delegated to a new manager; ADMIN must restore a disabled historical account.
+2. Each assigned reviewer, including ADMIN when assigned, opens **Phản hồi của tôi**, enters a 1–5 rating and up to 2,000 plain-text characters, and confirms the immutable submission. HR has access to raw feedback.
+3. HR can extend OPEN deadlines, cancel optional OPEN assignments, explicitly reopen cancelled assignments, or atomically replace PEER/SUBORDINATE reviewers while preserving the relationship/required flag. Submitted assignments cannot change. SELF/MANAGER cannot be replaced or made optional.
+4. Conflicts retain draft input. Explicitly reload versions and review before confirming again; the client does not retry with new versions automatically. Expired assignments require HR to extend the deadline.
+5. Current self/direct-manager scope controls employee summaries. Only the exact author's own comment is included; PEER/SUBORDINATE group statistics require three distinct submitted reviewers per group. The overall mean permits residual small-group inference; this is not an anonymity guarantee or a performance score.
+
+All protected screens share grouped desktop navigation, a collapsible mobile menu, responsive panels and contained table scrolling. The Vietnamese guide has the complete role walkthrough.
 
 ## Organization walkthrough
 
@@ -173,7 +185,7 @@ The [Phase 2 implementation plan](docs/superpowers/plans/2026-10-03-phase-2-auth
 
 ## Cycle and KPI walkthrough (Phase 4)
 
-Rebuild an existing Compose stack with `docker compose --env-file .env up --build --wait` to apply `20261020_0004`, retaining its volume and accounts. Back up valuable data before upgrading.
+Rebuild an existing Compose stack with `docker compose --env-file .env up --build --wait` to apply current head `20261020_0005`, retaining its volume and accounts; cycle/KPI functionality was introduced in `20261020_0004`. Back up valuable data before upgrading.
 
 1. ADMIN may edit `/settings/scoring`: component weights must total 100.00; defaults affect future activations only. ADMIN has no HR access.
 2. HR creates definitions at `/kpis`, then creates a DRAFT at `/review-cycles`, selects active employees in paginated batches, and confirms activation. Employees and their active managers need active linked accounts; references must be active. Validation identifies profiles needing attention.

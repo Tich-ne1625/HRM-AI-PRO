@@ -1,0 +1,21 @@
+# Review triển khai Phase 5
+
+Ngày: 2026-10-20. Cách thực hiện: trực tiếp đọc và đối chiếu mã nguồn, kiểm tra response JSON, test PostgreSQL có cạnh tranh thật và thao tác Edge trên project nghiệm thu riêng. Đây là review trực tiếp của người triển khai, không phải reviewer độc lập. Nghiệm thu CI sẽ được liên kết trong [kế hoạch](superpowers/plans/2026-10-20-phase-5-feedback.md).
+
+| Ranh giới | Cách kiểm chứng |
+| --- | --- |
+| Quyền lịch sử và quyền hiện tại | SELF/MANAGER/direct reports từ activation snapshot; PEER dùng hồ sơ/account hiện tại, loại identity thuộc quan hệ lịch sử. Chuyển quản lý/unlink/đổi role/ngừng làm việc không tự chuyển assignment. SQL owner scope cho inbox và SQL live scope cho summary được test riêng |
+| ADMIN và HR | ADMIN được giao có thể gửi của mình, không có HR raw/report quyền mặc định. HR không gửi thay người khác. Kiểm tra API, menu và form không có quyền không fetch raw |
+| Origin, CSRF, family và trạng thái tài khoản | Mỗi mutation dùng require_same_origin và authorize_domain_write. Event tests dừng writer trước guard rồi khóa account/logout/đổi role HR; writer bị từ chối sau khi tiếp tục |
+| Thứ tự khóa | Guard 730031 → sorted active ADMIN → sorted actor/reviewer users → active family → cycle → participant → assignment UUIDs → feedback. Discovery đọc ID trước, không khóa assignment trước participant. Auth/user writers giữ thứ tự hiện có; không có đường user lock rồi chờ guard |
+| Cạnh tranh với KPI | Feedback và KPI cùng participant.evidence_version. Barrier trước guard chứng minh các request cùng cạnh tranh; SET LOCAL lock_timeout và future timeout bắt treo/deadlock. Cùng assignment chỉ một feedback; khác assignment cùng version cũng chỉ một winner |
+| Gửi lại và lỗi giữa chừng | UNIQUE feedback.assignment_id, trạng thái SUBMITTED bất biến; replay được nhận diện trước stale version. Audit failure rollback feedback, trạng thái, cancelled/reopened/replacement rows và versions. Không retry bằng version mới ở client |
+| Coverage bắt buộc | Chính xác SELF/MANAGER đã gửi và mọi required không hủy đã gửi. Không hủy required; không hạ SELF/MANAGER. Replacement PEER/SUBORDINATE giữ required trong cùng transaction; account lịch sử bị khóa không được ngầm ủy quyền |
+| Deadline | Chỉ aware ISO/null, UTC normalization; check now >= due sau khi khóa; unit exact boundary. HR có thể gia hạn OPEN, không sửa SUBMITTED; ngày kết thúc chu kỳ không tự đóng |
+| Bảo mật phản hồi | DTO mine, HR administration và summary riêng. Threshold 0/1/2 có cùng shape suppressed; 3 mới hiện thống kê từng nhóm. Chỉ exact author có own_submission, kể cả manager đã viết. Không đưa nội dung/ratings vào audit. HTML trong comment render dạng text |
+| Cache và biểu mẫu | Auth cache clear khi đổi tài khoản; keys phân biệt mine/admin/summary và user. Feedback/KPI/tổ chức/account mutations invalidate context liên quan. Form chụp versions ban đầu, không nhận version mới từ background refetch; 409 giữ nội dung và yêu cầu reload chủ động |
+| Hiệu năng và giao diện | List dùng joined presentation, regression giới hạn số SELECT độc lập số dòng. Lookup phân trang và debounce 300ms, không thêm dependency. Dùng lại chu kỳ/participant/nhân viên/KPI; navigation desktop và menu mobile chung, bảng cuộn trong khung, keyboard focus tới xác nhận/chi tiết |
+
+Giới hạn được chấp nhận theo [hợp đồng](phase-5-contract.md): HR đọc dữ liệu gốc; tổng trung bình/số lượng có thể cho phép suy luận nhóm nhỏ, không cam kết ẩn danh tuyệt đối. Tài khoản SELF/MANAGER lịch sử bị khóa cần ADMIN khôi phục; không có delegation hay reset mật khẩu của người khác trong scope này. Chưa có tính điểm, chốt/đóng chu kỳ, AI hay dashboard giả.
+
+Nghiệm thu local đã chạy trên project `insighthr-phase5-acceptance`, cổng 13005/18005, tách khỏi stack người dùng. Smoke tạo tài khoản thật và gửi qua Next.js proxy; restart PostgreSQL giữ sáu assignment (năm SUBMITTED, một CANCELLED), năm feedback và tổng rating 20 trước khi migration chạy lại. Edge kiểm tra HR giao qua UI, EMPLOYEE xác nhận/gửi bất biến, manager mất report scope sau chuyển giao nhưng giữ inbox và ADMIN reviewer; các trang tổ chức/KPI/chu kỳ kiểm tra 390px/1280px không tràn ngang. Stack nghiệm thu đã dừng, giữ volume. Full-suite và race-repeat/CI được ghi sau khi hoàn tất, không suy ra từ số test collect.

@@ -43,7 +43,7 @@ For an already running disposable acceptance project:
 python scripts/smoke_auth.py --compose-project insighthr-acceptance
 ```
 
-That command creates disposable accounts, organization profiles and an ACTIVE cycle/KPI evidence. Phase 4 smoke requires a fresh acceptance project without an existing ACTIVE cycle; choose the project intentionally. Use a unique Compose project/empty volume when checking a clean install. Normal `down`/`up` must preserve users, employees, cycles/KPI evidence and revision `20261020_0004`; CI checks counts before migrations run again. Cleanup must name only that acceptance project. An HTTPS deployment additionally needs a real browser cookie check with Secure enabled.
+That command creates disposable accounts, organization profiles, an ACTIVE cycle/KPI evidence and feedback assignments/submissions. Smoke requires a fresh acceptance project without an existing ACTIVE cycle; choose the project intentionally. Use a unique Compose project/empty volume when checking a clean install. Normal `down`/`up` must preserve users, employees, cycles/KPI evidence, feedback and revision `20261020_0005`; CI checks counts/statuses/ratings before migrations run again. Cleanup must name only that acceptance project. An HTTPS deployment additionally needs a real browser cookie check with Secure enabled.
 
 Local evidence on 2026-10-19: Python 3.12.10, PostgreSQL 16.15, Node 26.8.1 and npm 11.19.0; 387 backend tests, 35 frontend tests, Ruff/mypy, ESLint, TypeScript and production build passed. Direct versions include Next.js 16.3.8, React 19.3.0, SQLAlchemy 2.1.3 and FastAPI 0.142.2; lockfiles record the complete dependency graph. Images/CI target Node 24. `npm audit --omit=dev` reported zero vulnerabilities; full audit reported five high findings in the existing ESLint → fast-glob → micromatch → braces dev-tool chain, with no compatible fix offered (the suggested downgrade to Next 14 is not applied). Local clean-container execution remains unavailable because Docker's Linux engine/WSL prerequisite is absent.
 
@@ -77,7 +77,15 @@ Docker Desktop/WSL2 is now available locally. An isolated project `insighthr-pha
 
 Final CI at runtime commit `adcbabe1a77e73042aea7e67552ea510ae450832` succeeded for backend (570 tests), frontend (69 tests) and docker-smoke: [InsightHR CI 39356761739](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/39356761739). The updated Linux workflow also checks cycle/participant/allocation/actual counts after PostgreSQL-only restart. The isolated local acceptance project was stopped afterward, preserving its volume and the user's existing running stack. Production HTTPS/Secure-cookie acceptance remains specific to the deployed environment.
 
-## Direct-host PostgreSQL
+## Phase 5 feedback operations
+
+Phase 5 is undergoing final acceptance. It adds no dependencies, environment variables or services. Apply head `20261020_0005`; upgrade preserves accounts/cycle/KPI evidence without inventing assignments. HR opens assignments from cycle participants, while any assigned role uses `/feedback`. Live employee scope controls `/employees/{id}/feedback?cycle_id=...`; historical assignment ownership remains valid after transfer/unlink/role/employment changes, provided the reviewer account and session are active. See the [Vietnamese walkthrough](../README.vi.md).
+
+SELF/MANAGER must be assigned explicitly and remain required. Disabled historical accounts block that coverage; ADMIN must restore the correct account. The current account recovery tools cannot reset another user's password; replacing a historical reviewer with a new account is outside this contract. HR can extend expired OPEN deadlines; no cron job cancels them. Submitted feedback cannot be edited/deleted. For stale-version conflicts retain text, explicitly reload versions, review and confirm again.
+
+Local isolated project `insighthr-phase5-acceptance` uses ports 13005/18005 and separate images/volume, leaving the working stack alone. Auth/organization/cycle/KPI/feedback HTTP smoke passed through Next.js, including real SELF/MANAGER/PEER/SUBORDINATE/ADMIN reviewers. PostgreSQL-only restart retained revision `20261020_0005`, six assignments (five SUBMITTED, one CANCELLED), five feedback rows and rating sum 20, together with account/organization/KPI counts, before migrations reran. Full regression, browser and CI results will be recorded after completion.
+
+## Direct-host PostgreSQL setup
 
 Create a local role and database with PostgreSQL 16 administrative credentials:
 
