@@ -47,6 +47,7 @@ function AdminUsers() {
     setConfirm(null); void cache.invalidateQueries({ queryKey: ["users"] });
     void cache.invalidateQueries({ queryKey: ["auth"] });
     void cache.invalidateQueries({ queryKey: ["feedback"] });
+    void cache.invalidateQueries({ queryKey: ["performance"] });
   } });
   return <>
     <section className="auth-card wide">

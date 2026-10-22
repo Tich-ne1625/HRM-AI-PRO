@@ -37,7 +37,7 @@ export function FeedbackError({ error, reload }: { error: Error; reload?: () => 
 }
 export function useFeedbackRefresh() {
   const cache = useQueryClient();
-  return async () => { await Promise.all([cache.invalidateQueries({ queryKey: ["feedback"] }), cache.invalidateQueries({ queryKey: ["reviews"] })]); };
+  return async () => { await Promise.all(["feedback", "reviews", "performance"].map((key) => cache.invalidateQueries({ queryKey: [key] }))); };
 }
 export function SubmissionContent({ rating, comment }: { rating: number; comment: string }) {
   return <><p><strong>Mức đánh giá: {rating}/5</strong></p><p className="plain-comment">{comment || "Không có nhận xét."}</p></>;

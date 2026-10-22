@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useAuth } from "../auth/auth-provider";
 import { organizationApi } from "../organization/api";
 import { Pagination } from "../organization/shared";
+import { CloseCycle } from "../performance/close-cycle";
 import { reviewApi, type Cycle } from "./api";
 import { CycleForm, type CycleValues } from "./cycle-directory";
 import { cycleStatus, ReviewAccess, ReviewError } from "./shared";
@@ -31,7 +32,7 @@ function Detail({ id }: { id: string }) {
       <h2>{row.policy_is_preview ? "Cấu hình dự kiến khi kích hoạt" : "Cấu hình đã đóng băng"}</h2>
       <p>KPI: {row.policy.kpi_weight}% · Phản hồi: {row.policy.feedback_weight}% · Giới hạn điểm KPI: {row.policy.kpi_cap ?? "Không giới hạn"}</p>
       {row.policy_is_preview && <p>Cấu hình và tổ chức có thể thay đổi trước khi kích hoạt. Nhân viên và người quản lý cần có tài khoản đang hoạt động.</p>}
-      <p>Chức năng tính điểm và chốt/đóng chu kỳ sẽ được bổ sung sau.</p>
+      {row.status === "ACTIVE" && user?.role === "HR" && <CloseCycle cycle={row} />}
       {row.can_activate && <button disabled={activate.isPending} onClick={() => setConfirmation(row.version)}>Kích hoạt chu kỳ</button>}
       {confirmation !== null && <section className="confirmation" role="group" aria-label="Xác nhận kích hoạt">
         <p>Kích hoạt sẽ đóng băng danh sách, phòng ban, chức danh, quan hệ quản lý và cấu hình chấm điểm. Sau đó không sửa danh sách tham gia.</p>
@@ -48,7 +49,7 @@ function Detail({ id }: { id: string }) {
       {participants.data && <><div className="table-scroll"><table><caption>{participants.data.total} người tham gia trong phạm vi</caption><thead><tr><th>Nhân viên</th><th>Phòng ban</th><th>Chức danh</th><th>Thao tác</th></tr></thead><tbody>
         {participants.data.items.map((p) => <tr key={p.id}><td>{p.employee_code} · {p.display_name}</td><td>{p.department_name}</td><td>{p.position_title}</td><td>{row.can_edit
           ? <button className="secondary" disabled={remove.isPending} onClick={() => remove.mutate(p.id)}>Bỏ {p.employee_code} khỏi nháp</button>
-          : <div className="row-actions"><Link href={`/employees/${p.employee_id}/kpis?cycle_id=${id}`}>{p.can_manage_kpis ? "Quản lý KPI" : "Xem KPI"}</Link><Link href={`/employees/${p.employee_id}/feedback?cycle_id=${id}`}>Tổng hợp phản hồi</Link>{user?.role === "HR" && <Link href={`/feedback-administration?participant_id=${p.id}&cycle_id=${id}`}>Phân công phản hồi</Link>}</div>}</td></tr>)}</tbody></table></div>
+          : <div className="row-actions"><Link href={`/employees/${p.employee_id}/performance?cycle_id=${id}`}>Kết quả</Link><Link href={`/employees/${p.employee_id}/kpis?cycle_id=${id}`}>{p.can_manage_kpis ? "Quản lý KPI" : "Xem KPI"}</Link><Link href={`/employees/${p.employee_id}/feedback?cycle_id=${id}`}>Tổng hợp phản hồi</Link>{user?.role === "HR" && <Link href={`/feedback-administration?participant_id=${p.id}&cycle_id=${id}`}>Phân công phản hồi</Link>}</div>}</td></tr>)}</tbody></table></div>
         {!participants.data.items.length && <p>Chưa có người tham gia phù hợp.</p>}
         <Pagination page={page} total={participants.data.total} pending={participants.isFetching} onPage={setPage} /></>}
       {remove.isError && <ReviewError error={remove.error} reload={() => {void refresh();}} />}

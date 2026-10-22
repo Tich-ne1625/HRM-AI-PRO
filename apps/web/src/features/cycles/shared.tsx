@@ -13,7 +13,15 @@ export function ReviewAccess({ children }: { children: ReactNode }) {
 }
 const errors: Record<string, string> = {
   stale_version: "Dữ liệu đã được người khác thay đổi. Thông tin đang nhập được giữ lại; hãy tải bản mới rồi kiểm tra trước khi lưu lại.",
-  stale_evidence_version: "KPI đã được người khác thay đổi. Thông tin đang nhập được giữ lại; hãy tải bản mới rồi nhập lại thay đổi.",
+  stale_evidence_version: "Dữ liệu đánh giá đã thay đổi. Hãy tải bản mới và kiểm tra trước khi xác nhận lại.",
+  stale_calculation_version: "Đã có lần tính mới. Hãy tải bản mới để kiểm tra kết quả trước khi chốt.",
+  review_already_finalized: "Kết quả đã được chốt. Hãy tải lại để xem trạng thái mới.",
+  review_stale: "Dữ liệu đã thay đổi. Cần tính lại điểm trước khi chốt.",
+  evidence_incomplete: "Cần hoàn tất KPI và phản hồi bắt buộc trước khi tính hoặc chốt điểm.",
+  evidence_inconsistent: "Dữ liệu đánh giá chưa nhất quán. Liên hệ HR để kiểm tra.",
+  optional_feedback_acknowledgement_required: "Số phân công chưa gửi đã thay đổi. Tải lại và xác nhận lại trước khi chốt.",
+  cycle_reviews_incomplete: "Còn người tham gia chưa chốt kết quả. Hoàn tất chốt cho tất cả người tham gia trước khi đóng kỳ.",
+  cycle_already_closed: "Chu kỳ đã đóng. Hãy tải lại để xem trạng thái mới.",
   active_cycle_exists: "Đã có chu kỳ đang đánh giá. Chỉ được kích hoạt một chu kỳ tại một thời điểm.",
   activation_requirements_not_met: "Chưa thể kích hoạt. Kiểm tra nhân viên, phòng ban, chức danh và tài khoản của nhân viên/người quản lý.",
   participant_already_enrolled: "Có nhân viên đã tham gia chu kỳ. Hãy tải lại danh sách và chọn lại.",

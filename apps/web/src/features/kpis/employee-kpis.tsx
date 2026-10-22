@@ -9,6 +9,7 @@ import { z } from "zod";
 import { reviewApi, type Allocation, type AllocationInput, type AllocationLine, type Definition } from "../cycles/api";
 import { cycleStatus, decimalUnits, ReviewAccess, ReviewError } from "../cycles/shared";
 import { Pagination } from "../organization/shared";
+import { EvaluationTabs } from "../performance/context-tabs";
 
 export function EmployeeKpis({id, cycle}: {id: string; cycle: string}) {
   return <ReviewAccess>{cycle ? <Detail id={id} cycle={cycle} /> : <section className="auth-card"><p>Hãy chọn chu kỳ và người tham gia để xem KPI.</p><Link href="/review-cycles">Chọn chu kỳ đánh giá</Link></section>}</ReviewAccess>;
@@ -19,7 +20,7 @@ function Detail({id, cycle}: {id: string; cycle: string}) {
   const [editingActual, setEditingActual] = useState<{row: AllocationLine; version: number} | null>(null);
   const query = useQuery({queryKey: ["reviews", "allocation", id, cycle], queryFn: () => reviewApi.allocation(id, cycle)});
   const cycleQuery = useQuery({queryKey: ["reviews", "cycle", cycle], queryFn: () => reviewApi.cycle(cycle)});
-  const refresh = async () => {await Promise.all([cache.invalidateQueries({queryKey: ["reviews"]}), cache.invalidateQueries({queryKey: ["feedback"]})]);};
+  const refresh = async () => {await Promise.all(["reviews", "feedback", "performance"].map((key) => cache.invalidateQueries({queryKey: [key]})));};
   const replace = useMutation({mutationFn: ({version, items}: {version: number; items: AllocationInput[]}) => reviewApi.replace(id, cycle, version, items), onSuccess: async () => {setEditing(false); await refresh();}});
   const actual = useMutation({mutationFn: ({row, version, value}: {row: string; version: number; value: string | null}) => reviewApi.actual(row, version, value), onSuccess: async () => {setEditingActual(null); await refresh();}});
   if (query.isPending) return <p role="status">Đang tải KPI nhân viên…</p>;
@@ -27,7 +28,7 @@ function Detail({id, cycle}: {id: string; cycle: string}) {
   const data = query.data, participant = data.participant;
   return <><section className="auth-card wide"><Link href={`/review-cycles/${cycle}`}>← Người tham gia chu kỳ</Link><p className="eyebrow">{cycleQuery.data?.name ?? "Chu kỳ được chọn"} · {cycleStatus[data.cycle_status]}</p>
     <h1>KPI · {participant.display_name}</h1><p>{participant.employee_code} · {participant.department_name} · {participant.position_title}</p>
-    {participant.is_snapshot && <div className="row-actions"><Link href={`/employees/${id}/feedback?cycle_id=${cycle}`}>Tổng hợp phản hồi cùng chu kỳ</Link></div>}
+    {participant.is_snapshot && <EvaluationTabs employeeId={id} cycleId={cycle} active="kpis" />}
     {cycleQuery.isError && <ReviewError error={cycleQuery.error} />}
     <p>{participant.is_snapshot ? "Thông tin tổ chức tại lúc kích hoạt chu kỳ." : "Thông tin nháp chưa đóng băng."} Phiên bản dữ liệu đánh giá: {participant.evidence_version}.</p>
     {!data.items.length && <p>Chưa phân bổ KPI.</p>}
