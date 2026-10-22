@@ -16,6 +16,7 @@ from app.modules.health.service import ReadinessService
 from app.modules.kpis.allocation_router import router as allocation_router
 from app.modules.kpis.router import router as kpis_router
 from app.modules.organization.router import router as organization_router
+from app.modules.performance.router import router as performance_router
 from app.modules.review_cycles.router import router as cycles_router
 from app.modules.settings.router import router as settings_router
 from app.modules.users.router import router as users_router
@@ -48,6 +49,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(cycles_router)
     app.include_router(allocation_router)
     app.include_router(feedback_router)
+    app.include_router(performance_router)
     return app
 
 

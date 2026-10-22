@@ -55,7 +55,11 @@ def test_activation_freezes_policy_and_relationships(world):
         },
     )
     assert conflict.status_code == 409 and conflict.json()["error"]["code"] == "active_cycle_exists"
-    assert world.client().post(f"/api/v1/review-cycles/{cycle['id']}/close").status_code == 404
+    closing = world.client().post(
+        f"/api/v1/review-cycles/{cycle['id']}/close", json={"expected_version": active["version"]}
+    )
+    assert closing.status_code == 409
+    assert closing.json()["error"]["code"] == "cycle_reviews_incomplete"
 
 
 @pytest.mark.parametrize(

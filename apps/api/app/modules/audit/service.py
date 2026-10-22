@@ -54,6 +54,16 @@ FEEDBACK_METADATA_KEYS = frozenset(
         "previous_assignment_id",
     }
 )
+PERFORMANCE_METADATA_KEYS = frozenset(
+    {
+        "participant_id",
+        "cycle_id",
+        "calculation_version",
+        "evidence_version",
+        "engine_version",
+        "evidence_hash",
+    }
+)
 
 
 class AuditWriter:
@@ -85,6 +95,8 @@ class AuditWriter:
             allowed = REVIEW_METADATA_KEYS
         if action.startswith(("assignment.", "feedback.")):
             allowed = FEEDBACK_METADATA_KEYS
+        if action.startswith("performance."):
+            allowed = PERFORMANCE_METADATA_KEYS
         if metadata.keys() - allowed:
             raise ValueError("Audit metadata contains an unsupported field")
         record = AuditLog(

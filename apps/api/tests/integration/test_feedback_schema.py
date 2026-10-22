@@ -13,7 +13,7 @@ from .test_feedback_workflows import create_assignment, feedback_world
 
 
 def test_feedback_migration_metadata_and_no_backfill(world):
-    assert ScriptDirectory.from_config(Config(str(ALEMBIC_INI))).get_heads() == ["20261020_0005"]
+    assert ScriptDirectory.from_config(Config(str(ALEMBIC_INI))).get_heads() == ["20261022_0006"]
     assert {"feedback", "feedback_assignments"} <= set(inspect(world.engine).get_table_names())
     command.check(Config(str(ALEMBIC_INI)))
     feedback_world(world)

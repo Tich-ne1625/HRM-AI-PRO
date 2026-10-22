@@ -219,6 +219,109 @@ def test_real_accounts_organization_linkage_scopes_and_transfer(auth_engine, mon
         assert peer.get(summary_path).status_code == 404
         assert admin.get(summary_path).status_code == 403
         assert hr.get("/api/v1/feedback-assignments?view=administration").json()["total"] == 4
+        # Phase 6 uses these same real sessions, frozen policy and submitted feedback.
+        linked_hr = hr.post(
+            "/api/v1/employees",
+            json={
+                **base,
+                "employee_code": "HR-01",
+                "display_name": "HR",
+                "user_id": accounts["hr"],
+            },
+        )
+        assert linked_hr.status_code == 201
+        optional = hr.post(
+            "/api/v1/feedback-assignments",
+            json={
+                "participant_id": participant["id"],
+                "reviewer_id": accounts["hr"],
+                "relationship": "PEER",
+                "required": False,
+                "expected_evidence_version": participant["evidence_version"],
+            },
+        )
+        assert optional.status_code == 201, optional.text
+        participant["evidence_version"] = optional.json()["evidence_version"]
+        performance_path = f"/api/v1/performance/{report_id}"
+        payload = {
+            "cycle_id": cycle.json()["id"],
+            "expected_evidence_version": participant["evidence_version"],
+        }
+        calculated = manager.post(performance_path + "/calculate", json=payload)
+        assert calculated.status_code == 201, calculated.text
+        performance = calculated.json()
+        assert performance["current_result"]["final_score"] == "76.50"
+        assert hr.post(performance_path + "/calculate", json=payload).json()["reused"]
+        changed = manager.patch(
+            "/api/v1/employee-kpis/" + assigned.json()["items"][0]["id"],
+            json={
+                "expected_evidence_version": participant["evidence_version"],
+                "actual": "90.0000",
+            },
+        )
+        assert changed.status_code == 200
+        assert (
+            employee.get(performance_path + f"?cycle_id={cycle.json()['id']}").json()["state"]
+            == "STALE"
+        )
+        payload["expected_evidence_version"] += 1
+        performance = hr.post(performance_path + "/calculate", json=payload).json()
+        assert performance["current_result"]["final_score"] == "87.00"
+        review_path = f"/api/v1/reviews/{performance['review_id']}"
+        assert employee.get(review_path + "/revisions").json()["total"] == 2
+        assert employee.get(review_path + "/revisions/1").json()["final_score"] == "76.50"
+        assert admin.get(review_path + "/revisions").status_code == 403
+        assert peer.get(review_path + "/revisions").status_code == 404
+        finalization = {
+            "expected_evidence_version": payload["expected_evidence_version"],
+            "expected_calculation_version": 2,
+            "acknowledge_open_optional_count": 1,
+        }
+        finalized = hr.post(review_path + "/finalize", json=finalization)
+        assert finalized.status_code == 200, finalized.text
+        assert finalized.json()["state"] == "FINALIZED"
+        assert (
+            hr.post(
+                "/api/v1/feedback",
+                json={
+                    "assignment_id": optional.json()["id"],
+                    "expected_assignment_version": 1,
+                    "expected_evidence_version": payload["expected_evidence_version"],
+                    "rating": 5,
+                    "comment": "Too late",
+                },
+            ).status_code
+            == 409
+        )
+        assert (
+            manager.patch(
+                "/api/v1/employee-kpis/" + assigned.json()["items"][0]["id"],
+                json={
+                    "expected_evidence_version": payload["expected_evidence_version"],
+                    "actual": "99.0000",
+                },
+            ).status_code
+            == 409
+        )
+        assert (
+            hr.post(
+                cycle_path + "/close", json={"expected_version": finalized.json()["cycle_version"]}
+            ).status_code
+            == 200
+        )
+        next_cycle = hr.post(
+            "/api/v1/review-cycles",
+            json={"name": "Next cycle", "start_date": "2027-01-01", "end_date": "2027-03-31"},
+        ).json()
+        next_path = "/api/v1/review-cycles/" + next_cycle["id"]
+        assert (
+            hr.post(
+                next_path + "/participants",
+                json={"expected_version": 1, "employee_ids": [report_id]},
+            ).status_code
+            == 200
+        )
+        assert hr.post(next_path + "/activate", json={"expected_version": 2}).status_code == 200
         assert (
             hr.patch(f"/api/v1/employees/{report_id}", json={"manager_id": None}).status_code == 200
         )
