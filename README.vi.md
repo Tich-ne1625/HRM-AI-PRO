@@ -232,6 +232,8 @@ Phase 4 đã hoàn tất theo [kế hoạch chi tiết](docs/superpowers/plans/2
 
 Phase 5 hoàn tất theo [kế hoạch 8 task](docs/superpowers/plans/2026-10-20-phase-5-feedback.md) và [hợp đồng](docs/phase-5-contract.md); runtime `bf04fe2` đã qua đầy đủ CI. Năm lượt test cạnh tranh đều đạt 26/26. Giới hạn bảo mật và account lịch sử được mô tả trong hướng dẫn dưới đây.
 
+Phase 6 đã có [kế hoạch 8 task](docs/superpowers/plans/2026-10-22-phase-6-performance.md) và [hợp đồng đề xuất](docs/phase-6-contract.md), lập ngày 2026-10-22 sau khi đối chiếu mã nguồn Phase 4–5. **Chưa bắt đầu code Phase 6.** Phạm vi là tính điểm chính xác, báo cáo/lịch sử, phát hiện điểm cũ khi dữ liệu đổi, HR chốt đánh giá và đóng chu kỳ; giao diện tận dụng các trang hiện có. AI thuộc Phase 7.
+
 ## Dùng phản hồi 360 (Phase 5)
 
 Sau khi cập nhật code, tại thư mục `hrm-ai` chạy `docker compose --env-file .env up --build --wait` để nâng schema lên `20261020_0005`, giữ nguyên tài khoản và dữ liệu. Trên màn hình hẹp, bấm **Mở menu** để chọn trang; màn hình lớn có điều hướng bên trái.

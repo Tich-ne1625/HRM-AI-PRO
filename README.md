@@ -162,6 +162,8 @@ The [Phase 4 plan](docs/superpowers/plans/2026-10-19-phase-4-cycles-kpis.md) and
 
 Phase 5 is complete against the [plan](docs/superpowers/plans/2026-10-20-phase-5-feedback.md) and [contract](docs/phase-5-contract.md), with CI acceptance at `bf04fe2`. It separates historical reviewer rights from live report scope and suppresses small peer/subordinate groups without promising anonymity. All 26 concurrency cases passed in each of five runs.
 
+The [Phase 6 plan](docs/superpowers/plans/2026-10-22-phase-6-performance.md) and [proposed contract](docs/phase-6-contract.md) were prepared on 2026-10-22 against the current Phase 4–5 implementation. Phase 6 code has not started. Eight tasks cover exact scoring, versioned reports/history, stale evidence, HR finalization/cycle closure, responsive UI reuse and acceptance; Gemini remains Phase 7.
+
 ## Feedback walkthrough (Phase 5)
 
 Rebuild with `docker compose --env-file .env up --build --wait` to apply `20261020_0005`, preserving accounts and Phase 4 evidence.
