@@ -2,6 +2,8 @@
 
 ## Phase 6 performance operations
 
+Accepted runtime `f595f23ca2c8a11605a833784bcf55648ee31712`: [InsightHR CI 39715137000](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/39715137000), backend/frontend/docker-smoke all success. Final logs show 767 backend tests without skips, Ruff/mypy clean (85 files), 104 web tests and clean lint/types/build. All 15 new concurrency/read-consistency/revalidation cases passed five local rounds. Both local acceptance stacks are stopped with their volumes retained.
+
 Apply current head `20261022_0006` with `docker compose --env-file .env up --build --wait` in an existing stack. No new environment variables, dependencies or services are required. The migration adds only result/history tables, retaining accounts, organization, cycle/KPI evidence and submitted/cancelled feedback. Direct-host users run `alembic upgrade head` from `apps/api`, then restart the API/web production processes.
 
 Use **Chu kỳ đánh giá → Kết quả** for a participant. HR/current eligible direct manager calculates only after every KPI actual and required response is present. A zero component policy weight still requires complete evidence. The report becomes STALE after any evidence mutation; explicitly recalculate. HR checks the current optional OPEN count and confirms finalization. All evidence writers then reject changes for that participant. HR closes only once every participant is finalized, then activates the next draft. Neither finalization nor closure has a reopen operation. Dates do not close cycles automatically. The [Vietnamese guide](../README.vi.md#dùng-báo-cáo-hiệu-suất-và-chốt-kỳ-phase-6) explains the workflow.

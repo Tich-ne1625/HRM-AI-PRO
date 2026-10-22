@@ -5,7 +5,7 @@ Status: Approved; Phases 1–4 completed and CI-verified as of 2026-10-20. See d
 
 ## Implementation status
 
-Phase 1 includes the FastAPI/Next.js foundation, PostgreSQL/Alembic readiness, Docker Compose and CI. Phase 2 implements authentication and account administration. Phase 3 adds department/position/employee schema and APIs, SQL-scoped reads, HR-only writes, user–employee linkage, guarded reporting-tree changes and Vietnamese web screens. Current identity reflects employee links. Phase 4 implements review-cycle drafts/enrollment/activation, frozen policies and reporting relationships, scoped KPI definitions, complete allocations/actuals, versioned defaults and Vietnamese screens; CI acceptance passed on 2026-10-20. Phase 5 feedback assignments/submission/summaries and shared responsive screens are implemented and CI-accepted at `bf04fe2` ([run 39369977157](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/39369977157)). Scoring, Gemini and dashboards remain planned. Implementation/acceptance evidence is in the phase plans, contracts and `docs/deployment.md`.
+Phase 1 includes the FastAPI/Next.js foundation, PostgreSQL/Alembic readiness, Docker Compose and CI. Phase 2 implements authentication and account administration. Phase 3 adds department/position/employee schema and APIs, SQL-scoped reads, HR-only writes, user–employee linkage, guarded reporting-tree changes and Vietnamese web screens. Current identity reflects employee links. Phase 4 implements review-cycle drafts/enrollment/activation, frozen policies and reporting relationships, scoped KPI definitions, complete allocations/actuals, versioned defaults and Vietnamese screens; CI acceptance passed on 2026-10-20. Phase 5 feedback assignments/submission/summaries and shared responsive screens are implemented and CI-accepted at `bf04fe2` ([run 39369977157](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/39369977157)). Phase 6 implements exact scoring, report history, HR finalization and cycle closure. Gemini and dashboards remain planned. Implementation/acceptance evidence is in the phase plans, contracts and `docs/deployment.md`.
 
 ## Purpose and existing workspace
 
@@ -234,7 +234,7 @@ Current managers receive scope to current direct reports; the frozen assignment 
 
 ### Deterministic scoring
 
-Use Python Decimal for calculation and PostgreSQL NUMERIC for storage. Weights are percentage points (70, 30, 100), not fractions. Reject NaN, infinity, negative actuals, zero/negative targets, invalid rating ranges, and configuration weights that do not sum to 100.00.
+Parse inputs exactly with Python Decimal, use Fraction for unrounded rational intermediates, and store final HALF_UP cents in PostgreSQL NUMERIC. Weights are percentage points (70, 30, 100), not fractions. Reject NaN, infinity, negative actuals, zero/negative targets, invalid rating ranges, and configuration weights that do not sum to 100.00.
 
 ```text
 HIGHER_IS_BETTER raw_score = actual / target * 100

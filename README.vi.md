@@ -18,7 +18,7 @@ Phase 1 đã hoàn thành:
 - Docker Compose thực hiện migration trước khi khởi động API và web.
 - GitHub Actions kiểm tra backend, frontend, image, migration và khả năng giữ dữ liệu sau khi khởi động lại.
 
-Phases 1–5 đã hoàn tất và qua CI. Phase 6 đã triển khai tính điểm, báo cáo/lịch sử, chốt đánh giá và đóng chu kỳ; đang hoàn tất kiểm tra nghiệm thu. Giao diện chung có **tab nhóm chức năng phía trên và menu trái theo quyền**, cùng tab KPI/phản hồi/kết quả giữ nguyên nhân viên và kỳ đang xem. Xem bằng chứng trong [kế hoạch Phase 6](docs/superpowers/plans/2026-10-22-phase-6-performance.md). Gemini và dashboard tổng thể chưa triển khai.
+Phases 1–6 đã hoàn tất và qua [CI nghiệm thu Phase 6](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/39715137000): **767 test backend, 104 test web**, kiểm tra chất lượng, build và Docker smoke/persistence đều đạt. Phase 6 có tính điểm, báo cáo/lịch sử, chốt đánh giá và đóng chu kỳ. Giao diện chung có **tab nhóm chức năng phía trên và menu trái theo quyền**, cùng tab KPI/phản hồi/kết quả giữ nguyên nhân viên và kỳ đang xem. Xem bằng chứng trong [kế hoạch Phase 6](docs/superpowers/plans/2026-10-22-phase-6-performance.md). Gemini và dashboard tổng thể chưa triển khai.
 
 ## Chạy và xem nhanh
 

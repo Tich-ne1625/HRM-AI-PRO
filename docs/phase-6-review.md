@@ -2,6 +2,8 @@
 
 Ngày: 2026-10-22. Đây là review trực tiếp của người triển khai, không phải reviewer độc lập. Đối chiếu với [hợp đồng](phase-6-contract.md) và [kế hoạch](superpowers/plans/2026-10-22-phase-6-performance.md).
 
+Runtime `f595f23` đã qua [CI 39715137000](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/39715137000): 767 backend tests, 104 web tests, Ruff/mypy/lint/types/build và Docker smoke/persistence. Năm lượt module cạnh tranh đều đạt 15/15. Stack nghiệm thu riêng đã dừng, giữ volume và không thay ứng dụng người dùng.
+
 | Ranh giới | Kiểm chứng |
 | --- | --- |
 | Số học | Decimal đầu vào → Fraction chính xác, không float; HALF_UP ở đầu ra cent. Final dùng thành phần chưa làm tròn. Golden 89.80, oracle Decimal precision cao, context precision khác nhau, số cực trị, cap >100/không cap, LOWER actual=0, dữ liệu lỗi |

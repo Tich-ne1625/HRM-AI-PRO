@@ -1,8 +1,8 @@
 # Kế hoạch Phase 6 — Tính điểm và chốt đánh giá
 
-Ngày lập: 2026-10-22. Trạng thái: **đã triển khai; đang hoàn tất nghiệm thu hồi quy/CI**.
+Ngày lập: 2026-10-22. Trạng thái: **đã triển khai và nghiệm thu**, runtime `f595f23`, [CI 39715137000](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/39715137000).
 
-Tham chiếu: [kiến trúc](../../architecture.md), [hợp đồng đề xuất Phase 6](../../phase-6-contract.md), [nghiệm thu Phase 5](2026-10-20-phase-5-feedback.md), [API](../../api.md), [database](../../database.md), [vận hành](../../deployment.md).
+Tham chiếu: [kiến trúc](../../architecture.md), [hợp đồng Phase 6](../../phase-6-contract.md), [nghiệm thu Phase 5](2026-10-20-phase-5-feedback.md), [API](../../api.md), [database](../../database.md), [vận hành](../../deployment.md).
 
 ## Cơ sở đối chiếu
 
@@ -93,7 +93,7 @@ File dự kiến: `apps/web/src/features/performance/`, route `/employees/[id]/p
 
 - [x] Entry từ participant giữ employee/cycle context; header có nhãn lịch sử và trạng thái, desktop overview + breakdown, mobile cards/table trong khung. Không nhân đôi employee/cycle picker hoặc thêm dashboard trống.
 - [x] Readiness gợi ý đúng trang xử lý KPI/phản hồi HR, không dẫn peer/manager vào route raw không có quyền. EMPLOYEE read-only; manager không calculate self; ADMIN không fetch report.
-- [x] Server scores chuỗi hai số lẻ; UI không tự tính/round lại, không clamp >100. Hiển thị conversion rating 1→20, 5→100 và lý do tổng không cộng từ số đã làm tròn.
+- [x] Server scores chuỗi hai số lẻ; UI không tự tính/round lại, không clamp >100. Hiển thị mức phản hồi /5 cạnh điểm phản hồi đã chuẩn hóa và lý do tổng không cộng từ số đã làm tròn.
 - [x] Chưa tính/stale không hiện 0/điểm cũ như current; lịch sử version có nhãn rõ. Không có AI summary/themes/strengths bịa.
 - [x] Form capture versions lúc mở, 409 giữ lựa chọn, explicit reload/confirmation; finalize nêu rõ khóa dữ liệu và optional chưa gửi chỉ HR, close explicit confirmation, chống double-click, focus/accessibility/loading/error/empty.
 - [x] Cache keys tách user/employee/cycle/current/revision/HR context; KPI/feedback/assignment/cycle mutations invalidate report readiness/current; finalization invalidates mọi quyền/khả năng edit liên quan; auth clear cache giữ nguyên.
@@ -117,13 +117,13 @@ Gate: không còn blocker về exact score, data loss, stale finalization, autho
 
 File dự kiến: `scripts/smoke_auth.py` hoặc performance smoke được workflow gọi, `.github/workflows/phase1-ci.yml`, README Việt/Anh, API/database/deployment/architecture, contract/plan này.
 
-- [ ] Full backend PostgreSQL không skip, Ruff/mypy; toàn bộ web tests/lint/types/build. Chỉ ghi số test thực chạy và head thực; dependencies hiện có được giữ nếu không có lý do kỹ thuật cụ thể.
-- [ ] Smoke qua Next.js proxy mở rộng cùng ACTIVE cycle/participant Phase 4–5: calculate/reused → stale → recalculate → finalize → reject edits → close → activate next. Không xóa feedback/kỳ cũ hoặc bypass điều kiện chốt để làm smoke xanh.
-- [ ] Smoke có ít nhất một optional OPEN cần HR acknowledgement; giữ ít nhất hai calculation revisions để chứng minh history. Chốt signature persistence mới từ scenario thực, không giữ cứng assumption một ACTIVE cycle/count chỉ một cycle của Phase 5 sau khi có kỳ kế tiếp.
-- [ ] Metadata/head expectations cập nhật migration mới; upgrade từ Phase 5 giữ submitted/cancelled feedback, accounts và KPI. Nonroot, ảnh không app .env/secret/test tooling như gate hiện có.
-- [ ] Project/ports/images/volume nghiệm thu riêng, không thay stack người dùng 3000/8000. Restart riêng PostgreSQL, kiểm tra revision/counts/scores/hash/calculation versions/finalized timestamps/cycle statuses và history trước migration rerun. Không xóa volume người dùng.
-- [ ] Docs hướng dẫn đầy đủ vai trò, đủ dữ liệu, stale, history, optional chưa gửi lúc chốt, không reopen, close rồi tạo kỳ mới; làm rõ chưa có AI/dashboard. Update architecture note exact rational internal arithmetic, schema/endpoint map thực tế.
-- [ ] CI backend/frontend/docker-smoke cùng thành công tại đúng runtime commit; record URL, local/browser/race results và giới hạn. Git diff/status clean, commit/push theo ủy quyền repository. Sau đó mới đánh dấu Phase 6 hoàn tất.
+- [x] Full backend PostgreSQL không skip, Ruff/mypy; toàn bộ web tests/lint/types/build. Chỉ ghi số test thực chạy và head thực; dependencies hiện có được giữ nếu không có lý do kỹ thuật cụ thể.
+- [x] Smoke qua Next.js proxy mở rộng cùng ACTIVE cycle/participant Phase 4–5: calculate/reused → stale → recalculate → finalize → reject edits → close → activate next. Không xóa feedback/kỳ cũ hoặc bypass điều kiện chốt để làm smoke xanh.
+- [x] Smoke có ít nhất một optional OPEN cần HR acknowledgement; giữ ít nhất hai calculation revisions để chứng minh history. Chốt signature persistence mới từ scenario thực, không giữ cứng assumption một ACTIVE cycle/count chỉ một cycle của Phase 5 sau khi có kỳ kế tiếp.
+- [x] Metadata/head expectations cập nhật migration mới; upgrade từ Phase 5 giữ submitted/cancelled feedback, accounts và KPI. Nonroot, ảnh không app .env/secret/test tooling như gate hiện có.
+- [x] Project/ports/images/volume nghiệm thu riêng, không thay stack người dùng 3000/8000. Restart riêng PostgreSQL, kiểm tra revision/counts/scores/hash/calculation versions/finalized timestamps/cycle statuses và history trước migration rerun. Không xóa volume người dùng.
+- [x] Docs hướng dẫn đầy đủ vai trò, đủ dữ liệu, stale, history, optional chưa gửi lúc chốt, không reopen, close rồi tạo kỳ mới; làm rõ chưa có AI/dashboard. Update architecture note exact rational internal arithmetic, schema/endpoint map thực tế.
+- [x] CI backend/frontend/docker-smoke cùng thành công tại đúng runtime commit; record URL, local/browser/race results và giới hạn. Git diff/status clean, commit/push theo ủy quyền repository. Sau đó mới đánh dấu Phase 6 hoàn tất.
 
 Gate: [hợp đồng](../../phase-6-contract.md) được thực hiện, không score/AI giả hoặc bỏ missing evidence; chỉ chuyển Phase 7 sau nghiệm thu Phase 6. Commit `docs: complete Phase 6 performance acceptance and walkthrough`.
 
@@ -132,3 +132,27 @@ Gate: [hợp đồng](../../phase-6-contract.md) được thực hiện, không 
 Đã đọc trực tiếp các điểm nối và trạng thái repository như mô tả ở đầu. Đây là thay đổi tài liệu; không chạy lại full integration/Docker, không coi số 661/89 cũ là kết quả mới. Trước Task 1 phải đo baseline mới với TEST_DATABASE_URL `_test`; làm việc trong `apps/api`/`apps/web` đúng thư mục cấu hình. Kiểm tra link tài liệu và sole Alembic head chỉ chứng minh tài liệu/head, không chứng minh Phase 6 đã triển khai.
 
 Kiểm tra lượt lập kế hoạch: source HEAD `00f01c719a7bbda7e744b5b01c9a5f591dba3c08`; `alembic heads` trả duy nhất `20261020_0005`; link nội bộ/UTF-8 hợp lệ, đủ tám task và implementation checklist vẫn chưa đánh dấu. Không đọc/sửa `.env` hoặc dữ liệu ứng dụng đang chạy.
+
+## Bằng chứng nghiệm thu triển khai — 2026-10-22
+
+Runtime `f595f23ca2c8a11605a833784bcf55648ee31712` có [CI 39715137000](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/39715137000) thành công đủ backend/frontend/docker-smoke. Log thực tế: **767 backend tests passed in 186.60s**, không skip; Ruff sạch, mypy **85 source files**; **104 web tests**, lint/typecheck/build sạch. Sole Alembic head `20261022_0006`; metadata parity và downgrade/upgrade PostgreSQL qua.
+
+Baseline backend local trước đổi metadata: **661 passed in 551.49s**. Engine đã chạy RED khi module còn thiếu rồi GREEN; unit engine/schema/hash có 34 ca. Lượt full local sau triển khai có 748 đạt, hai kỳ vọng cũ Phase 4 thất bại (close còn bị coi là 404 và head còn 0005). Đã cập nhật đúng hành vi mới; 14 ca targeted gồm hai lỗi đó, privacy/query count, manager self và close/activate qua; bảy ca cuối về audit/DB rollback/frozen policy cũng qua. Full CI 767 mới là bằng chứng cuối toàn bộ suite, không lấy số collect hoặc cộng các lượt targeted làm số full-suite.
+
+| Lượt PostgreSQL cạnh tranh Phase 6 | Kết quả thực chạy |
+| --- | --- |
+| 1 | 15/15 — 41.82s |
+| 2 | 15/15 — 36.50s |
+| 3 | 15/15 — 34.90s |
+| 4 | 15/15 — 34.74s |
+| 5 | 15/15 — 32.30s |
+
+Các ca bao gồm calculate/calculate, finalize/finalize, finalize-vs-actual/submit/allocation/replacement, calculate-vs-actual, close-vs-finalize/close/activate, snapshot reader-vs-writer và revalidation disable/logout/role/manager khi chờ guard. Không chạy các integration suite đồng thời trên một DB `_test`.
+
+Hai project Docker riêng đã build/run: `insighthr-phase6-acceptance` tại 13006/18006 và `insighthr-phase6-final-acceptance` tại 13016/18016; images gắn tag nghiệm thu, volumes riêng. Smoke qua Next.js dùng bootstrap/login/account linkage thật, giữ feedback của cùng kỳ Phase 4–5, tạo hai revisions 24.00/87.00, xác nhận một optional OPEN, finalize, chặn evidence writers, close và activate kỳ tiếp. CI kiểm tra nonroot/runtime contents và đúng scenario này.
+
+Restart PostgreSQL riêng trước khi migration chạy lại giữ hai cycles (CLOSED/ACTIVE), hai participants, một KPI actual=90, bảy assignments (5 SUBMITTED/1 CANCELLED/1 OPEN), năm feedback/sum rating=20, một finalized review và hai revisions. Fingerprint gồm toàn bộ snapshot/hash/score/version/timestamps trùng trước/sau; fixture cuối có SHA-256 `73a08e2f1b74d4d4a8ab242789b3132299a94cbe6e497d9fb53e1a2d1728e5cb` tại lúc kiểm tra. CI cũng so fingerprint trước khi chạy migrate lại. Các stack nghiệm thu đã dừng, giữ volume; không thay stack người dùng tại 3000/8000.
+
+Edge thật thực hiện MANAGER calculate, EMPLOYEE xem STALE, HR recalculate/history/finalize/close và kiểm tra ADMIN menu/inbox. Các màn nhân viên/phòng ban/chức danh/KPI/chu kỳ/phản hồi được xem ở 390/1280px, keyboard focus và không tràn viewport. Đã xem ảnh để sửa tab mobile bị khuất, menu trái đánh dấu nhầm nhóm và hai điểm thành phần mobile. Lượt kiểm tra CSS cuối xác nhận cả ba tab nằm trong khung, hai cột thành phần và đúng menu chu kỳ.
+
+Triển khai gom thành ba commit hoạt động đầy đủ: backend `8a3a5cd`, web `73c0e90`, smoke/tài liệu `f595f23`; commit bàn giao sau đó chỉ cập nhật bằng chứng tài liệu. Không thêm dependency/service/env hay AI giả. [Review trực tiếp](../../phase-6-review.md) mô tả quyền, privacy, số học, khóa và atomicity; không có tuyên bố reviewer độc lập. Figma chưa truy cập được, màu dùng bảng màu dự án theo yêu cầu đã được người dùng chấp nhận. Gemini/dashboard/seed/Kubernetes vẫn thuộc các phase sau.

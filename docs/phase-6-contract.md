@@ -1,6 +1,6 @@
 # Hợp đồng Phase 6 — Tính điểm và chốt đánh giá
 
-Ngày: 2026-10-22. Trạng thái: **đã triển khai; đang hoàn tất nghiệm thu hồi quy/CI**. Tham chiếu [kiến trúc](architecture.md), [Phase 4](phase-4-contract.md), [Phase 5](phase-5-contract.md), [kế hoạch Phase 6](superpowers/plans/2026-10-22-phase-6-performance.md).
+Ngày: 2026-10-22. Trạng thái: **đã triển khai và nghiệm thu**, runtime `f595f23`, [CI 39715137000](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/39715137000). Tham chiếu [kiến trúc](architecture.md), [Phase 4](phase-4-contract.md), [Phase 5](phase-5-contract.md), [kế hoạch Phase 6](superpowers/plans/2026-10-22-phase-6-performance.md).
 
 ## 1. Hiện trạng khi lập kế hoạch và phạm vi
 
@@ -34,7 +34,7 @@ Mọi feedback SUBMITTED đều tính như nhau, kể cả optional; không tự
 
 Input/output thập phân dùng Decimal/chuỗi, tuyệt đối không float. Chỉ làm tròn kết quả lưu/hiển thị đến hai số lẻ bằng ROUND_HALF_UP; final tính từ các thành phần chưa làm tròn. Các dòng KPI hiển thị đã làm tròn có thể cộng lệch vài phần trăm điểm so với final; UI giải thích ngắn gọn, không cộng lại bằng JavaScript.
 
-Đề xuất cụ thể hóa yêu cầu “không làm tròn trung gian” của kiến trúc: parse Decimal chính xác, dùng `fractions.Fraction` trong thư viện chuẩn cho phép chia/tổng hữu tỉ nội bộ, chuyển chính xác sang số cent theo ROUND_HALF_UP ở biên lưu/DTO. Điều này tránh phụ thuộc precision mặc định 28 khi gặp phân số tuần hoàn và trường hợp sát nửa cent. Không thêm dependency; engine thuần không biết ORM/HTTP. Task engine phải có oracle hữu tỉ độc lập và test biên; cập nhật ghi chú kỹ thuật kiến trúc khi triển khai, không coi lựa chọn này là code đã có.
+Đề xuất cụ thể hóa yêu cầu “không làm tròn trung gian” của kiến trúc: parse Decimal chính xác, dùng `fractions.Fraction` trong thư viện chuẩn cho phép chia/tổng hữu tỉ nội bộ, chuyển chính xác sang số cent theo ROUND_HALF_UP ở biên lưu/DTO. Điều này tránh phụ thuộc precision mặc định 28 khi gặp phân số tuần hoàn và trường hợp sát nửa cent. Không thêm dependency; engine thuần không biết ORM/HTTP. Task engine phải có oracle hữu tỉ độc lập và test biên; ghi chú kiến trúc đã cập nhật theo implementation.
 
 LOWER_IS_BETTER luôn cần finite cap; thiếu cap trả lỗi policy không tương thích. Cap >100 và HIGHER_IS_BETTER không cap được hỗ trợ; không ép điểm về [0,100]. Điểm không âm, hữu hạn, đề xuất lưu NUMERIC(20,2): 18 chữ số nguyên đủ cho giới hạn actual/target NUMERIC(14,4), kể cả target 0.0001 và actual lớn nhất. Phải chứng minh giới hạn bằng test, từ chối overflow thay vì cắt/round input.
 

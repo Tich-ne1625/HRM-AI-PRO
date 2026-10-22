@@ -8,7 +8,7 @@ The project is a modular monolith: a Next.js web application, a FastAPI backend,
 
 ## Current scope
 
-Phases 1–5 are CI-accepted. Phase 6 now implements exact performance scoring, scoped reports and immutable calculation history, HR finalization and cycle closure; final acceptance is in progress. A shared top header plus role-based left navigation and contextual KPI/feedback/report tabs serve existing pages. See the [Phase 6 plan](docs/superpowers/plans/2026-10-22-phase-6-performance.md). Gemini and dashboards remain planned.
+Phases 1–6 are CI-accepted. [Phase 6 CI](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/39715137000) passed **767 backend tests, 104 web tests**, quality/build and Docker smoke/persistence at runtime `f595f23`. Phase 6 implements exact scoring, scoped reports and immutable calculation history, HR finalization and cycle closure. A shared top header plus role-based left navigation and contextual KPI/feedback/report tabs serve existing pages. See the [Phase 6 plan](docs/superpowers/plans/2026-10-22-phase-6-performance.md). Gemini and dashboards remain planned.
 
 ## Performance workflow
 
@@ -162,11 +162,11 @@ Set `AUTH_ACCESS_SECRET` to a nondefault key of at least 32 characters outside d
 
 ## Future phases
 
-The [Phase 4 plan](docs/superpowers/plans/2026-10-19-phase-4-cycles-kpis.md) and [contract](docs/phase-4-contract.md) record implementation and CI acceptance on 2026-10-20. Phase 5 feedback assignments/submission are also accepted. Closing cycles depends on review finalization in Phase 6. Scoring, Gemini, dashboards, seed data and Kubernetes follow [the architecture](docs/architecture.md).
+The [Phase 4 plan](docs/superpowers/plans/2026-10-19-phase-4-cycles-kpis.md) and [contract](docs/phase-4-contract.md) record implementation and CI acceptance on 2026-10-20. Phase 5 feedback assignments/submission are also accepted. Phase 6 implements scoring and closes cycles after review finalization. Gemini, dashboards, seed data and Kubernetes follow [the architecture](docs/architecture.md).
 
 Phase 5 is complete against the [plan](docs/superpowers/plans/2026-10-20-phase-5-feedback.md) and [contract](docs/phase-5-contract.md), with CI acceptance at `bf04fe2`. It separates historical reviewer rights from live report scope and suppresses small peer/subordinate groups without promising anonymity. All 26 concurrency cases passed in each of five runs.
 
-The [Phase 6 plan](docs/superpowers/plans/2026-10-22-phase-6-performance.md) and [contract](docs/phase-6-contract.md) were prepared on 2026-10-22 against the current Phase 4–5 implementation. Phase 6 code is implemented; final acceptance is in progress. Eight tasks cover exact scoring, versioned reports/history, stale evidence, HR finalization/cycle closure, responsive UI reuse and acceptance; Gemini remains Phase 7.
+The [Phase 6 plan](docs/superpowers/plans/2026-10-22-phase-6-performance.md) and [contract](docs/phase-6-contract.md) were prepared on 2026-10-22 against the current Phase 4–5 implementation. Phase 6 is implemented and CI-accepted at runtime `f595f23`. Eight tasks cover exact scoring, versioned reports/history, stale evidence, HR finalization/cycle closure, responsive UI reuse and acceptance; Gemini remains Phase 7.
 
 ## Feedback walkthrough (Phase 5)
 
