@@ -11,6 +11,7 @@ import subprocess
 from http.cookiejar import CookieJar
 from urllib.error import HTTPError
 from urllib.request import HTTPCookieProcessor, Request, build_opener
+from uuid import uuid4
 
 
 class Browser:
@@ -426,6 +427,18 @@ def performance_smoke(
         body={"expected_version": finalized["cycle_version"]},
     )
     assert employee.request(path)["state"] == "FINALIZED"
+    ai_path = "/api/v1/performance/" + report["review_id"] + "/ai-analysis"
+    ai_state = employee.request(ai_path)
+    assert ai_state["state"] == "NOT_GENERATED" and not ai_state["configured"]
+    manager.request(ai_path + "?audience=HR_PRIVATE", expected=403)
+    admin.request(ai_path, expected=403)
+    hr.request(ai_path, method="POST", expected=503, body={
+        "client_request_id": str(uuid4()),
+        "expected_calculation_version": report["current_result"]["calculation_version"],
+        "expected_evidence_version": report["evidence_version"],
+    })
+    assert hr.request(review + "/ai-analyses")["total"] == 0
+    print("AI keyless HTTP smoke passed: saved-read endpoint, private scope, disabled POST, no attempt.")
     next_cycle = hr.request(
         "/api/v1/review-cycles",
         method="POST",

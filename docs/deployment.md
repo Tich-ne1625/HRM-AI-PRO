@@ -200,3 +200,26 @@ Verified locally on 2026-10-03:
 
 The local Docker engine could not start because this Windows installation requires an Administrator session and restart to enable WSL. GitHub's Linux runner built both production images with locked runtime constraints and passed the clean Compose startup, reserved-character database password, migration, API readiness, web-to-API connectivity, final-image inspection, and normal `down`/`up` persistence checks in [`Phase 1 CI` run 37132907757](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/37132907757). The persistence check reads the retained Alembic revision after restarting PostgreSQL alone, before migrations can run again.
 
+
+
+## Phase 7 optional Gemini operations
+
+Upgrade to head `20261022_0007` with `docker compose --env-file .env up --build --wait`. Existing volumes/data are retained. The new locked google-genai 2.32.0 SDK is installed in the API image only; no new service or frontend SDK is required. API startup, readiness, numeric workflow and saved analysis GETs do not contact Gemini. The previous Phase 6 acceptance above is historical.
+
+| Variable | Default and boundary |
+| --- | --- |
+| GEMINI_ENABLED | false; keyless startup remains supported |
+| GEMINI_API_KEY | empty SecretStr; required when enabled, API runtime only |
+| GEMINI_MODEL | empty; operator chooses a supported structured-JSON model |
+| GEMINI_TIMEOUT_SECONDS | 20; integer 5-30, total deadline and SDK millisecond timeout |
+| GEMINI_MAX_OUTPUT_TOKENS | 2048; integer 512-4096 |
+
+Keep secrets out of Git, NEXT_PUBLIC_ variables, build args, screenshots and logs. Compose forwards Gemini settings only to the API service. Migrate/web do not receive the key. Changing these runtime settings requires recreating the API container; updating code/dependencies also requires rebuilding. Direct-host users supply API environment variables, run `alembic upgrade head`, and restart the API and production web process.
+
+HR selects PUBLIC or HR_PRIVATE in the report and explicitly confirms each generation. PUBLIC transmits only aliased numeric evidence and filtered aggregate statistics. HR_PRIVATE additionally transmits up to twenty sanitized comments of at most 500 characters each from the exact revision. Redaction is best effort. Requests are bounded to 64 KiB and output to 32 KiB with strict six-field validation. No tools, background generation or SDK retry; failures do not block scoring/finalization/closure.
+
+A lost response should be checked by replaying the same client_request_id. Do not create a new request key automatically. RUNNING leases expire after 60 seconds, then an explicit authorized fresh request can recover. Cooldown is 30 seconds across audiences. Old success/history remain readable after a failed regeneration. Crashes after provider acceptance cannot guarantee exactly-once billing.
+
+Offline CI uses real SDK MockTransport tests and injected-provider integration tests. Fresh Docker smoke runs keyless first. Only in the explicitly disposable `insighthr-ci` or `insighthr-phase7-acceptance` project, a separate test-runner process receives `apps/api/tests/acceptance/seed_ai_fixture.py` through stdin. That test code is absent from the runtime image and running API; it creates clearly labelled demo-fixture public/private successes, a failed regeneration and an expired lease. `check_performance_persistence.py` asserts these four nonempty attempts and fingerprints complete content, output, versions, hashes and numeric evidence before/after PostgreSQL-only restart, before migrations run again. Never run this fixture/checker on a user database.
+
+Live Gemini acceptance has not been performed. To opt in, configure a valid key and supported model yourself, use fictional employee/feedback evidence, enable Gemini, then have HR explicitly create PUBLIC and HR_PRIVATE advice. Check saved schema/model/times, correct privacy scope, controlled regeneration and numeric score stability. Record the live model/SDK/result separately; never label injected-provider output as a real Gemini response. Do not put credentials or full prompts in acceptance artifacts.

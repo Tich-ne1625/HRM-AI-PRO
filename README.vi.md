@@ -18,9 +18,9 @@ Phase 1 đã hoàn thành:
 - Docker Compose thực hiện migration trước khi khởi động API và web.
 - GitHub Actions kiểm tra backend, frontend, image, migration và khả năng giữ dữ liệu sau khi khởi động lại.
 
-Phases 1–6 đã hoàn tất và qua [CI nghiệm thu Phase 6](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/39715137000): **767 test backend, 104 test web**, kiểm tra chất lượng, build và Docker smoke/persistence đều đạt. Phase 6 có tính điểm, báo cáo/lịch sử, chốt đánh giá và đóng chu kỳ. Giao diện chung có **tab nhóm chức năng phía trên và menu trái theo quyền**, cùng tab KPI/phản hồi/kết quả giữ nguyên nhân viên và kỳ đang xem. Xem bằng chứng trong [kế hoạch Phase 6](docs/superpowers/plans/2026-10-22-phase-6-performance.md). Gemini và dashboard tổng thể chưa triển khai.
+Phases 1–6 đã hoàn tất và qua [CI nghiệm thu Phase 6](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/39715137000): **767 test backend, 104 test web**, kiểm tra chất lượng, build và Docker smoke/persistence đều đạt. Phase 6 có tính điểm, báo cáo/lịch sử, chốt đánh giá và đóng chu kỳ. Giao diện chung có **tab nhóm chức năng phía trên và menu trái theo quyền**, cùng tab KPI/phản hồi/kết quả giữ nguyên nhân viên và kỳ đang xem. Xem bằng chứng trong [kế hoạch Phase 6](docs/superpowers/plans/2026-10-22-phase-6-performance.md). Dashboard tổng thể chưa triển khai; Phase 7 được cập nhật bên dưới.
 
-Công đoạn tiếp theo là **Phase 7 — tư vấn Gemini**. Đã có [kế hoạch 8 task](docs/superpowers/plans/2026-10-22-phase-7-gemini.md) và [hợp đồng đề xuất](docs/phase-7-contract.md), chưa bắt đầu code. AI sẽ nằm trên trang kết quả hiện có: tư vấn từ số liệu cho người có quyền xem, phân tích nhận xét nội bộ riêng HR, chỉ chạy khi HR chủ động xác nhận. Điểm số và dự án vẫn dùng được khi chưa cấu hình Gemini.
+**Phase 7 — tư vấn Gemini** đã được triển khai trên trang kết quả: tư vấn chung từ số liệu và phân tích nhận xét riêng HR, có xác nhận trước khi gửi. Mặc định AI tắt, không cần API key để chạy dự án. Xem [kế hoạch và bằng chứng nghiệm thu](docs/superpowers/plans/2026-10-22-phase-7-gemini.md), [hợp đồng](docs/phase-7-contract.md) và [review](docs/phase-7-review.md). Dashboard tổng thể chưa triển khai; kiểm thử Gemini thật được ghi riêng với kiểm thử offline.
 
 ## Chạy và xem nhanh
 
@@ -33,6 +33,27 @@ docker compose --env-file .env up --build --wait
 Mở **http://localhost:3000/login** để đăng nhập. Lệnh trên build lại code và tự nâng database, giữ tài khoản/dữ liệu cũ. Những lần chạy sau khi code không đổi có thể bỏ `--build`. Các bước tạo ADMIN lần đầu nằm ở phần bên dưới.
 
 Để xem kết quả: **Chu kỳ đánh giá → mở kỳ → người tham gia → Kết quả**. HR và quản lý hiện tại tính điểm; nhân viên xem kết quả của mình. Hướng dẫn chốt/đóng kỳ ở [phần Phase 6](#dùng-báo-cáo-hiệu-suất-và-chốt-kỳ-phase-6).
+
+## Dùng tư vấn AI (Phase 7)
+
+1. Mở **Chu kỳ đánh giá → người tham gia → Kết quả**. Khối **Tư vấn AI** nằm ngay dưới điểm số, dùng chung header, menu trái và nhân viên/kỳ đang xem.
+2. **HR** chọn **Tư vấn chung** hoặc **Nội bộ HR**. Tư vấn chung chỉ gửi số liệu KPI/điểm và thống kê phản hồi đã lọc; nội bộ HR gửi thêm tối đa 20 nhận xét đã che thông tin của đúng lần tính. Che thông tin là biện pháp giảm rủi ro, không bảo đảm ẩn danh tuyệt đối.
+3. Bấm **Tạo tư vấn AI**, đọc phạm vi dữ liệu, tích đồng ý và xác nhận. Chỉ thao tác này mới gửi dữ liệu tới Gemini và có thể phát sinh phí. Mở trang, làm mới, tính điểm và chốt kỳ không tự gọi AI.
+4. Nhân viên và quản lý trực tiếp hiện tại chỉ đọc tư vấn chung đã lưu; ADMIN không có quyền HR mặc định. HR xem riêng nội bộ và lịch sử. Đầu ra chỉ mang tính tư vấn, không sửa điểm số.
+5. Nếu mất kết nối, dùng **Kiểm tra yêu cầu vừa gửi** để tra lại cùng mã yêu cầu. Muốn tạo bản khác phải chủ động xác nhận lại; chờ ít nhất 30 giây giữa hai lượt của cùng hồ sơ. Tạo lại lỗi vẫn giữ bản thành công trước đó.
+6. Khi KPI/phản hồi thay đổi, tính lại điểm trước khi tạo tư vấn mới. Tư vấn cũ được giữ trong lịch sử. Kết quả đã chốt và kỳ đã đóng vẫn có thể được phân tích nếu có quyền.
+
+Nếu thấy **Gemini chưa được cấu hình**, dự án vẫn chạy bình thường. Khi muốn bật, tự điền trong `.env` phía máy chủ:
+
+```dotenv
+GEMINI_ENABLED=true
+GEMINI_API_KEY=<API key của bạn>
+GEMINI_MODEL=<model hỗ trợ structured JSON mà bạn được quyền dùng>
+GEMINI_TIMEOUT_SECONDS=20
+GEMINI_MAX_OUTPUT_TOKENS=2048
+```
+
+Sau đó chạy `docker compose --env-file .env up --build --wait`. Key chỉ chuyển vào API, không đưa vào biến `NEXT_PUBLIC_`, Git hay ảnh chụp. Khi chưa cần, giữ `GEMINI_ENABLED=false` và để key/model trống. Kiểm thử tự động dùng provider giả có nhãn; **chưa nghiệm thu lời gọi Gemini thật**. Hướng dẫn kiểm thử thật với dữ liệu hư cấu nằm trong [vận hành Phase 7](docs/deployment.md#phase-7-optional-gemini-operations).
 
 ## Dùng báo cáo hiệu suất và chốt kỳ (Phase 6)
 

@@ -1,5 +1,6 @@
 """Import every mapped model to populate the shared Alembic metadata."""
 
+from app.modules.ai.models import AIAnalysis, AnalysisStatus
 from app.modules.audit.models import AuditLog
 from app.modules.auth.models import AuthSession
 from app.modules.employees.models import Employee, EmploymentStatus
@@ -12,6 +13,8 @@ from app.modules.settings.models import SystemConfig
 from app.modules.users.models import User, UserRole
 
 __all__ = [
+    "AIAnalysis",
+    "AnalysisStatus",
     "AssignmentStatus",
     "AuditLog",
     "AuthSession",

@@ -1,6 +1,6 @@
 # Kế hoạch Phase 7 — Gemini và tư vấn hiệu suất
 
-Ngày: 2026-10-22. Trạng thái: **đã lập kế hoạch; chưa bắt đầu code Phase 7**.
+Ngày: 2026-10-22. Trạng thái: **đã triển khai, đang nghiệm thu offline; Gemini thật chưa được gọi**. Baseline của lượt triển khai: 767 backend và 104 web test đạt; các gate cuối được ghi riêng bên dưới khi hoàn tất.
 
 Tham chiếu: [hợp đồng đề xuất](../../phase-7-contract.md), [AI design](../../ai-design.md), [kiến trúc](../../architecture.md), [nghiệm thu Phase 6](2026-10-22-phase-6-performance.md), [review](../../phase-6-review.md), [API](../../api.md), [vận hành](../../deployment.md).
 
@@ -13,7 +13,7 @@ Tham chiếu: [hợp đồng đề xuất](../../phase-7-contract.md), [AI desig
 - [x] Đối chiếu tài liệu chính thức Google: SDK `google-genai`, structured JSON/Pydantic, model catalog; chưa chốt version package/model alias hoặc cài dependency. Kiểm tra lại khi code.
 - [x] Đề xuất hai audience: PUBLIC dùng số/aggregate không comment; HR_PRIVATE phân tích nhận xét đã khử định danh. Không dùng output có nguồn private cho employee/manager.
 
-Lượt này chỉ sửa tài liệu. Không đổi code/dependency/schema/runtime/env, không gọi Gemini, không tạo image/container và không đọc key trong `.env`. Implementation checklist bên dưới giữ chưa đánh dấu. Khi triển khai dùng project Docker/ports/volume riêng; không tích lũy image tag theo từng task, dọn image nghiệm thu không dùng sau gate, giữ nguyên dữ liệu/volume người dùng.
+Lượt lập kế hoạch ban đầu chỉ sửa tài liệu. Lượt triển khai được người dùng duyệt sau đó bổ sung SDK/schema/API/UI và kiểm thử theo các task bên dưới. Không đọc key trong `.env` hoặc gọi Gemini thật. Nghiệm thu dùng project Docker/ports/volume riêng; không tích lũy image tag theo từng task, dọn image nghiệm thu không dùng sau gate, giữ nguyên dữ liệu/volume người dùng.
 
 ## Luồng bàn giao dự kiến
 

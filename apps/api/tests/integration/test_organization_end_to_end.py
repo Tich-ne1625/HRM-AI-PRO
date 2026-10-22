@@ -1,6 +1,8 @@
 from io import StringIO
+from uuid import uuid4
 
 from fastapi.testclient import TestClient
+from pydantic import SecretStr
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -15,6 +17,13 @@ def test_real_accounts_organization_linkage_scopes_and_transfer(auth_engine, mon
     assert main(["--email", "admin@example.com", "--password-stdin"]) == 0
     settings = Settings(database_url=auth_engine.url.render_as_string(hide_password=False))
     app = create_app(settings)
+    from .test_ai_workflows import FakeProvider
+
+    settings.gemini_enabled = True
+    settings.gemini_api_key = SecretStr("offline-key")
+    settings.gemini_model = "offline-model"
+    app.state.ai_provider = FakeProvider()
+    monkeypatch.setattr("app.modules.ai.service.COOLDOWN_SECONDS", 0)
 
     def login(email, password="initial-password"):
         client = TestClient(app, headers={"Origin": settings.web_origin})
@@ -272,6 +281,23 @@ def test_real_accounts_organization_linkage_scopes_and_transfer(auth_engine, mon
         assert employee.get(review_path + "/revisions/1").json()["final_score"] == "76.50"
         assert admin.get(review_path + "/revisions").status_code == 403
         assert peer.get(review_path + "/revisions").status_code == 404
+        ai_path = f"/api/v1/performance/{performance['review_id']}/ai-analysis"
+        ai_body = {
+            "client_request_id": str(uuid4()),
+            "expected_calculation_version": 2,
+            "expected_evidence_version": performance["evidence_version"],
+        }
+        advice = hr.post(ai_path, json=ai_body)
+        assert advice.status_code == 201, advice.text
+        private = hr.post(
+            ai_path, json={**ai_body, "client_request_id": str(uuid4()), "audience": "HR_PRIVATE"}
+        )
+        assert private.status_code == 201, private.text
+        assert employee.get(ai_path).json()["current_analysis"]["id"] == advice.json()["id"]
+        assert manager.get(ai_path).status_code == 200
+        assert admin.get(ai_path).status_code == 403
+        assert peer.get(ai_path).status_code == 404
+        assert employee.get(review_path + "/ai-analyses/" + private.json()["id"]).status_code == 404
         finalization = {
             "expected_evidence_version": payload["expected_evidence_version"],
             "expected_calculation_version": 2,
@@ -328,6 +354,8 @@ def test_real_accounts_organization_linkage_scopes_and_transfer(auth_engine, mon
         assert manager.get(f"/api/v1/employees/{report_id}").status_code == 404
         assert manager.get(kpis_path).status_code == 404
         assert manager.get(summary_path).status_code == 404
+        assert manager.get(ai_path).status_code == 404
+        assert employee.get(ai_path).json()["state"] == "CURRENT"
         assert manager.get(f"/api/v1/feedback-assignments/{assignments[1][1]}").status_code == 200
         assert hr.patch(f"/api/v1/employees/{report_id}", json={"user_id": None}).status_code == 200
         assert employee.get("/api/v1/auth/me").json()["employee_id"] is None

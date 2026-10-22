@@ -208,3 +208,23 @@ Versions are strict positive integers. Ratings are strict integer 1–5, rejecti
 All assignment changes and submissions increment one shared participant.evidence_version, with appropriate assignment.version increments. No-op validates lifecycle/authority/versions without incrementing/auditing. Submitted assignment fields are immutable. Replay returns 409 feedback_already_submitted without a second audit/version increment. A lost response can be checked through GET; do not automatically retry with fresh versions. Errors include stale_assignment_version/stale_evidence_version, deadline_passed, assignment_not_open, reviewer_ineligible/reviewer_inactive, assignment_already_exists, required_relationship_exists, required_coverage_conflict and assignment_limit_reached.
 
 Summary exposes count/Decimal HALF_UP mean as a two-decimal string (null if none), readiness, relationship groups and at most the caller's own authored submission. Each PEER/SUBORDINATE group with fewer than three submitted reviewers has exactly `{relationship,suppressed:true,count:null,mean:null}`. No other comments/reviewer identifiers/submission timestamps appear. HR raw access is explicit, and aggregate inference remains possible. No feedback_score/final_score or AI output is created.
+
+
+## Phase 7 audience-separated AI advice
+
+All endpoints are no-store. GETs never generate, audit, expire or recover attempts. HR/self/current direct manager reads are scoped in SQL; ADMIN has no implicit HR role. HR_PRIVATE is HR-only, including count/history/detail; a non-HR request guessing a private analysis UUID receives 404.
+
+| Method/path | Behavior |
+| --- | --- |
+| GET `/performance/{review_id}/ai-analysis?audience=PUBLIC` | State/configuration/capabilities plus current, last successful and latest attempt; default PUBLIC |
+| POST `/performance/{review_id}/ai-analysis` | HR, exact Origin/session-bound CSRF; explicit generation/replay |
+| GET `/reviews/{review_id}/ai-analyses?audience=PUBLIC&page=1&page_size=20` | Audience-scoped history; page_size 1-100 |
+| GET `/reviews/{review_id}/ai-analyses/{analysis_id}` | Saved attempt; no provider call |
+
+POST body: `{client_request_id:UUID,expected_calculation_version:int,expected_evidence_version:int,audience?:PUBLIC|HR_PRIVATE,regenerate?:bool,expected_latest_generation?:int}`. Versions are strict positive integers, booleans are strict, extras forbidden. Regeneration requires expected_latest_generation equal to the current successful generation for this calculation/audience, or 0 when absent. That field is forbidden for ordinary generation. Capture versions before confirming; never silently replace them after 409.
+
+201 means a new successful generation, 200 a reused success or terminal replay, 202 an unexpired RUNNING replay. A matching request key never causes a second provider call. Different intent with the same key returns 409 idempotency_conflict. One RUNNING attempt per review across audiences, a 60-second lease and 30-second cooldown limit duplication. Expired status is derived on GET; an authorized fresh POST performs recovery. Failed regeneration preserves the last success. Changed evidence/calculation or revoked authority discards pending output. Finalized reviews in CLOSED cycles remain eligible for advice without reopening evidence.
+
+Responses expose only attempt UUID/audience/generation and calculation/evidence versions/status/model/prompt version/times/sampled flag/advisory/output/error code. No requester, hashes, fence, prompt or raw source comments. Output has exactly summary, strengths, improvement_areas, feedback_themes, recommended_actions and caveats. PUBLIC never uses private comments as input; HR_PRIVATE is a separate generation and cannot be reused publicly.
+
+Errors include ai_not_configured (503), provider_timeout (504), provider_invalid_output/provider_blocked (502), provider_quota/provider_configuration/provider_unavailable (503), generation_cooldown (429), generation_in_progress/generation_expired/analysis_stale/stale_analysis_version/stale_calculation_version/stale_evidence_version/review_stale/idempotency_conflict (409), and normal authorization/validation errors. Provider exception bodies and credentials are never returned. See [the full contract](phase-7-contract.md).

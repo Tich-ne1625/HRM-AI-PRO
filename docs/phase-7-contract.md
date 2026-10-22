@@ -1,6 +1,6 @@
-# Hợp đồng đề xuất Phase 7 — Tư vấn Gemini theo quyền
+# Hợp đồng Phase 7 — Tư vấn Gemini theo quyền
 
-Ngày: 2026-10-22. Trạng thái: **đã đối chiếu và lập kế hoạch, chưa triển khai runtime Phase 7**. Tham chiếu [kiến trúc](architecture.md), [AI design](ai-design.md), [Phase 6](phase-6-contract.md) và [kế hoạch triển khai](superpowers/plans/2026-10-22-phase-7-gemini.md).
+Ngày: 2026-10-22. Trạng thái: **đã triển khai, đang tổng hợp nghiệm thu offline; chưa nghiệm thu Gemini thật**. Tham chiếu [kiến trúc](architecture.md), [AI design](ai-design.md), [Phase 6](phase-6-contract.md), [review](phase-7-review.md) và [kế hoạch triển khai](superpowers/plans/2026-10-22-phase-7-gemini.md).
 
 ## 1. Cơ sở và phạm vi
 

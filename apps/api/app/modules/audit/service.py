@@ -66,6 +66,20 @@ PERFORMANCE_METADATA_KEYS = frozenset(
 )
 
 
+AI_METADATA_KEYS = frozenset(
+    {
+        "review_id",
+        "audience",
+        "generation_version",
+        "calculation_version",
+        "evidence_version",
+        "model",
+        "prompt_version",
+        "error_code",
+    }
+)
+
+
 class AuditWriter:
     def record(
         self,
@@ -97,6 +111,8 @@ class AuditWriter:
             allowed = FEEDBACK_METADATA_KEYS
         if action.startswith("performance."):
             allowed = PERFORMANCE_METADATA_KEYS
+        if action.startswith("ai_analysis."):
+            allowed = AI_METADATA_KEYS
         if metadata.keys() - allowed:
             raise ValueError("Audit metadata contains an unsupported field")
         record = AuditLog(

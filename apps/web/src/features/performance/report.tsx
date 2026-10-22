@@ -3,6 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useState } from "react";
+import { AISection } from "../ai/section";
 import { useAuth } from "../auth/auth-provider";
 import { ReviewAccess, ReviewError } from "../cycles/shared";
 import { relationships, SubmissionContent } from "../feedback/shared";
@@ -30,7 +31,7 @@ function ReportContent({ employeeId, cycleId }: { employeeId: string; cycleId: s
   const cache = useQueryClient();
   const query = useQuery({ queryKey: ["performance", "report", employeeId, cycleId, user?.id], queryFn: () => performanceApi.report(employeeId, cycleId) });
   const [confirm, setConfirm] = useState(false);
-  const refresh = async () => { setConfirm(false); await Promise.all(["performance", "reviews", "feedback"].map((key) => cache.invalidateQueries({ queryKey: [key] }))); };
+  const refresh = async () => { setConfirm(false); await Promise.all(["performance", "reviews", "feedback", "ai"].map((key) => cache.invalidateQueries({ queryKey: [key] }))); };
   const calculate = useMutation({ mutationFn: () => performanceApi.calculate(employeeId, cycleId, query.data!.evidence_version), onSuccess: refresh });
   if (query.isPending) return <p role="status">Đang tải báo cáo hiệu suất…</p>;
   if (query.isError) return <ReviewError error={query.error} reload={() => { void refresh(); }} />;
@@ -52,6 +53,7 @@ function ReportContent({ employeeId, cycleId }: { employeeId: string; cycleId: s
       {calculate.isError && <ReviewError error={calculate.error} reload={() => { calculate.reset(); void refresh(); }} />}
       {confirm && row.can_finalize && row.review_id && <FinalizeReview key={`${row.review_id}-${row.evidence_version}-${row.current_result?.calculation_version}`} report={row} onDone={refresh} onCancel={() => setConfirm(false)} />}
     </section>
+    <AISection report={row} />
     {row.current_result && <CalculationDetail row={row.current_result} />}
     {row.review_id && <History reviewId={row.review_id} />}
   </>;

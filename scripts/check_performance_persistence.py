@@ -19,6 +19,7 @@ SELECT jsonb_build_object(
   'kpis', (SELECT jsonb_agg(to_jsonb(k) ORDER BY k.id) FROM employee_kpis k),
   'assignments', (SELECT jsonb_agg(to_jsonb(a) ORDER BY a.id) FROM feedback_assignments a),
   'feedback', (SELECT jsonb_agg(to_jsonb(f) ORDER BY f.id) FROM feedback f),
+  'analyses', (SELECT jsonb_agg(to_jsonb(a) ORDER BY a.id) FROM ai_analyses a),
   'reviews', (SELECT jsonb_agg(to_jsonb(r) ORDER BY r.id) FROM performance_reviews r),
   'revisions', (SELECT jsonb_agg(to_jsonb(v) ORDER BY v.calculation_version)
                 FROM performance_review_revisions v)
@@ -52,7 +53,14 @@ def main() -> None:
         capture_output=True,
     )
     data = json.loads(result.stdout)
-    assert data["head"] == "20261022_0006"
+    assert data["head"] == "20261022_0007"
+    analyses = data["analyses"] or []
+    assert len(analyses) == 4, "Seed the explicit offline AI acceptance fixture first"
+    assert sorted(a["status"] for a in analyses) == ["FAILED", "RUNNING", "SUCCEEDED", "SUCCEEDED"]
+    assert sorted(a["audience"] for a in analyses) == ["HR_PRIVATE", "HR_PRIVATE", "PUBLIC", "PUBLIC"]
+    assert all(a["model"] == "demo-fixture" for a in analyses)
+    assert all((a["output"] is not None) == (a["status"] == "SUCCEEDED") for a in analyses)
+    assert all(a["calculation_version"] == 2 for a in analyses)
     assert data["users"] >= 7 and data["employees"] >= 7
     assert len(data["cycles"]) == 2 and sorted(c["status"] for c in data["cycles"]) == [
         "ACTIVE",

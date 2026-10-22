@@ -57,7 +57,7 @@ function ReviewerPicker({ participantId, relationship, value, onChange, allowCan
 }) {
   const id = useId();
   const [page, setPage] = useState(1), [search, setSearch] = useState(""), [q, setQ] = useState("");
-  useEffect(() => { const timer = setTimeout(() => { setQ(search); setPage(1); }, 300); return () => clearTimeout(timer); }, [search]);
+  useEffect(() => { if (search === q) return; const timer = setTimeout(() => { setQ(search); setPage(1); }, 300); return () => clearTimeout(timer); }, [search, q]);
   const { user } = useAuth();
   const query = useQuery({ queryKey: ["feedback", "administration", "options", participantId, relationship, page, q, user?.id],
     queryFn: () => feedbackApi.options(participantId, relationship, { page, q }) });

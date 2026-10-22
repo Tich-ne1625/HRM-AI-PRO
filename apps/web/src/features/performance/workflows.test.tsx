@@ -11,6 +11,7 @@ import { PerformanceReport } from "./report";
 import type { Cycle } from "../cycles/api";
 
 const mocks = vi.hoisted(() => ({ role: "HR", api: { report: vi.fn(), calculate: vi.fn(), context: vi.fn(), finalize: vi.fn(), revisions: vi.fn(), revision: vi.fn(), close: vi.fn() } }));
+vi.mock("../ai/section", () => ({ AISection: () => null }));
 vi.mock("../auth/auth-provider", () => ({ useAuth: () => ({ user: { id: "user", role: mocks.role } }) }));
 vi.mock("./api", () => ({ performanceApi: mocks.api }));
 const result = { calculation_version: 1, evidence_version: 8, engine_version: "1", calculated_at: "2026-10-22T00:00:00Z", kpi_score: "90.00", feedback_score: "80.00", final_score: "87.00", policy: { schema_version: 1, kpi_weight: "70.00", feedback_weight: "30.00", kpi_cap: "100.00" }, items: [], feedback: { count: 2, mean: "4.00", groups: [{ relationship: "PEER", suppressed: true, count: null, mean: null }], own_submission: null } };

@@ -37,9 +37,18 @@ class Settings(BaseSettings):
     cookie_secure: bool = False
     access_token_minutes: int = Field(default=15, gt=0)
     refresh_session_days: int = Field(default=7, gt=0)
+    gemini_enabled: bool = False
+    gemini_api_key: SecretStr = SecretStr("")
+    gemini_model: str = Field(default="", max_length=128, pattern=r"^[A-Za-z0-9._/-]*$")
+    gemini_timeout_seconds: int = Field(default=20, ge=5, le=30)
+    gemini_max_output_tokens: int = Field(default=2048, ge=512, le=4096)
 
     @model_validator(mode="after")
     def validate_security_constraints(self) -> Self:
+        if self.gemini_enabled and (
+            not self.gemini_api_key.get_secret_value().strip() or not self.gemini_model
+        ):
+            raise ValueError("Enabled Gemini requires an API key and model")
         database_url = self.database_url.get_secret_value()
         if not database_url.startswith("postgresql+psycopg://"):
             raise ValueError("PostgreSQL with the psycopg driver is required")

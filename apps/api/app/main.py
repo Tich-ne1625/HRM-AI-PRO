@@ -8,6 +8,8 @@ from fastapi import FastAPI
 from app.core.config import Settings, get_settings
 from app.core.database import get_engine, get_session_factory
 from app.core.errors import register_error_handling
+from app.modules.ai.provider import GeminiProvider
+from app.modules.ai.router import router as ai_router
 from app.modules.auth.router import router as auth_router
 from app.modules.employees.router import router as employees_router
 from app.modules.feedback.router import router as feedback_router
@@ -38,6 +40,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         app.state.engine,
         application_settings.alembic_config_path,
     )
+    app.state.ai_provider = GeminiProvider(application_settings)
     register_error_handling(app)
     app.include_router(health_router)
     app.include_router(auth_router)
@@ -50,6 +53,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(allocation_router)
     app.include_router(feedback_router)
     app.include_router(performance_router)
+    app.include_router(ai_router)
     return app
 
 

@@ -20,7 +20,7 @@ function Detail({id, cycle}: {id: string; cycle: string}) {
   const [editingActual, setEditingActual] = useState<{row: AllocationLine; version: number} | null>(null);
   const query = useQuery({queryKey: ["reviews", "allocation", id, cycle], queryFn: () => reviewApi.allocation(id, cycle)});
   const cycleQuery = useQuery({queryKey: ["reviews", "cycle", cycle], queryFn: () => reviewApi.cycle(cycle)});
-  const refresh = async () => {await Promise.all(["reviews", "feedback", "performance"].map((key) => cache.invalidateQueries({queryKey: [key]})));};
+  const refresh = async () => {await Promise.all(["reviews", "feedback", "performance", "ai"].map((key) => cache.invalidateQueries({queryKey: [key]})));};
   const replace = useMutation({mutationFn: ({version, items}: {version: number; items: AllocationInput[]}) => reviewApi.replace(id, cycle, version, items), onSuccess: async () => {setEditing(false); await refresh();}});
   const actual = useMutation({mutationFn: ({row, version, value}: {row: string; version: number; value: string | null}) => reviewApi.actual(row, version, value), onSuccess: async () => {setEditingActual(null); await refresh();}});
   if (query.isPending) return <p role="status">Đang tải KPI nhân viên…</p>;

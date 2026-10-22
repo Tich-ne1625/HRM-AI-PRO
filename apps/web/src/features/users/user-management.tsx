@@ -48,6 +48,7 @@ function AdminUsers() {
     void cache.invalidateQueries({ queryKey: ["auth"] });
     void cache.invalidateQueries({ queryKey: ["feedback"] });
     void cache.invalidateQueries({ queryKey: ["performance"] });
+    void cache.invalidateQueries({ queryKey: ["ai"] });
   } });
   return <>
     <section className="auth-card wide">

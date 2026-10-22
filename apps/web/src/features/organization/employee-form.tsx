@@ -33,6 +33,7 @@ export function EmployeeForm({ initial, onSaved }: { initial?: Employee; onSaved
     void cache.invalidateQueries({ queryKey: ["reviews"] });
     void cache.invalidateQueries({ queryKey: ["feedback"] });
     void cache.invalidateQueries({ queryKey: ["performance"] });
+    void cache.invalidateQueries({ queryKey: ["ai"] });
     void cache.invalidateQueries({ queryKey: ["users"] });
     void cache.invalidateQueries({ queryKey: ["auth"] }); onSaved();
   } });

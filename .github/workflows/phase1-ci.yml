@@ -130,10 +130,14 @@ jobs:
           curl --fail --silent http://localhost:3000/login --output login-page.html
           grep -q '<title>InsightHR</title>' login-page.html
           python scripts/smoke_auth.py --compose-project insighthr-ci
+      - name: Seed explicit offline AI persistence fixture
+        run: |
+          # Test-only stdin program; no fake-provider setting or test file in the image/API server.
+          docker compose --project-name insighthr-ci --env-file .env.example exec -T api python - insighthr-ci < apps/api/tests/acceptance/seed_ai_fixture.py
       - name: Verify persistence across normal restart
         run: |
           revision_before="$(docker compose --project-name insighthr-ci --env-file .env.example exec -T postgres sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc "SELECT version_num FROM alembic_version"' | tr -d '[:space:]')"
-          test "$revision_before" = "20261022_0006"
+          test "$revision_before" = "20261022_0007"
           users_before="$(docker compose --project-name insighthr-ci --env-file .env.example exec -T postgres sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc "SELECT count(*) FROM users"' | tr -d '[:space:]')"
           test "$users_before" -ge 2
           employees_before="$(docker compose --project-name insighthr-ci --env-file .env.example exec -T postgres sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc "SELECT count(*) FROM employees"' | tr -d '[:space:]')"

@@ -8,9 +8,9 @@ The project is a modular monolith: a Next.js web application, a FastAPI backend,
 
 ## Current scope
 
-Phases 1–6 are CI-accepted. [Phase 6 CI](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/39715137000) passed **767 backend tests, 104 web tests**, quality/build and Docker smoke/persistence at runtime `f595f23`. Phase 6 implements exact scoring, scoped reports and immutable calculation history, HR finalization and cycle closure. A shared top header plus role-based left navigation and contextual KPI/feedback/report tabs serve existing pages. See the [Phase 6 plan](docs/superpowers/plans/2026-10-22-phase-6-performance.md). Gemini and dashboards remain planned.
+Phases 1–6 are CI-accepted. [Phase 6 CI](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/39715137000) passed **767 backend tests, 104 web tests**, quality/build and Docker smoke/persistence at runtime `f595f23`. Phase 6 implements exact scoring, scoped reports and immutable calculation history, HR finalization and cycle closure. A shared top header plus role-based left navigation and contextual KPI/feedback/report tabs serve existing pages. See the [Phase 6 plan](docs/superpowers/plans/2026-10-22-phase-6-performance.md). Dashboard work remains planned; Phase 7 implementation is described below.
 
-Next is [Phase 7 planning](docs/superpowers/plans/2026-10-22-phase-7-gemini.md), with a [proposed contract](docs/phase-7-contract.md) for explicit Gemini generation on the existing report page: PUBLIC numeric advice and separate HR_PRIVATE sanitized-comment analysis. No Phase 7 runtime/SDK/schema/env changes have been implemented. Numeric workflows remain independent of AI.
+Phase 7 implements explicit Gemini generation on the existing report: PUBLIC numeric advice and separate HR_PRIVATE sanitized-comment analysis. AI is disabled and keyless by default. HR confirms each generation; saved advice/history remain readable without a configured provider. See the [plan and acceptance](docs/superpowers/plans/2026-10-22-phase-7-gemini.md), [contract](docs/phase-7-contract.md), [review](docs/phase-7-review.md) and [Vietnamese guide](README.vi.md). Live Gemini acceptance is separate from offline provider tests.
 
 ## Performance workflow
 
