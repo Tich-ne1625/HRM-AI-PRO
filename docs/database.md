@@ -1,8 +1,18 @@
 # Database design status
 
+## Phase 6 performance schema
+
+Revision `20261022_0006` introduces `performance_reviews` and `performance_review_revisions`, with no score backfill. The header has a UNIQUE participant FK; history has UNIQUE(review_id,calculation_version). FKs use RESTRICT. Both store calculation/evidence versions, numeric engine version, a 64-character canonical SHA-256 evidence hash, exact NUMERIC(20,2) nonnegative finite scores, object JSONB evidence/policy snapshots and a UTC calculation timestamp. The header also has created/updated/finalized timestamps. Each calculation inserts an immutable revision, including version 1; no revision mutation endpoint exists.
+
+Private evidence contains frozen subject/KPI labels, input numbers, submitted assignment membership and ratings, but no comments, emails or organization graph. Public DTOs project only permitted score breakdowns and confidentiality-filtered feedback. Comments are retrieved only for the authenticated author whose submitted assignment belonged to that revision.
+
+Evidence/calculation hashes include sorted UUIDs, fixed-scale quantities, frozen policy, policy source/evidence versions and engine version. Times and current account/manager state are excluded. Reports derive STALE from evidence/engine version without mutating storage on GET. Recalculation atomically updates the stable header, inserts one revision and audits, without changing evidence/cycle versions. Identical hashes reuse the header without audit/history duplication.
+
+Writes retain guard → sorted ADMIN/users → session family → cycle → participant → evidence/review/revision order. Aggregate report/history reads use REPEATABLE READ and do not acquire the write guard. HR finalization sets participant/header finalized_at to exactly the same UTC timestamp, increments cycle.version once and audits atomically. Closure validates all participants under the cycle lock. Restart verification fingerprints complete persisted snapshots, scores, hashes, versions and timestamps before migrations rerun.
+
 ## Phase 3 organization schema
 
-Current sole head is `20261020_0005` (feedback assignments/submissions), following cycle/KPI `20261020_0004`, organization `20261019_0003`, authentication `20261003_0002` and baseline `20261003_0001`. Upgrade/downgrade and metadata parity are tested against PostgreSQL.
+Current sole head is `20261022_0006` (performance results/history), following feedback `20261020_0005`, following cycle/KPI `20261020_0004`, organization `20261019_0003`, authentication `20261003_0002` and baseline `20261003_0001`. Upgrade/downgrade and metadata parity are tested against PostgreSQL.
 
 | Table | Contract |
 | --- | --- |

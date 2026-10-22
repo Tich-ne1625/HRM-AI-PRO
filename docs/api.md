@@ -136,7 +136,22 @@ Every handled HTTP, validation, dependency, and unexpected error uses this shape
 
 The same request ID is returned in the `X-Request-ID` response header. A caller-provided ID is accepted only when it is 8–128 characters and contains alphanumeric characters, hyphens, underscores, or periods. Unexpected exceptions return a generic message and never serialize exception text.
 
-## Future API
+## Phase 6 performance reports and lifecycle
+
+Implemented under `/api/v1`, all no-store. Read scope is HR/self/current direct manager, with ADMIN excluded. Missing/outside resources share 404. Every mutation requires exact Origin, family-bound CSRF and locked account/role/family revalidation. No automatic retry with refreshed versions after 409.
+
+| Method/path | Payload and behavior |
+| --- | --- |
+| GET `/performance/{employee_id}?cycle_id=...` | Scoped report: NOT_CALCULATED/CURRENT/STALE/FINALIZED, readiness, frozen labels, capability flags; current_result=null when stale/not calculated; last_calculation explicitly historical |
+| GET `/performance/{employee_id}/readiness?cycle_id=...` | Public actionable issue codes/KPI IDs; HR additionally receives pending/blocked required assignment IDs |
+| POST `/performance/{employee_id}/calculate` | HR/current eligible direct manager, ACTIVE/unfinalized; `{cycle_id,expected_evidence_version}`. First 201, later 200. Same hash returns reused=true without a revision/audit |
+| GET `/reviews/{id}/revisions` | Scoped history, page >=1, page_size 1–100; newest calculation_version first |
+| GET `/reviews/{id}/revisions/{calculation_version}` | Scoped immutable calculation detail with allowed feedback aggregates and at most caller's own submission in that revision |
+| GET `/reviews/{id}/finalization-context` | HR-only current evidence/calculation versions, readiness, open_optional_count |
+| POST `/reviews/{id}/finalize` | HR-only `{expected_evidence_version,expected_calculation_version,acknowledge_open_optional_count}`; acknowledgement is mandatory even when zero; locks evidence and returns FINALIZED report |
+| POST `/review-cycles/{id}/close` | HR-only `{expected_version}`; ACTIVE, nonempty, every review finalized/consistent; returns `{id,status:"CLOSED",version}` |
+
+Versions and acknowledgement counts are strict integers; extra fields/forged scores are forbidden. Score outputs are two-decimal strings. Calculation reads raw integer ratings, not the display mean. Optional OPEN does not block calculation, optional SUBMITTED contributes equally. Finalization rechecks the exact evidence hash, both versions and optional count. Submitted/cancelled/open historical records remain; all later evidence writes fail. Closure never finalizes automatically and has no reopen API. Errors include stale_evidence_version/stale_calculation_version/stale_version, evidence_incomplete/evidence_inconsistent, review_stale/review_already_finalized, participant_finalized, cycle_not_active/cycle_already_closed, optional_feedback_acknowledgement_required and cycle_reviews_incomplete. The latter returns bounded participant issues and total issue count only to HR.
 
 The reviewed endpoint map, pagination contract, role scopes, error meanings, and evidence-version concurrency rules are defined in [architecture.md](architecture.md). Documentation will add concrete request/response schemas as each phase implements them.
 
@@ -166,7 +181,7 @@ Quantity/percentage inputs and outputs are decimal strings. Target >0; actual >=
 
 PUT preserves each retained definition's assignment UUID and snapshot. Same target retains actual; target change clears it; weight changes retain it. Removed then re-added definitions get a new snapshot. Retired definitions can remain and receive actuals, but cannot be newly assigned. A new LOWER_IS_BETTER requires a finite cycle cap. Evidence writes serialize on the participant and increment one shared evidence_version. Do not retry automatically with a fresh version after 409.
 
-Errors: 409 stale_version/stale_evidence_version, duplicate_code, participant_already_enrolled, cycle_not_draft/cycle_not_active, active_cycle_exists, activation_requirements_not_met, kpi_definition_inactive/kpi_policy_incompatible, participant_finalized; 404 cycle_not_found/participant_not_found/kpi_not_found/employee_kpi_not_found/employee_not_found; 422 validation_error. Activation details list at most 100 `{employee_id,code}` issues plus total issue_count, only for HR. Missing system singleton returns 503 configuration_unavailable. No `/close` endpoint until finalization is implemented in Phase 6.
+Errors: 409 stale_version/stale_evidence_version, duplicate_code, participant_already_enrolled, cycle_not_draft/cycle_not_active, active_cycle_exists, activation_requirements_not_met, kpi_definition_inactive/kpi_policy_incompatible, participant_finalized; 404 cycle_not_found/participant_not_found/kpi_not_found/employee_kpi_not_found/employee_not_found; 422 validation_error. Activation details list at most 100 `{employee_id,code}` issues plus total issue_count, only for HR. Missing system singleton returns 503 configuration_unavailable. The Phase 6 `/close` endpoint below now implements the finalization prerequisite.
 
 Policy defaults are `{schema_version:1,kpi_weight:"70.00",feedback_weight:"30.00",kpi_cap:"100.00"}`. Review history, role rules and allowed state transitions are documented in the [Phase 4 contract](phase-4-contract.md).
 

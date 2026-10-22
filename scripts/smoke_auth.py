@@ -62,6 +62,7 @@ def organization_smoke(admin: Browser, hr: Browser, suffix: str) -> None:
         ("employee", "EMPLOYEE"),
         ("peer", "EMPLOYEE"),
         ("subordinate", "EMPLOYEE"),
+        ("optional", "EMPLOYEE"),
     ):
         email = f"{name}-{suffix}@example.com"
         accounts[name] = admin.request(
@@ -113,7 +114,7 @@ def organization_smoke(admin: Browser, hr: Browser, suffix: str) -> None:
             "manager_id": leader["id"],
         },
     )
-    for name in ("peer", "subordinate"):
+    for name in ("peer", "subordinate", "optional"):
         hr.request(
             "/api/v1/employees",
             method="POST",
@@ -145,7 +146,9 @@ def organization_smoke(admin: Browser, hr: Browser, suffix: str) -> None:
         browsers["employee"],
         report,
         suffix,
-        extra_reviewers={name: browsers[name] for name in ("peer", "subordinate")},
+        extra_reviewers={
+            name: browsers[name] for name in ("peer", "subordinate", "optional")
+        },
         organization_base=base,
     )
     hr.request(
@@ -286,7 +289,12 @@ def review_cycle_smoke(
         },
     )
     assert employee.request(path)["policy"]["kpi_cap"] == "120.00"
-    hr.request(path + "/close", method="POST", expected=404)
+    hr.request(
+        path + "/close",
+        method="POST",
+        body={"expected_version": activated["version"]},
+        expected=409,
+    )
     print(
         "Cycle/KPI HTTP smoke passed: defaults, activation, snapshots, allocation, "
         "actual zero, scope, CSRF and stale version."
@@ -301,6 +309,147 @@ def review_cycle_smoke(
         cycle,
         organization_base,
         suffix,
+    )
+    performance_smoke(
+        admin,
+        hr,
+        manager,
+        employee,
+        extra_reviewers["optional"],
+        actual["participant"],
+        cycle,
+        actual_path,
+    )
+
+
+def performance_smoke(
+    admin: Browser,
+    hr: Browser,
+    manager: Browser,
+    employee: Browser,
+    optional: Browser,
+    participant: dict,
+    cycle: dict,
+    actual_path: str,
+) -> None:
+    context = hr.request("/api/v1/feedback-context?participant_id=" + participant["id"])
+    assignment = hr.request(
+        "/api/v1/feedback-assignments",
+        method="POST",
+        expected=201,
+        body={
+            "participant_id": participant["id"],
+            "reviewer_id": optional.request("/api/v1/auth/me")["id"],
+            "relationship": "PEER",
+            "required": False,
+            "expected_evidence_version": context["evidence_version"],
+        },
+    )
+    base = "/api/v1/performance/" + participant["employee_id"]
+    path = base + "?cycle_id=" + cycle["id"]
+    payload = {
+        "cycle_id": cycle["id"],
+        "expected_evidence_version": assignment["evidence_version"],
+    }
+    manager.request(
+        base + "/calculate", method="POST", body=payload, csrf=False, expected=403
+    )
+    calculated = manager.request(
+        base + "/calculate", method="POST", body=payload, expected=201
+    )
+    assert calculated["current_result"]["final_score"] == "24.00"
+    assert hr.request(base + "/calculate", method="POST", body=payload)["reused"]
+    admin.request(path, expected=403)
+    optional.request(path, expected=404)
+    manager.request(
+        actual_path,
+        method="PATCH",
+        body={
+            "expected_evidence_version": payload["expected_evidence_version"],
+            "actual": "90.0000",
+        },
+    )
+    stale = employee.request(path)
+    assert stale["state"] == "STALE" and stale["current_result"] is None
+    payload["expected_evidence_version"] += 1
+    report = hr.request(base + "/calculate", method="POST", body=payload)
+    assert report["current_result"]["final_score"] == "87.00"
+    review = "/api/v1/reviews/" + report["review_id"]
+    assert employee.request(review + "/revisions")["total"] == 2
+    assert employee.request(review + "/revisions/1")["final_score"] == "24.00"
+    manager.request(review + "/finalization-context", expected=403)
+    final_context = hr.request(review + "/finalization-context")
+    assert final_context["open_optional_count"] == 1
+    body = {
+        "expected_evidence_version": final_context["evidence_version"],
+        "expected_calculation_version": final_context["calculation_version"],
+        "acknowledge_open_optional_count": 0,
+    }
+    hr.request(review + "/finalize", method="POST", body=body, expected=409)
+    body["acknowledge_open_optional_count"] = 1
+    hr.request(review + "/finalize", method="POST", body=body, csrf=False, expected=403)
+    finalized = hr.request(review + "/finalize", method="POST", body=body)
+    assert finalized["state"] == "FINALIZED"
+    hr.request(review + "/finalize", method="POST", body=body, expected=409)
+    manager.request(
+        actual_path,
+        method="PATCH",
+        body={
+            "expected_evidence_version": body["expected_evidence_version"],
+            "actual": "99.0000",
+        },
+        expected=409,
+    )
+    optional.request(
+        "/api/v1/feedback",
+        method="POST",
+        body={
+            "assignment_id": assignment["id"],
+            "expected_assignment_version": 1,
+            "expected_evidence_version": body["expected_evidence_version"],
+            "rating": 5,
+            "comment": "Late feedback",
+        },
+        expected=409,
+    )
+    cycle_path = "/api/v1/review-cycles/" + cycle["id"]
+    hr.request(
+        cycle_path + "/close",
+        method="POST",
+        body={"expected_version": finalized["cycle_version"]},
+        csrf=False,
+        expected=403,
+    )
+    hr.request(
+        cycle_path + "/close",
+        method="POST",
+        body={"expected_version": finalized["cycle_version"]},
+    )
+    assert employee.request(path)["state"] == "FINALIZED"
+    next_cycle = hr.request(
+        "/api/v1/review-cycles",
+        method="POST",
+        expected=201,
+        body={
+            "name": "Next smoke cycle",
+            "start_date": "2027-01-01",
+            "end_date": "2027-03-31",
+        },
+    )
+    next_path = "/api/v1/review-cycles/" + next_cycle["id"]
+    hr.request(
+        next_path + "/participants",
+        method="POST",
+        body={"expected_version": 1, "employee_ids": [participant["employee_id"]]},
+    )
+    assert (
+        hr.request(
+            next_path + "/activate", method="POST", body={"expected_version": 2}
+        )["status"]
+        == "ACTIVE"
+    )
+    print(
+        "Performance HTTP smoke passed: exact scores, reuse, stale/recalculate, two revisions, optional acknowledgement, atomic finalization, evidence locks, closure and next activation."
     )
 
 

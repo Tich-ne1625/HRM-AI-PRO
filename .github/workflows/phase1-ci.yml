@@ -133,19 +133,22 @@ jobs:
       - name: Verify persistence across normal restart
         run: |
           revision_before="$(docker compose --project-name insighthr-ci --env-file .env.example exec -T postgres sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc "SELECT version_num FROM alembic_version"' | tr -d '[:space:]')"
-          test "$revision_before" = "20261020_0005"
+          test "$revision_before" = "20261022_0006"
           users_before="$(docker compose --project-name insighthr-ci --env-file .env.example exec -T postgres sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc "SELECT count(*) FROM users"' | tr -d '[:space:]')"
           test "$users_before" -ge 2
           employees_before="$(docker compose --project-name insighthr-ci --env-file .env.example exec -T postgres sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc "SELECT count(*) FROM employees"' | tr -d '[:space:]')"
           test "$employees_before" -ge 2
           evidence_before="$(docker compose --project-name insighthr-ci --env-file .env.example exec -T postgres sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc "SELECT (SELECT count(*) FROM review_cycles)||CHR(58)||(SELECT count(*) FROM cycle_participants)||CHR(58)||(SELECT count(*) FROM employee_kpis)||CHR(58)||(SELECT count(*) FROM employee_kpis WHERE actual IS NOT NULL)"' | tr -d '[:space:]')"
-          test "$evidence_before" = "1:1:1:1"
+          test "$evidence_before" = "2:2:1:1"
           feedback_before="$(docker compose --project-name insighthr-ci --env-file .env.example exec -T postgres sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc "SELECT (SELECT count(*) FROM feedback_assignments)||CHR(58)||(SELECT count(*) FROM feedback_assignments WHERE status=CHR(83)||CHR(85)||CHR(66)||CHR(77)||CHR(73)||CHR(84)||CHR(84)||CHR(69)||CHR(68))||CHR(58)||(SELECT count(*) FROM feedback_assignments WHERE status=CHR(67)||CHR(65)||CHR(78)||CHR(67)||CHR(69)||CHR(76)||CHR(76)||CHR(69)||CHR(68))||CHR(58)||(SELECT count(*) FROM feedback)||CHR(58)||(SELECT sum(rating) FROM feedback)"' | tr -d '[:space:]')"
-          test "$feedback_before" = "6:5:1:5:20"
+          test "$feedback_before" = "7:5:1:5:20"
+          performance_before="$(python scripts/check_performance_persistence.py --compose-project insighthr-ci)"
           docker compose --project-name insighthr-ci --env-file .env.example down
           docker compose --project-name insighthr-ci --env-file .env.example up --detach --wait --no-build postgres
           revision_after_restart="$(docker compose --project-name insighthr-ci --env-file .env.example exec -T postgres sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc "SELECT version_num FROM alembic_version"' | tr -d '[:space:]')"
           test "$revision_after_restart" = "$revision_before"
+          performance_after="$(python scripts/check_performance_persistence.py --compose-project insighthr-ci)"
+          test "$performance_after" = "$performance_before"
           users_after="$(docker compose --project-name insighthr-ci --env-file .env.example exec -T postgres sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc "SELECT count(*) FROM users"' | tr -d '[:space:]')"
           test "$users_after" = "$users_before"
           employees_after="$(docker compose --project-name insighthr-ci --env-file .env.example exec -T postgres sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc "SELECT count(*) FROM employees"' | tr -d '[:space:]')"

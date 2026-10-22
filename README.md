@@ -8,7 +8,11 @@ The project is a modular monolith: a Next.js web application, a FastAPI backend,
 
 ## Current scope
 
-Phases 1–5 are implemented and CI-verified: foundation, authentication, organization/employees, cycle/KPI workflows and feedback 360 with Vietnamese screens. Current account linkage and SQL scopes enforce live access; snapshots preserve historical assignment rights. Shared responsive layouts serve desktop/mobile. [Phase 5 CI](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/39369977157) passed **661 backend tests, 89 web tests and Docker smoke** at runtime `bf04fe2`. Evidence is in [deployment.md](docs/deployment.md). Scoring and AI remain planned.
+Phases 1–5 are CI-accepted. Phase 6 now implements exact performance scoring, scoped reports and immutable calculation history, HR finalization and cycle closure; final acceptance is in progress. A shared top header plus role-based left navigation and contextual KPI/feedback/report tabs serve existing pages. See the [Phase 6 plan](docs/superpowers/plans/2026-10-22-phase-6-performance.md). Gemini and dashboards remain planned.
+
+## Performance workflow
+
+To use Phase 6, open **Review cycles → participant → Kết quả**. Complete KPI actuals and required SELF/MANAGER/other assignments, then HR or the current eligible direct manager calculates. Changed evidence makes the report STALE until explicit recalculation; history remains available. HR reviews the open optional assignment count and confirms finalization, which locks all evidence writers. HR closes a cycle only after every participant is finalized, then activates the next draft. Closed reports retain live access controls. ADMIN has no implicit HR access. Use `docker compose --env-file .env up --build --wait` after updating code; existing data is preserved. See the [Vietnamese walkthrough](README.vi.md#dùng-báo-cáo-hiệu-suất-và-chốt-kỳ-phase-6).
 
 ## Technology stack
 
@@ -126,7 +130,7 @@ alembic revision --autogenerate -m "describe the schema change"
 alembic upgrade head
 ```
 
-Review every generated migration before running it. The sole head is `20261020_0005` (feedback), following `20261020_0004` (cycle/KPI), `20261019_0003` (organization), `20261003_0002` (authentication) and baseline `20261003_0001`. Back up data that must be kept before upgrades.
+Review every generated migration before running it. The sole head is `20261022_0006` (performance), following feedback `20261020_0005` and `20261020_0004` (cycle/KPI), `20261019_0003` (organization), `20261003_0002` (authentication) and baseline `20261003_0001`. Back up data that must be kept before upgrades.
 
 ## Tests and quality gates
 
@@ -162,11 +166,11 @@ The [Phase 4 plan](docs/superpowers/plans/2026-10-19-phase-4-cycles-kpis.md) and
 
 Phase 5 is complete against the [plan](docs/superpowers/plans/2026-10-20-phase-5-feedback.md) and [contract](docs/phase-5-contract.md), with CI acceptance at `bf04fe2`. It separates historical reviewer rights from live report scope and suppresses small peer/subordinate groups without promising anonymity. All 26 concurrency cases passed in each of five runs.
 
-The [Phase 6 plan](docs/superpowers/plans/2026-10-22-phase-6-performance.md) and [proposed contract](docs/phase-6-contract.md) were prepared on 2026-10-22 against the current Phase 4–5 implementation. Phase 6 code has not started. Eight tasks cover exact scoring, versioned reports/history, stale evidence, HR finalization/cycle closure, responsive UI reuse and acceptance; Gemini remains Phase 7.
+The [Phase 6 plan](docs/superpowers/plans/2026-10-22-phase-6-performance.md) and [contract](docs/phase-6-contract.md) were prepared on 2026-10-22 against the current Phase 4–5 implementation. Phase 6 code is implemented; final acceptance is in progress. Eight tasks cover exact scoring, versioned reports/history, stale evidence, HR finalization/cycle closure, responsive UI reuse and acceptance; Gemini remains Phase 7.
 
 ## Feedback walkthrough (Phase 5)
 
-Rebuild with `docker compose --env-file .env up --build --wait` to apply `20261020_0005`, preserving accounts and Phase 4 evidence.
+Rebuild with `docker compose --env-file .env up --build --wait` to apply `20261022_0006`, preserving accounts and Phase 4 evidence.
 
 1. HR opens an ACTIVE cycle and selects **Phân công phản hồi** beside a participant. Assign SELF and MANAGER explicitly; activation does not create these required assignments. Historical accounts cannot be delegated to a new manager; ADMIN must restore a disabled historical account.
 2. Each assigned reviewer, including ADMIN when assigned, opens **Phản hồi của tôi**, enters a 1–5 rating and up to 2,000 plain-text characters, and confirms the immutable submission. HR has access to raw feedback.
@@ -187,11 +191,11 @@ The [Phase 2 implementation plan](docs/superpowers/plans/2026-10-03-phase-2-auth
 
 ## Cycle and KPI walkthrough (Phase 4)
 
-Rebuild an existing Compose stack with `docker compose --env-file .env up --build --wait` to apply current head `20261020_0005`, retaining its volume and accounts; cycle/KPI functionality was introduced in `20261020_0004`. Back up valuable data before upgrading.
+Rebuild an existing Compose stack with `docker compose --env-file .env up --build --wait` to apply current head `20261022_0006`, retaining its volume and accounts; cycle/KPI functionality was introduced in `20261020_0004`. Back up valuable data before upgrading.
 
 1. ADMIN may edit `/settings/scoring`: component weights must total 100.00; defaults affect future activations only. ADMIN has no HR access.
 2. HR creates definitions at `/kpis`, then creates a DRAFT at `/review-cycles`, selects active employees in paginated batches, and confirms activation. Employees and their active managers need active linked accounts; references must be active. Validation identifies profiles needing attention.
-3. Activation freezes policy and organization/relationship history. Only one ACTIVE is permitted. Closing depends on Phase 6 finalization and is intentionally unavailable; dates do not automatically close a cycle.
+3. Activation freezes policy and organization/relationship history. Only one ACTIVE is permitted. HR can close after all participants have finalized reviews; dates do not automatically close a cycle.
 4. From cycle participants, HR/current direct manager opens employee KPIs. Replace a complete nonempty allocation of at most 100 distinct definitions with positive targets/weights summing exactly to 100.00. Partial edits stay in the browser.
 5. Enter nonnegative actuals one row at a time; zero is valid and blank clears. Changing a target clears its actual after confirmation; changing weight retains it. Definition edits do not rewrite assignment snapshots.
 6. Employees read their own allocation; managers read self/current direct reports and cannot edit their own KPIs. Transfer changes live access while preserving historical snapshots. A 409 conflict retains input until explicit reload; reload fresh data and re-enter changes, without an automatic version retry.

@@ -18,7 +18,30 @@ Phase 1 đã hoàn thành:
 - Docker Compose thực hiện migration trước khi khởi động API và web.
 - GitHub Actions kiểm tra backend, frontend, image, migration và khả năng giữ dữ liệu sau khi khởi động lại.
 
-Phases 1–5 đã hoàn tất và qua CI: nền tảng, xác thực/quản trị tài khoản, tổ chức/nhân viên, chu kỳ/KPI và phản hồi 360. Phase 5 có phân công HR, inbox cho mọi role được giao, gửi một lần và tổng hợp có giới hạn bảo mật; các trang dùng chung bố cục desktop/mobile. [CI Phase 5](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/39369977157): **661 test backend, 89 test web** và Docker smoke qua. Xem bằng chứng trong [hướng dẫn triển khai](docs/deployment.md). `employee_id` là mã hồ sơ đã liên kết hoặc `null`. Tính điểm, Gemini và dashboard chưa triển khai.
+Phases 1–5 đã hoàn tất và qua CI. Phase 6 đã triển khai tính điểm, báo cáo/lịch sử, chốt đánh giá và đóng chu kỳ; đang hoàn tất kiểm tra nghiệm thu. Giao diện chung có **tab nhóm chức năng phía trên và menu trái theo quyền**, cùng tab KPI/phản hồi/kết quả giữ nguyên nhân viên và kỳ đang xem. Xem bằng chứng trong [kế hoạch Phase 6](docs/superpowers/plans/2026-10-22-phase-6-performance.md). Gemini và dashboard tổng thể chưa triển khai.
+
+## Chạy và xem nhanh
+
+Nếu đã có `.env`, mở Docker Desktop, rồi chạy tại thư mục `hrm-ai`:
+
+```powershell
+docker compose --env-file .env up --build --wait
+```
+
+Mở **http://localhost:3000/login** để đăng nhập. Lệnh trên build lại code và tự nâng database, giữ tài khoản/dữ liệu cũ. Những lần chạy sau khi code không đổi có thể bỏ `--build`. Các bước tạo ADMIN lần đầu nằm ở phần bên dưới.
+
+Để xem kết quả: **Chu kỳ đánh giá → mở kỳ → người tham gia → Kết quả**. HR và quản lý hiện tại tính điểm; nhân viên xem kết quả của mình. Hướng dẫn chốt/đóng kỳ ở [phần Phase 6](#dùng-báo-cáo-hiệu-suất-và-chốt-kỳ-phase-6).
+
+## Dùng báo cáo hiệu suất và chốt kỳ (Phase 6)
+
+1. Mở **Chu kỳ đánh giá → người tham gia → Kết quả**. Các tab phía trên báo cáo chuyển giữa KPI, phản hồi và kết quả của cùng nhân viên/kỳ; không cần chọn lại.
+2. Nếu chưa đủ dữ liệu, làm theo **Việc cần hoàn thành**: phân bổ KPI đúng 100%, nhập thực tế cho mọi KPI, hoàn thành tự đánh giá, đánh giá của quản lý và mọi phân công bắt buộc. Phân công không bắt buộc chưa gửi không chặn tính điểm.
+3. **HR hoặc quản lý trực tiếp hiện tại** bấm **Tính điểm hiệu suất**. Điểm lấy cấu hình đã đóng băng khi kích hoạt kỳ; không phụ thuộc AI. Ví dụ KPI 90 và phản hồi 80, trọng số 70/30, cho điểm hiệu suất **87.00**.
+4. Khi sửa KPI/phân công hoặc có thêm phản hồi, báo cáo hiện **Cần tính lại**. Điểm cũ được giữ trong **Lịch sử tính điểm**; bấm **Tính lại điểm** để có kết quả mới. Không thay dữ liệu thì tính lại sẽ dùng kết quả hiện có, không tạo lịch sử trùng.
+5. **HR** bấm **Chốt kết quả**, kiểm tra số phân công không bắt buộc chưa gửi, tích xác nhận rồi **Xác nhận chốt kết quả**. Chốt sẽ khóa KPI, phân công, gửi phản hồi và tính lại của nhân viên trong kỳ đó. Các phân công chưa gửi được giữ trong lịch sử. Không mở lại kết quả đã chốt.
+6. Sau khi mọi người tham gia đã chốt, **HR** mở chi tiết chu kỳ → **Đóng chu kỳ** → xác nhận. Sau đó có thể kích hoạt kỳ nháp tiếp theo. Kỳ đã đóng vẫn xem được theo quyền hiện tại.
+
+Nhân viên chỉ xem của mình; quản lý xem bản thân/nhân viên trực tiếp nhưng không tự tính điểm cho mình. ADMIN không có quyền HR. Khi chuyển quản lý, quyền đọc báo cáo/lịch sử đổi theo quan hệ hiện tại. Nhóm phản hồi nhỏ vẫn được ẩn thống kê; báo cáo chỉ hiện nhận xét do chính người xem viết. Nếu báo xung đột dữ liệu, chọn **Tải bản mới** và kiểm tra lại trước khi xác nhận.
 
 ## Công nghệ
 
@@ -130,7 +153,7 @@ alembic revision --autogenerate -m "mo ta thay doi schema"
 alembic upgrade head
 ```
 
-Luôn kiểm tra migration được sinh ra trước khi chạy. Head hiện tại là `20261020_0005`, thêm phân công và phản hồi; nối sau chu kỳ/KPI `20261020_0004`, organization `20261019_0003`, auth `20261003_0002` và baseline `20261003_0001`. Nâng cấp database hiện hữu bằng `alembic upgrade head`; sao lưu dữ liệu cần giữ trước khi migration.
+Luôn kiểm tra migration được sinh ra trước khi chạy. Head hiện tại là `20261022_0006`, thêm kết quả và lịch sử tính điểm; nối sau feedback `20261020_0005`, chu kỳ/KPI `20261020_0004`, organization `20261019_0003`, auth `20261003_0002` và baseline `20261003_0001`. Nâng cấp database hiện hữu bằng `alembic upgrade head`; sao lưu dữ liệu cần giữ trước khi migration.
 
 ## Kiểm thử và kiểm tra chất lượng
 
@@ -205,12 +228,12 @@ Nếu đang chạy bản cũ bằng Docker, từ thư mục `hrm-ai` chạy:
 docker compose --env-file .env up --build --wait
 ```
 
-Lệnh build lại và áp head hiện tại `20261020_0005`; chức năng chu kỳ/KPI được thêm từ `20261020_0004`. Sao lưu dữ liệu cần giữ trước khi nâng cấp; không cần tạo lại ADMIN hoặc xóa volume.
+Lệnh build lại và áp head hiện tại `20261022_0006`; chức năng chu kỳ/KPI được thêm từ `20261020_0004`. Không cần tạo lại ADMIN hoặc xóa volume.
 
 1. **ADMIN** mở **Cấu hình chấm điểm** (`/settings/scoring`): mặc định KPI 70%, phản hồi 30%, cap 100.00. Chỉ sửa nếu cần; tổng hai trọng số phải đúng 100.00%. Sửa mặc định không đổi chu kỳ đã kích hoạt. ADMIN không có quyền HR.
 2. **HR** mở **Danh mục KPI** (`/kpis`), thêm mã/tên/đơn vị và chọn “Càng cao càng tốt” hoặc “Càng thấp càng tốt”. Ngừng sử dụng không xóa KPI đã gán; định nghĩa đã ngừng không được gán mới.
 3. **HR** mở **Chu kỳ đánh giá** (`/review-cycles`), tạo nháp với tên/ngày, mở chi tiết rồi tìm/chọn người tham gia. Lựa chọn giữ khi đổi trang; mỗi lượt thêm tối đa 100 người. Nhân viên phải đang làm việc, có phòng ban/chức danh hoạt động, có tài khoản đang hoạt động và có người quản lý đang làm việc với tài khoản active. Người chưa có quản lý chưa đủ điều kiện theo chính sách SELF + MANAGER bắt buộc.
-4. Bấm **Kích hoạt chu kỳ** rồi xác nhận. Lỗi chỉ rõ hồ sơ cần kiểm tra nếu thiếu điều kiện. Kích hoạt đóng băng danh sách, thông tin tổ chức, quan hệ lịch sử và policy; không sửa danh sách sau đó. Chỉ có một ACTIVE. Chưa có thao tác đóng chu kỳ vì chốt đánh giá thuộc Phase 6; ngày kết thúc không tự đóng.
+4. Bấm **Kích hoạt chu kỳ** rồi xác nhận. Lỗi chỉ rõ hồ sơ cần kiểm tra nếu thiếu điều kiện. Kích hoạt đóng băng danh sách, thông tin tổ chức, quan hệ lịch sử và policy; không sửa danh sách sau đó. Chỉ có một ACTIVE. HR đóng kỳ sau khi mọi người tham gia đã chốt kết quả; ngày kết thúc không tự đóng.
 5. Từ danh sách người tham gia, **HR hoặc quản lý trực tiếp hiện tại** mở **Quản lý KPI**. Bấm **Chỉnh phân bổ KPI**, tìm/chọn KPI, nhập target dương và từng trọng số dương, tổng đúng **100.00%**, rồi **Lưu toàn bộ phân bổ**. Danh sách chưa đủ 100% chỉ là nháp trên màn hình. Tối đa 100 KPI/người/chu kỳ.
 6. Bấm **Nhập thực tế** ở từng KPI để nhập actual không âm. `0.0000` là kết quả hợp lệ; để trống để xóa. Đổi target của KPI đã có actual cần xác nhận và xóa actual liên quan để nhập lại. Đổi weight giữ actual; sửa danh mục không đổi snapshot của KPI đã gán.
 7. **EMPLOYEE** mở chu kỳ của mình rồi **Xem KPI**, không sửa được. MANAGER đọc self/direct reports hiện tại nhưng chỉ ghi cho direct report đang làm việc, không tự ghi KPI của mình. Chuyển quản lý đổi quyền hiện tại và giữ nguyên lịch sử tổ chức của kỳ.
@@ -228,15 +251,17 @@ Lệnh build lại và áp head hiện tại `20261020_0005`; chức năng chu k
 
 ## Các phase tiếp theo
 
-Phase 4 đã hoàn tất theo [kế hoạch chi tiết](docs/superpowers/plans/2026-10-19-phase-4-cycles-kpis.md) và [hợp đồng nghiệp vụ](docs/phase-4-contract.md), nghiệm thu CI ngày 2026-10-20. Phase 5 phản hồi cũng đã nghiệm thu; công đoạn tiếp theo là Phase 6 tính điểm/chốt đánh giá, bao gồm điều kiện đóng chu kỳ. Tính điểm, Gemini, dashboard, seed và Kubernetes chưa được triển khai.
+Phase 4 đã hoàn tất theo [kế hoạch chi tiết](docs/superpowers/plans/2026-10-19-phase-4-cycles-kpis.md) và [hợp đồng nghiệp vụ](docs/phase-4-contract.md), nghiệm thu CI ngày 2026-10-20. Phase 5 phản hồi cũng đã nghiệm thu. Gemini, dashboard, seed và Kubernetes là các công đoạn tiếp theo.
 
 Phase 5 hoàn tất theo [kế hoạch 8 task](docs/superpowers/plans/2026-10-20-phase-5-feedback.md) và [hợp đồng](docs/phase-5-contract.md); runtime `bf04fe2` đã qua đầy đủ CI. Năm lượt test cạnh tranh đều đạt 26/26. Giới hạn bảo mật và account lịch sử được mô tả trong hướng dẫn dưới đây.
 
-Phase 6 đã có [kế hoạch 8 task](docs/superpowers/plans/2026-10-22-phase-6-performance.md) và [hợp đồng đề xuất](docs/phase-6-contract.md), lập ngày 2026-10-22 sau khi đối chiếu mã nguồn Phase 4–5. **Chưa bắt đầu code Phase 6.** Phạm vi là tính điểm chính xác, báo cáo/lịch sử, phát hiện điểm cũ khi dữ liệu đổi, HR chốt đánh giá và đóng chu kỳ; giao diện tận dụng các trang hiện có. AI thuộc Phase 7.
+Phase 6 có [kế hoạch 8 task](docs/superpowers/plans/2026-10-22-phase-6-performance.md) và [hợp đồng](docs/phase-6-contract.md). Tính điểm và lịch sử hoạt động độc lập với AI; AI thuộc Phase 7.
 
 ## Dùng phản hồi 360 (Phase 5)
 
-Sau khi cập nhật code, tại thư mục `hrm-ai` chạy `docker compose --env-file .env up --build --wait` để nâng schema lên `20261020_0005`, giữ nguyên tài khoản và dữ liệu. Trên màn hình hẹp, bấm **Mở menu** để chọn trang; màn hình lớn có điều hướng bên trái.
+Xem báo cáo đã tính bằng tab **Kết quả hiệu suất** trong trang KPI hoặc tổng hợp phản hồi. Mức phản hồi trung bình /5 khác với điểm phản hồi /100 dùng trong báo cáo.
+
+Sau khi cập nhật code, tại thư mục `hrm-ai` chạy `docker compose --env-file .env up --build --wait` để nâng schema lên `20261022_0006`, giữ nguyên tài khoản và dữ liệu. Trên màn hình hẹp, bấm **Mở menu** để chọn trang; màn hình lớn có điều hướng bên trái.
 
 1. **HR** vào **Chu kỳ đánh giá**, mở chu kỳ ACTIVE, chọn **Phân công phản hồi** ở dòng người tham gia. Trang này dùng lại nhân viên và chu kỳ vừa chọn.
 2. Trong **Thêm phân công**, chọn quan hệ và người đánh giá hợp lệ, đặt hạn nếu cần rồi **Giao phản hồi**. Cần giao cả **Tự đánh giá** và **Quản lý**; kích hoạt chu kỳ chưa tự tạo hai phân công này. Hai quan hệ luôn bắt buộc và dùng tài khoản đã ghi nhận lúc kích hoạt. Nếu tài khoản bị khóa, ADMIN cần khôi phục đúng tài khoản, không tự giao cho quản lý mới.

@@ -1,8 +1,8 @@
-# Hợp đồng đề xuất Phase 6 — Tính điểm và chốt đánh giá
+# Hợp đồng Phase 6 — Tính điểm và chốt đánh giá
 
-Ngày: 2026-10-22. Trạng thái: **đề xuất để triển khai, chưa có runtime Phase 6**. Tham chiếu [kiến trúc](architecture.md), [Phase 4](phase-4-contract.md), [Phase 5](phase-5-contract.md), [kế hoạch Phase 6](superpowers/plans/2026-10-22-phase-6-performance.md).
+Ngày: 2026-10-22. Trạng thái: **đã triển khai; đang hoàn tất nghiệm thu hồi quy/CI**. Tham chiếu [kiến trúc](architecture.md), [Phase 4](phase-4-contract.md), [Phase 5](phase-5-contract.md), [kế hoạch Phase 6](superpowers/plans/2026-10-22-phase-6-performance.md).
 
-## 1. Đối chiếu hiện trạng và phạm vi
+## 1. Hiện trạng khi lập kế hoạch và phạm vi
 
 | Mã nguồn đã đọc | Điểm nối |
 | --- | --- |
