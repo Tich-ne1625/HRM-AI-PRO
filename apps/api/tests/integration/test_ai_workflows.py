@@ -163,14 +163,23 @@ def test_provider_runs_without_database_locks_and_stale_output_is_discarded(ai_w
         assert row.status == "FAILED" and row.output is None
 
 
-def test_completion_rechecks_account_authority(ai_world):
-    from app.modules.users.models import User
+@pytest.mark.parametrize("revocation", ["disabled", "role", "logout"])
+def test_completion_rechecks_account_authority(ai_world, revocation):
+    from app.modules.users.models import User, UserRole
 
     world, provider, _, path, body, _ = ai_world
 
     def revoke():
+        if revocation == "logout":
+            response = world.client().post("/api/v1/auth/logout")
+            assert response.status_code == 204, response.text
+            return
         with Session(world.engine) as session, session.begin():
-            session.get(User, UUID(world.users["hr"])).is_active = False
+            user = session.get(User, UUID(world.users["hr"]))
+            if revocation == "disabled":
+                user.is_active = False
+            else:
+                user.role = UserRole.EMPLOYEE
 
     provider.hook = revoke
     response = world.client().post(path, json=body)

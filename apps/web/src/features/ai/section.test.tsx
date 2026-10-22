@@ -120,3 +120,34 @@ it("drops the open confirmation when switching to another review", async () => {
   expect(screen.queryByRole("button", { name: "Xác nhận tạo tư vấn" })).toBeNull();
   expect(mocks.api.generate).not.toHaveBeenCalled();
 });
+
+const saved = { id: "a1", generation_version: 1, calculation_version: 1, model: "test-model",
+  status: "SUCCEEDED", output: { summary: "Saved advice", strengths: [], improvement_areas: [],
+    feedback_themes: [], recommended_actions: [], caveats: ["Advisory only"] } };
+
+it("opens stale advice only as labelled public history without generating", async () => {
+  mocks.role = "EMPLOYEE";
+  mocks.api.state.mockResolvedValue({ ...state, state: "STALE", can_generate: false,
+    last_successful_analysis: saved });
+  mocks.api.history.mockResolvedValue({ items: [saved], total: 1, page: 1, page_size: 20 });
+  mocks.api.detail.mockResolvedValue(saved);
+  const user = userEvent.setup(); mount();
+  await screen.findByText(/Có tư vấn thuộc lần tính trước/);
+  expect(screen.queryByText("Saved advice")).toBeNull();
+  await user.click(screen.getByRole("button", { name: "Xem lịch sử AI" }));
+  await user.click(await screen.findByRole("button", { name: "Xem tư vấn 1" }));
+  await screen.findByText("Saved advice");
+  expect(screen.getByRole("heading", { name: "Đang xem tư vấn lịch sử" })).toBeTruthy();
+  expect(mocks.api.history).toHaveBeenCalledWith("r1", "PUBLIC", 1);
+  expect(mocks.api.detail).toHaveBeenCalledWith("r1", "a1");
+  expect(mocks.api.generate).not.toHaveBeenCalled();
+});
+
+it("keeps saved advice visible when a later regeneration fails", async () => {
+  mocks.api.state.mockResolvedValue({ ...state, state: "CURRENT", current_analysis: saved,
+    last_successful_analysis: saved, latest_attempt: { status: "FAILED", error_code: "provider_timeout" } });
+  mount(); await screen.findByText("Saved advice");
+  expect(screen.getByText(/Tư vấn đã lưu trước đó vẫn được giữ/)).toBeTruthy();
+  expect(await screen.findByRole("button", { name: "Tạo lại tư vấn AI" })).toBeTruthy();
+  expect(mocks.api.generate).not.toHaveBeenCalled();
+});

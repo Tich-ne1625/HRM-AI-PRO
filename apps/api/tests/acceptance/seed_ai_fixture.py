@@ -1,7 +1,7 @@
 """OFFLINE acceptance fixture, host test runner only; never shipped in runtime."""
 
 import sys
-from datetime import timedelta
+from datetime import UTC, datetime, timedelta
 from uuid import uuid4
 
 from pydantic import SecretStr
@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 import app.modules.ai.service as service_module
 from app.core.config import Settings
 from app.core.policies import AuthContext
+from app.core.security import hash_opaque_token, new_opaque_token
 from app.models import AIAnalysis, AuthSession, PerformanceReview, User, UserRole
 from app.modules.ai.provider import ProviderError, ProviderResult
 from app.modules.ai.schemas import AnalysisOutput, Audience, GenerateInput
@@ -50,13 +51,17 @@ class Provider:
 
 with Session(engine, expire_on_commit=False) as session:
     user = session.scalars(select(User).where(User.role == UserRole.HR, User.is_active)).first()
-    auth = session.scalars(
-        select(AuthSession).where(
-            AuthSession.user_id == user.id,
-            AuthSession.revoked_at.is_(None),
-            AuthSession.consumed_at.is_(None),
-        )
-    ).first()
+    # HTTP smoke deliberately logs HR out. Create a fresh test-runner family,
+    # independent of browser sessions and without changing the API's provider.
+    auth = AuthSession(
+        user_id=user.id,
+        family_id=uuid4(),
+        token_hash=hash_opaque_token(new_opaque_token()),
+        csrf_hash=hash_opaque_token(new_opaque_token()),
+        expires_at=datetime.now(UTC) + timedelta(hours=1),
+    )
+    session.add(auth)
+    session.flush()
     review = session.scalars(select(PerformanceReview)).one()
     assert not session.scalars(select(AIAnalysis)).first(), "Fixture must start empty"
     context = AuthContext(user=user, session=auth, family_id=auth.family_id)

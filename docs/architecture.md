@@ -317,6 +317,8 @@ All business endpoints use `/api/v1`. Lists accept validated `page`, `page_size`
 | POST /reviews/{review_id}/finalize | HR finalization of current complete review |
 | POST /performance/{review_id}/ai-analysis | HR explicit generation; regenerate flag required to replace a current success |
 | GET /performance/{review_id}/ai-analysis | Scoped saved analysis; never invoke Gemini |
+| GET /reviews/{review_id}/ai-analyses | Audience-scoped saved history |
+| GET /reviews/{review_id}/ai-analyses/{analysis_id} | Audience-safe saved detail |
 | GET /dashboard?cycle_id=... | Role-scoped metrics and activities |
 | GET /ai-reports | Scoped paginated saved analyses |
 | GET, PATCH /settings/scoring | ADMIN inspect/update future-cycle defaults |
