@@ -71,3 +71,9 @@ Chọn **Chu kỳ đánh giá → Thực hành đánh giá → người tham gia
 - Sau khi mọi người trong kỳ ACTIVE đều đã chốt, HR **Đóng chu kỳ**, rồi có thể kích hoạt kỳ nháp tiếp theo. Một hồ sơ chưa chốt vẫn chặn đóng kỳ.
 
 Mọi lần thử sau đó thay đổi dữ liệu thật trong môi trường local của bạn. Lệnh nạp lại không hoàn tác những thay đổi đó. Nếu quên mật khẩu demo, dùng ADMIN đang có để đặt lại mật khẩu từng tài khoản qua giao diện quản trị.
+
+## Kiểm chứng khi bổ sung bộ demo
+
+[CI 39737007010](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/39737007010) tại `33af896` đạt cả backend/frontend/docker-smoke: **816 backend test**, Ruff/mypy sạch (93 source files), frontend và Docker giữ các gate hiện có. Kiểm thử mới xác nhận đăng nhập đủ 10 role/account, phạm vi của hai quản lý, các trạng thái hồ sơ, chạy lại không đổi mật khẩu/tiến độ, từ chối mã trùng/chu kỳ ACTIVE hiện có/production và rollback toàn bộ sau lỗi muộn.
+
+Trên local đã nạp thành công 10 tài khoản demo vào database có sẵn 3 tài khoản; fingerprint của các tài khoản cũ không đổi. Đăng nhập thật đủ 10 tài khoản qua web proxy tại `localhost:3000` đạt; trạng thái An CURRENT 82.80, Bình/Dũng NOT_CALCULATED, Hà FINALIZED 87.00, Linh STALE đúng dự kiến. Chạy lại không tạo trùng. Số AI attempt vẫn bằng 0; không gọi Gemini. Không lưu mật khẩu local vào Git/tài liệu.
