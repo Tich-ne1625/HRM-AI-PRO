@@ -11,6 +11,7 @@ from app.core.errors import register_error_handling
 from app.modules.ai.provider import GeminiProvider
 from app.modules.ai.router import router as ai_router
 from app.modules.auth.router import router as auth_router
+from app.modules.dashboard.router import router as dashboard_router
 from app.modules.employees.router import router as employees_router
 from app.modules.feedback.router import router as feedback_router
 from app.modules.health.router import router as health_router
@@ -54,6 +55,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(feedback_router)
     app.include_router(performance_router)
     app.include_router(ai_router)
+    app.include_router(dashboard_router)
     return app
 
 

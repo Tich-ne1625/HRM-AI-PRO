@@ -1,0 +1,17 @@
+import { apiFetch } from "../../lib/api-client";
+
+export interface CycleOption { id: string; name: string; status: string }
+export interface Overview {
+  role: string; pending_feedback: number;
+  active_accounts?: number; inactive_accounts?: number; account_roles?: Record<string, number>;
+  active_employees?: number; cycles?: CycleOption[]; cycles_truncated?: boolean;
+  selected_cycle?: CycleOption | null; participants?: number; finalized?: number;
+  current?: number; stale?: number; not_calculated?: number; awaiting_completion?: number;
+  sample_size?: number; average?: string | null; score_bands?: Record<string, number>;
+  kpis_assigned?: number; kpis_entered?: number; kpi_entry_percent?: string | null;
+  departments?: { name: string; participants: number; sample_size: number; average: string | null }[];
+  departments_truncated?: boolean;
+}
+export const dashboardApi = {
+  get: (cycle: string) => apiFetch<Overview>(`/api/v1/dashboard${cycle ? `?cycle_id=${encodeURIComponent(cycle)}` : ""}`),
+};

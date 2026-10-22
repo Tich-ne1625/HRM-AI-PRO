@@ -1,5 +1,13 @@
 # API contract
 
+## Dashboard (Phase 8, part 1)
+
+`GET /api/v1/dashboard?cycle_id=<optional UUID>` is authenticated, read-only and `no-store`. ADMIN receives only account totals by active status/role and own pending feedback count; an explicit cycle returns 404. HR/MANAGER/EMPLOYEE use existing SQL employee/cycle scope and receive cycle choices, selected-cycle participant states, valid-score average/sample/distribution, KPI actual-entry coverage and department snapshots. The own pending-feedback count spans active cycles and never exposes other reviewers.
+
+Default cycle order is ACTIVE, CLOSED, DRAFT (HR only), then newest start date and UUID. Choices and department groups are bounded to 100 with truncation flags; an explicitly selected older authorized cycle is appended. Unauthorized and missing cycles both return 404. All aggregates share one REPEATABLE READ snapshot. Empty averages/coverage are null; decimals are JSON strings rounded HALF_UP to two places. No domain writes, provider initialization or generation occur. See [the exact definitions](phase-8-contract.md).
+
+Gemini generation HTTP 404 is returned as sanitized `provider_model_unavailable` (503); HTTP 400/401/403 map to `provider_configuration`. No provider response body, key or prompt is logged. Replaying a previously failed request reads its stored result; retrying after configuration changes requires a fresh confirmed intent.
+
 ## Authentication and accounts (Phase 2)
 
 All responses use `Cache-Control: no-store` for successful personalized endpoints. Public user JSON contains only `id`, normalized `email`, `role`, `is_active`, `employee_id` (linked employee UUID, otherwise null). No response returns a password/hash or access/refresh token in JSON.

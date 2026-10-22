@@ -21,13 +21,15 @@ OUTPUT = {
 @pytest.mark.parametrize(
     "status,code",
     [
+        (400, "provider_configuration"),
+        (404, "provider_model_unavailable"),
         (429, "provider_quota"),
         (503, "provider_unavailable"),
         (403, "provider_configuration"),
         (200, None),
     ],
 )
-def test_real_sdk_transport_has_no_retries_or_tools(monkeypatch, status, code):
+def test_real_sdk_transport_has_no_retries_or_tools(monkeypatch, caplog, status, code):
     calls = []
     clients = []
     closed = []
@@ -90,6 +92,7 @@ def test_real_sdk_transport_has_no_retries_or_tools(monkeypatch, status, code):
     assert not calls[0].get("tools")
     assert all(client.is_closed for client in clients)
     assert closed == [True]
+    assert "SECRET" not in caplog.text and "offline-key" not in caplog.text
 
 
 def test_total_timeout_and_cleanup(monkeypatch):

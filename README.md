@@ -14,6 +14,10 @@ Phase 7 is [offline CI-accepted](https://github.com/Tich-ne1625/HRM-AI-PRO/actio
 
 ## Performance workflow
 
+Phase 8 is in progress: `/dashboard` is the new default login destination, with scoped cycle metrics, valid-score sample sizes/distribution, department snapshots and own feedback tasks. ADMIN receives account metrics only. See the [contract](docs/phase-8-contract.md) and [plan](docs/superpowers/plans/2026-10-22-phase-8-dashboard.md). The central AI report list, sanitized activity feed and complete UX acceptance remain subsequent work.
+
+A bounded live adapter probe with fictional numbers succeeded on `gemini-3.5-flash-lite` on 2026-10-22, validating all six output fields. This verifies connectivity/schema, not full live business acceptance or advice quality. Provider HTTP 404 now maps to `provider_model_unavailable`; raw provider errors and keys are never exposed.
+
 To use Phase 6, open **Review cycles → participant → Kết quả**. Complete KPI actuals and required SELF/MANAGER/other assignments, then HR or the current eligible direct manager calculates. Changed evidence makes the report STALE until explicit recalculation; history remains available. HR reviews the open optional assignment count and confirms finalization, which locks all evidence writers. HR closes a cycle only after every participant is finalized, then activates the next draft. Closed reports retain live access controls. ADMIN has no implicit HR access. Use `docker compose --env-file .env up --build --wait` after updating code; existing data is preserved. See the [Vietnamese walkthrough](README.vi.md#dùng-báo-cáo-hiệu-suất-và-chốt-kỳ-phase-6).
 
 ## Sample data

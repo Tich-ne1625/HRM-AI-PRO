@@ -44,6 +44,7 @@ ERROR_STATUS = {
     "provider_invalid_output": 502,
     "provider_blocked": 502,
     "provider_configuration": 503,
+    "provider_model_unavailable": 503,
     "provider_quota": 503,
     "provider_unavailable": 503,
     "analysis_stale": 409,

@@ -10,6 +10,7 @@ export function WorkspaceHeader() {
   const path = usePathname() ?? "";
   const domain = user && ["HR", "MANAGER", "EMPLOYEE"].includes(user.role);
   const tabs = [
+    { href: "/dashboard", label: "Tổng quan", active: path === "/dashboard" },
     { href: "/account", label: "Cá nhân", active: path === "/account" || path.startsWith("/feedback") && !path.startsWith("/feedback-administration") },
     ...(domain ? [
       { href: "/review-cycles", label: "Đánh giá hiệu suất", active: path.startsWith("/review-cycles") || path.startsWith("/kpis") || path.startsWith("/feedback-administration") || /^\/employees\/[^/]+\/(kpis|feedback|performance)/.test(path) },
@@ -19,7 +20,7 @@ export function WorkspaceHeader() {
   ];
   const roles: Record<string, string> = { ADMIN: "Quản trị viên", HR: "Nhân sự", MANAGER: "Quản lý", EMPLOYEE: "Nhân viên" };
   return <header className="workspace-topbar">
-    <Link href="/account" className="brand">Insight<span>HR</span><small>Không gian làm việc</small></Link>
+    <Link href="/dashboard" className="brand">Insight<span>HR</span><small>Không gian làm việc</small></Link>
     <nav className="workspace-tabs" aria-label="Nhóm chức năng">{tabs.map((tab) => <Link key={tab.href} href={tab.href} aria-current={tab.active ? "location" : undefined}>{tab.label}</Link>)}</nav>
     {user && <Link href="/account" className="workspace-profile"><span className="profile-dot" aria-hidden="true">{user.role.slice(0, 1)}</span><span>{roles[user.role]}<small>Tài khoản của bạn</small></span></Link>}
   </header>;
@@ -33,6 +34,7 @@ export function WorkspaceNavigation() {
   const [expanded, setExpanded] = useState(false);
   const domain = user && ["HR", "MANAGER", "EMPLOYEE"].includes(user.role);
   const groups = [
+    { label: "Không gian làm việc", items: [{ href: "/dashboard", label: "Tổng quan" }] },
     { label: "Cá nhân", items: [{ href: "/account", label: "Tài khoản" }, ...(user ? [{ href: "/feedback", label: "Phản hồi của tôi" }] : [])] },
     ...(domain ? [{ label: "Đánh giá", items: [{ href: "/review-cycles", label: "Chu kỳ đánh giá" }, { href: "/kpis", label: "Danh mục KPI" }, ...(user?.role === "HR" ? [{ href: "/feedback-administration", label: "Quản trị phản hồi" }] : [])] },
       { label: "Tổ chức", items: [{ href: "/employees", label: "Nhân viên" }, { href: "/departments", label: "Phòng ban" }, { href: "/positions", label: "Chức danh" }] }] : []),

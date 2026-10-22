@@ -24,6 +24,8 @@ Phases 1–6 đã hoàn tất và qua [CI nghiệm thu Phase 6](https://github.c
 
 ## Chạy và xem nhanh
 
+**Phase 8 đang triển khai:** trang **Tổng quan** tại `/dashboard` dùng chung header và menu trái. Đăng nhập sẽ vào trang này; có chọn chu kỳ, tiến độ, điểm trung bình kèm số mẫu, phân bố điểm và bảng phòng ban theo quyền. ADMIN xem tổng quan tài khoản. Xem [hợp đồng](docs/phase-8-contract.md) và [kế hoạch Phase 8](docs/superpowers/plans/2026-10-22-phase-8-dashboard.md). Danh sách tư vấn AI tập trung, hoạt động gần đây và nghiệm thu UX toàn bộ còn ở các phần tiếp theo; Phase 8 chưa hoàn tất.
+
 Nếu đã có `.env`, mở Docker Desktop, rồi chạy tại thư mục `hrm-ai`:
 
 ```powershell
@@ -63,7 +65,9 @@ GEMINI_TIMEOUT_SECONDS=20
 GEMINI_MAX_OUTPUT_TOKENS=2048
 ```
 
-Sau đó chạy `docker compose --env-file .env up --build --wait`. Key chỉ chuyển vào API, không đưa vào biến `NEXT_PUBLIC_`, Git hay ảnh chụp. Khi chưa cần, giữ `GEMINI_ENABLED=false` và để key/model trống. Kiểm thử tự động dùng provider giả có nhãn; **chưa nghiệm thu lời gọi Gemini thật**. Hướng dẫn kiểm thử thật với dữ liệu hư cấu nằm trong [vận hành Phase 7](docs/deployment.md#phase-7-optional-gemini-operations).
+Sau đó chạy `docker compose --env-file .env up --build --wait`. Key chỉ chuyển vào API, không đưa vào biến `NEXT_PUBLIC_`, Git hay ảnh chụp. Khi chưa cần, giữ `GEMINI_ENABLED=false` và để key/model trống. Kiểm thử tự động dùng provider giả có nhãn. Ngày 22/10/2026 đã kiểm tra adapter thật với dữ liệu hư cấu ngắn: `gemini-3.5-flash-lite` trả đúng 6 trường đầu ra. Đây là kiểm tra kết nối/định dạng, chưa phải nghiệm thu chất lượng tư vấn và toàn bộ nghiệp vụ AI thật. Hướng dẫn nằm trong [vận hành Phase 7](docs/deployment.md#phase-7-optional-gemini-operations).
+
+Nếu model trả lỗi **không khả dụng** (`provider_model_unavailable`), chọn model được quyền tạo nội dung rồi nạp lại API. Model xuất hiện trong danh sách không bảo đảm dự án được dùng để tạo nội dung; xem [thông báo của Google về dòng 2.5](https://ai.google.dev/gemini-api/docs/deprecations). Nếu đã có yêu cầu thất bại, đóng yêu cầu cũ rồi xác nhận một yêu cầu tạo mới; tra lại mã cũ chỉ đọc kết quả thất bại đã lưu.
 
 ## Dùng báo cáo hiệu suất và chốt kỳ (Phase 6)
 

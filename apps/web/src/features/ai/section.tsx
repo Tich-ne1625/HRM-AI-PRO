@@ -14,6 +14,7 @@ const errors: Record<string, string> = {
   provider_quota: "Gemini đang giới hạn lượt sử dụng. Hãy chờ rồi thử lại.",
   provider_unavailable: "Tạm thời không kết nối được Gemini.",
   provider_configuration: "Cấu hình Gemini chưa phù hợp. Người vận hành cần kiểm tra key và model.",
+  provider_model_unavailable: "Google chưa cho phép model này tạo nội dung với dự án/API key hiện tại. Người vận hành cần chọn model được hỗ trợ rồi nạp lại cấu hình API.",
   provider_invalid_output: "Phản hồi AI chưa đạt định dạng yêu cầu nên chưa được lưu thành tư vấn.",
   provider_blocked: "Gemini chưa trả được nội dung hoàn chỉnh. Bạn có thể thử lại sau.",
   analysis_stale: "Dữ liệu đã thay đổi trong lúc tạo tư vấn. Hãy kiểm tra kết quả mới trước khi tạo lại.",

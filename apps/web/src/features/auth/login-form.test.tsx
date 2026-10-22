@@ -17,7 +17,7 @@ vi.mock("./auth-provider", () => ({ useAuth: () => ({
 
 beforeEach(() => { vi.clearAllMocks(); mocks.pending = false; mocks.signedIn = false; });
 
-it("submits labeled credentials with Enter and redirects to account", async () => {
+it("submits labeled credentials with Enter and redirects to dashboard", async () => {
   const user = userEvent.setup();
   mocks.login.mockResolvedValue({});
   render(<LoginForm />);
@@ -26,7 +26,7 @@ it("submits labeled credentials with Enter and redirects to account", async () =
   await waitFor(() => expect(mocks.login).toHaveBeenCalledWith({
     email: "a@example.com", password: "original-password",
   }));
-  expect(mocks.replace).toHaveBeenCalledWith("/account");
+  expect(mocks.replace).toHaveBeenCalledWith("/dashboard");
 });
 
 it("shows a generic credential error without exposing submitted values", async () => {
@@ -45,10 +45,10 @@ it("disables submit while pending and redirects an authenticated visitor", async
   expect((screen.getByRole("button") as HTMLButtonElement).disabled).toBe(true);
   mocks.signedIn = true;
   view.rerender(<LoginForm />);
-  await waitFor(() => expect(mocks.replace).toHaveBeenCalledWith("/account"));
+  await waitFor(() => expect(mocks.replace).toHaveBeenCalledWith("/dashboard"));
 });
 
 it.each(["https://evil.example", "//evil.example", "/\\evil.example", "javascript:alert(1)"])(
-  "rejects unsafe redirects: %s", (value) => { expect(safeRedirect(value)).toBe("/account"); },
+  "rejects unsafe redirects: %s", (value) => { expect(safeRedirect(value)).toBe("/dashboard"); },
 );
 it("keeps internal redirects", () => { expect(safeRedirect("/admin/users?page=2")).toBe("/admin/users?page=2"); });

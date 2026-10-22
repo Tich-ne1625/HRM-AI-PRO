@@ -1,10 +1,13 @@
 import asyncio
+import logging
 from dataclasses import dataclass
 from typing import Any, Protocol
 
 from app.core.config import Settings
 from app.modules.ai.input_builder import SYSTEM_PROMPT, canonical
 from app.modules.ai.schemas import AnalysisOutput, parse_output
+
+logger = logging.getLogger(__name__)
 
 
 class ProviderError(Exception):
@@ -39,9 +42,12 @@ class GeminiProvider:
         except Exception as error:
             code = getattr(error, "code", 0)
             code = code if isinstance(code, int) else 0
+            logger.warning("Gemini request failed (HTTP %d)", code)
             mapped = {
+                400: "provider_configuration",
                 401: "provider_configuration",
                 403: "provider_configuration",
+                404: "provider_model_unavailable",
                 429: "provider_quota",
             }.get(code, "provider_unavailable")
             raise ProviderError(mapped) from None

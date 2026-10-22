@@ -15,7 +15,7 @@ const schema = z.object({
 
 export function safeRedirect(value: string | null): string {
   return value?.startsWith("/") && !value.startsWith("//") && !value.includes("\\") &&
-    !/[\u0000-\u0020]/.test(value) ? value : "/account";
+    !/[\u0000-\u0020]/.test(value) ? value : "/dashboard";
 }
 
 export function LoginForm() {

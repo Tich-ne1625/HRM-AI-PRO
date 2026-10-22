@@ -13,7 +13,7 @@ export default async function HomePage() {
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-blue-700">
               InsightHR
             </p>
-            <p className="mt-1 text-sm text-slate-600">Performance management platform</p>
+            <p className="mt-1 text-sm text-slate-600">Không gian quản lý và đánh giá hiệu suất</p>
           </div>
           <span className="rounded-full bg-slate-900 px-3 py-1.5 text-xs font-medium text-white">
             <Link href="/login">Đăng nhập</Link>
@@ -24,11 +24,11 @@ export default async function HomePage() {
           <div className="max-w-3xl">
             <p className="text-sm font-semibold text-blue-700">InsightHR</p>
             <h1 className="mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">
-              A reliable foundation for fair, explainable performance reviews.
+              Theo dõi mục tiêu, phản hồi và phát triển cùng đội ngũ.
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600">
-              The web application, API, migrations, and PostgreSQL readiness checks are wired
-              together. Sign in to manage your account. Employee workflows are coming in the next phase.
+              Đăng nhập để mở tổng quan theo vai trò, cập nhật KPI, thực hiện phản hồi 360
+              và theo dõi kết quả đánh giá. Tư vấn AI hỗ trợ thảo luận và phát triển nhân viên.
             </p>
           </div>
 
@@ -37,13 +37,13 @@ export default async function HomePage() {
 
         <section aria-labelledby="foundation-heading" className="border-t border-slate-200 pt-8">
           <h2 id="foundation-heading" className="text-sm font-semibold text-slate-900">
-            Foundation services
+            Các công việc trong không gian làm việc
           </h2>
           <dl className="mt-5 grid gap-px overflow-hidden rounded-xl border border-slate-200 bg-slate-200 sm:grid-cols-3">
             {[
-              ["Web", "Next.js App Router"],
-              ["API", "FastAPI modular monolith"],
-              ["Data", "PostgreSQL with Alembic"],
+              ["Mục tiêu", "Quản lý chu kỳ và KPI"],
+              ["Phản hồi", "Thực hiện đánh giá 360"],
+              ["Kết quả", "Theo dõi hiệu suất và tư vấn AI"],
             ].map(([term, description]) => (
               <div className="bg-white p-5" key={term}>
                 <dt className="text-sm text-slate-500">{term}</dt>
