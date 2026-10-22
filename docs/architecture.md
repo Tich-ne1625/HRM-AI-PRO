@@ -1,7 +1,7 @@
 # InsightHR architecture proposal
 
 Date: 2026-10-03  
-Status: Approved; Phases 1–4 completed and CI-verified as of 2026-10-20. See deployment.md for acceptance evidence.
+Status: Approved; Phases 1–6 completed and CI-verified as of 2026-10-22. Phase 7 planning is documented separately; Gemini is not implemented. See deployment.md for acceptance evidence.
 
 ## Implementation status
 
@@ -260,6 +260,8 @@ Changes to system defaults affect future activated cycles. Existing cycles retai
 HR may access raw feedback for administration. Reviewers see their own submissions. Employees and managers see aggregates, their own authored content, and sanitized themes; peer/subordinate identities and individual comments are excluded from their report responses. Suppress relationship-specific summaries with fewer than three non-self/non-manager submissions. Whole-review averages remain available, with an explanation that small review groups provide limited confidentiality. No anonymity guarantee is made.
 
 ### AI reliability and data boundaries
+
+The [Phase 7 proposed contract](phase-7-contract.md) refines this boundary into two audience-specific generations: PUBLIC receives only numbers/filtered aggregates without comments, while HR_PRIVATE may process sanitized revision comments and is readable only by HR. This avoids exposing private-comment-derived output through public report scope. The [eight-task plan](superpowers/plans/2026-10-22-phase-7-gemini.md) covers optional configuration, strict schemas, fenced leases/idempotency, lock-free provider calls, scoped history, existing report UI and offline/live acceptance. These are planned changes, not implemented endpoints or provider verification.
 
 - Only an explicit HR request invokes Gemini; viewing any page or saved report never triggers generation.
 - Set `GEMINI_API_KEY`, `GEMINI_MODEL`, timeout, and bounded output size through environment variables. Model choice and current SDK/API behavior will be verified against Google's official documentation during Phase 7. Do not hard-code a model in scoring or service code.
