@@ -204,6 +204,16 @@ The local Docker engine could not start because this Windows installation requir
 
 ## Phase 7 optional Gemini operations
 
+### Local follow-up on 2026-10-22
+
+Dashboard runtime `7d10da5` passed [CI 39745189991](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/39745189991): 821 backend/122 web tests, Ruff/mypy (97 source files), lint/types/build and Docker smoke/persistence. This accepts Phase 8 part 1; the central AI listing, sanitized activity and full cross-screen UX acceptance remain open.
+
+The user's configured `gemini-2.5-flash-lite` could list its model metadata but returned HTTP 404 for content generation. The local non-secret model setting was changed to `gemini-3.5-flash-lite`; the API container was recreated and then rebuilt with the dashboard changes. Effective settings were checked as enabled/key-present/model-name only; no key was printed or committed.
+
+A bounded real adapter probe with fictional numbers validated the six-field output. Subsequently one explicit PUBLIC request through the application's authenticated same-origin API succeeded for the fictional `DEMO-AN` active-cycle report. The saved analysis was read back with matching contents and the performance result/state stayed unchanged. This is actual provider output, not an injected fixture. It is a limited live PUBLIC smoke; HR_PRIVATE, live concurrent recovery and qualitative accuracy are not claimed as accepted. The successful advice remains in the user's demo for inspection, alongside the previous failed attempt.
+
+The local stack at 3000/8000 now runs the dashboard build, with the original PostgreSQL volume and user/demo data retained. Edge checks covered HR, MANAGER, EMPLOYEE and ADMIN at 390/1280px (eight screenshots), no document horizontal overflow and no AI POST from visiting the dashboard. HR saw five participants and a valid average of 84.90 from two samples; manager saw three participants/82.80 from one sample; the unfinished employee had no fabricated average; ADMIN received thirteen active accounts and no HR metrics. Evidence is stored locally under ignored `.superpowers/sdd/phase-8/` without credentials or full prompts. Earlier Phase 7 statements below describe the original offline acceptance, before this follow-up.
+
 [CI 39728715722](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/39728715722) accepted `b16efd6`: 811 backend/117 web tests, Ruff/mypy (92 source files), lint/types/build and Docker smoke including four nonempty AI attempts persisted through restart. Local Edge verified the existing layout and role scopes at 390/1280px. Five local concurrency rounds passed 6/6 each. The isolated acceptance stack is stopped, its volume retained and its two image tags removed; the user stack at 3000/8000 was not changed. Live provider acceptance remains unperformed.
 
 Upgrade to head `20261022_0007` with `docker compose --env-file .env up --build --wait`. Existing volumes/data are retained. The new locked google-genai 2.32.0 SDK is installed in the API image only; no new service or frontend SDK is required. API startup, readiness, numeric workflow and saved analysis GETs do not contact Gemini. The previous Phase 6 acceptance above is historical.

@@ -26,6 +26,8 @@ Phases 1–6 đã hoàn tất và qua [CI nghiệm thu Phase 6](https://github.c
 
 **Phase 8 đang triển khai:** trang **Tổng quan** tại `/dashboard` dùng chung header và menu trái. Đăng nhập sẽ vào trang này; có chọn chu kỳ, tiến độ, điểm trung bình kèm số mẫu, phân bố điểm và bảng phòng ban theo quyền. ADMIN xem tổng quan tài khoản. Xem [hợp đồng](docs/phase-8-contract.md) và [kế hoạch Phase 8](docs/superpowers/plans/2026-10-22-phase-8-dashboard.md). Danh sách tư vấn AI tập trung, hoạt động gần đây và nghiệm thu UX toàn bộ còn ở các phần tiếp theo; Phase 8 chưa hoàn tất.
 
+Phần dashboard đã qua [CI](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/39745189991) tại `7d10da5`: **821 test backend, 122 test web**, chất lượng/build và Docker smoke/persistence đều đạt. Kiểm tra trình duyệt local có đủ ADMIN/HR/quản lý/nhân viên trên desktop và mobile.
+
 Nếu đã có `.env`, mở Docker Desktop, rồi chạy tại thư mục `hrm-ai`:
 
 ```powershell
@@ -68,6 +70,8 @@ GEMINI_MAX_OUTPUT_TOKENS=2048
 Sau đó chạy `docker compose --env-file .env up --build --wait`. Key chỉ chuyển vào API, không đưa vào biến `NEXT_PUBLIC_`, Git hay ảnh chụp. Khi chưa cần, giữ `GEMINI_ENABLED=false` và để key/model trống. Kiểm thử tự động dùng provider giả có nhãn. Ngày 22/10/2026 đã kiểm tra adapter thật với dữ liệu hư cấu ngắn: `gemini-3.5-flash-lite` trả đúng 6 trường đầu ra. Đây là kiểm tra kết nối/định dạng, chưa phải nghiệm thu chất lượng tư vấn và toàn bộ nghiệp vụ AI thật. Hướng dẫn nằm trong [vận hành Phase 7](docs/deployment.md#phase-7-optional-gemini-operations).
 
 Nếu model trả lỗi **không khả dụng** (`provider_model_unavailable`), chọn model được quyền tạo nội dung rồi nạp lại API. Model xuất hiện trong danh sách không bảo đảm dự án được dùng để tạo nội dung; xem [thông báo của Google về dòng 2.5](https://ai.google.dev/gemini-api/docs/deprecations). Nếu đã có yêu cầu thất bại, đóng yêu cầu cũ rồi xác nhận một yêu cầu tạo mới; tra lại mã cũ chỉ đọc kết quả thất bại đã lưu.
+
+Đã kiểm tra thêm một yêu cầu PUBLIC thật qua API ứng dụng trên hồ sơ demo **An** bằng model mới: tạo thành công, lưu và đọc lại được, điểm số không đổi. Có thể mở **Chu kỳ đánh giá → An → Kết quả → Tư vấn AI** để xem bản đã lưu mà không gọi Gemini thêm. Chưa nghiệm thu toàn bộ HR_PRIVATE hoặc độ chính xác của lời khuyên.
 
 ## Dùng báo cáo hiệu suất và chốt kỳ (Phase 6)
 
