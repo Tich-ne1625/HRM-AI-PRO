@@ -1,7 +1,7 @@
 # InsightHR architecture proposal
 
 Date: 2026-10-03  
-Status: Approved; Phases 1–6 completed and CI-verified as of 2026-10-22. Phase 7 adds optional audience-separated Gemini advice; offline and live acceptance are tracked separately in phase-7-review.md. See deployment.md for acceptance evidence.
+Status: Approved; Phases 1–7 implemented and offline CI-verified as of 2026-10-22. Phase 7 adds optional audience-separated Gemini advice; live Gemini acceptance has not been performed. See phase-7-review.md. See deployment.md for acceptance evidence.
 
 ## Implementation status
 

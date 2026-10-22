@@ -204,6 +204,8 @@ The local Docker engine could not start because this Windows installation requir
 
 ## Phase 7 optional Gemini operations
 
+[CI 39728715722](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/39728715722) accepted `b16efd6`: 811 backend/117 web tests, Ruff/mypy (92 source files), lint/types/build and Docker smoke including four nonempty AI attempts persisted through restart. Local Edge verified the existing layout and role scopes at 390/1280px. Five local concurrency rounds passed 6/6 each. The isolated acceptance stack is stopped, its volume retained and its two image tags removed; the user stack at 3000/8000 was not changed. Live provider acceptance remains unperformed.
+
 Upgrade to head `20261022_0007` with `docker compose --env-file .env up --build --wait`. Existing volumes/data are retained. The new locked google-genai 2.32.0 SDK is installed in the API image only; no new service or frontend SDK is required. API startup, readiness, numeric workflow and saved analysis GETs do not contact Gemini. The previous Phase 6 acceptance above is historical.
 
 | Variable | Default and boundary |

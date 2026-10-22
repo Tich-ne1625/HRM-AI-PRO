@@ -1,6 +1,6 @@
 # Hợp đồng Phase 7 — Tư vấn Gemini theo quyền
 
-Ngày: 2026-10-22. Trạng thái: **đã triển khai, đang tổng hợp nghiệm thu offline; chưa nghiệm thu Gemini thật**. Tham chiếu [kiến trúc](architecture.md), [AI design](ai-design.md), [Phase 6](phase-6-contract.md), [review](phase-7-review.md) và [kế hoạch triển khai](superpowers/plans/2026-10-22-phase-7-gemini.md).
+Ngày: 2026-10-22. Trạng thái: **đã triển khai và nghiệm thu offline/CI; chưa nghiệm thu Gemini thật**. Tham chiếu [kiến trúc](architecture.md), [AI design](ai-design.md), [Phase 6](phase-6-contract.md), [review](phase-7-review.md) và [kế hoạch triển khai](superpowers/plans/2026-10-22-phase-7-gemini.md).
 
 ## 1. Cơ sở và phạm vi
 
@@ -58,7 +58,7 @@ Provider interface được inject để test offline. Một invocation cho mộ
 
 ## 5. Lưu trữ, lease và phiên bản
 
-Migration dự kiến `20261022_0007`, sau `20261022_0006`, chỉ thêm `ai_analyses`, không backfill output giả. FK RESTRICT đến review và requester; composite FK `(review_id,calculation_version)` đến UNIQUE đã có của PerformanceReviewRevision ràng buộc đúng revision/cùng review. Không sửa giá trị snapshot/history.
+Migration `20261022_0007` đã triển khai, sau `20261022_0006`, chỉ thêm `ai_analyses`, không backfill output giả. FK RESTRICT đến review và requester; composite FK `(review_id,calculation_version)` đến UNIQUE đã có của PerformanceReviewRevision ràng buộc đúng revision/cùng review. Không sửa giá trị snapshot/history.
 
 Mỗi attempt giữ UUID, audience, generation_version tăng theo `(review_id,audience)`, calculation/evidence/engine versions, evidence_hash, input_hash, prompt/redaction/schema versions, model yêu cầu/model trả về nếu có, requested_by, client_request_id, request_fingerprint, status `RUNNING/SUCCEEDED/FAILED`, sanitized error_code, output JSON nullable, reserved/completed/generated timestamps UTC, lease_until và fencing token. Không lưu API key, raw prompt, raw provider body hoặc raw comments. Constraints kiểm tra versions/hash/enums/object JSON và status/output/timestamps nhất quán. Success row bất biến qua API; generation mới không ghi đè success cũ.
 

@@ -1,6 +1,6 @@
 # Review Phase 7 — Gemini advisory
 
-Ngày 2026-10-22. Review trực tiếp trên code và kiểm thử; không có reviewer độc lập trong lượt này. Bằng chứng cuối cùng được ghi tại [kế hoạch triển khai](superpowers/plans/2026-10-22-phase-7-gemini.md). Kiểm thử đang được tổng hợp; chưa gọi Gemini thật.
+Ngày 2026-10-22. Review trực tiếp trên code và kiểm thử; không có reviewer độc lập trong lượt này. Bằng chứng cuối cùng được ghi tại [kế hoạch triển khai](superpowers/plans/2026-10-22-phase-7-gemini.md). [CI 39728715722](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/39728715722) đạt cả ba job tại `b16efd6`: **811 backend, 117 web**, Ruff/mypy/lint/types/build và Docker smoke/persistence; chưa gọi Gemini thật. Năm lượt race local mỗi lượt 6/6 đạt.
 
 Các ranh giới được đối chiếu:
 

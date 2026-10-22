@@ -20,7 +20,7 @@ Phase 1 đã hoàn thành:
 
 Phases 1–6 đã hoàn tất và qua [CI nghiệm thu Phase 6](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/39715137000): **767 test backend, 104 test web**, kiểm tra chất lượng, build và Docker smoke/persistence đều đạt. Phase 6 có tính điểm, báo cáo/lịch sử, chốt đánh giá và đóng chu kỳ. Giao diện chung có **tab nhóm chức năng phía trên và menu trái theo quyền**, cùng tab KPI/phản hồi/kết quả giữ nguyên nhân viên và kỳ đang xem. Xem bằng chứng trong [kế hoạch Phase 6](docs/superpowers/plans/2026-10-22-phase-6-performance.md). Dashboard tổng thể chưa triển khai; Phase 7 được cập nhật bên dưới.
 
-**Phase 7 — tư vấn Gemini** đã được triển khai trên trang kết quả: tư vấn chung từ số liệu và phân tích nhận xét riêng HR, có xác nhận trước khi gửi. Mặc định AI tắt, không cần API key để chạy dự án. Xem [kế hoạch và bằng chứng nghiệm thu](docs/superpowers/plans/2026-10-22-phase-7-gemini.md), [hợp đồng](docs/phase-7-contract.md) và [review](docs/phase-7-review.md). Dashboard tổng thể chưa triển khai; kiểm thử Gemini thật được ghi riêng với kiểm thử offline.
+**Phase 7 — tư vấn Gemini** đã qua [CI nghiệm thu](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/39728715722): **811 test backend, 117 test web**, quality/build và Docker persistence đạt. Đã triển khai trên trang kết quả: tư vấn chung từ số liệu và phân tích nhận xét riêng HR, có xác nhận trước khi gửi. Mặc định AI tắt, không cần API key để chạy dự án. Xem [kế hoạch và bằng chứng nghiệm thu](docs/superpowers/plans/2026-10-22-phase-7-gemini.md), [hợp đồng](docs/phase-7-contract.md) và [review](docs/phase-7-review.md). Dashboard tổng thể chưa triển khai; kiểm thử Gemini thật được ghi riêng với kiểm thử offline.
 
 ## Chạy và xem nhanh
 
