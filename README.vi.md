@@ -34,6 +34,16 @@ Mở **http://localhost:3000/login** để đăng nhập. Lệnh trên build l�
 
 Để xem kết quả: **Chu kỳ đánh giá → mở kỳ → người tham gia → Kết quả**. HR và quản lý hiện tại tính điểm; nhân viên xem kết quả của mình. Hướng dẫn chốt/đóng kỳ ở [phần Phase 6](#dùng-báo-cáo-hiệu-suất-và-chốt-kỳ-phase-6).
 
+## Dữ liệu mẫu để thực hành từng role
+
+Đã có lệnh nạp bộ demo với **10 tài khoản, 8 nhân viên và 3 chu kỳ** ở các trạng thái khác nhau. Sau khi cập nhật image, chạy:
+
+```powershell
+docker compose --env-file .env exec api python -m app.cli.seed_demo
+```
+
+Lệnh in mật khẩu ngẫu nhiên một lần. Chạy lại không nhân bản, không đổi mật khẩu hay đặt lại tiến độ. Bộ demo giữ nguyên dữ liệu hiện có, chỉ chạy trong development/test và không tự gọi Gemini. Xem [tài khoản và bài thực hành ADMIN / HR / quản lý / nhân viên](docs/demo.vi.md).
+
 ## Dùng tư vấn AI (Phase 7)
 
 1. Mở **Chu kỳ đánh giá → người tham gia → Kết quả**. Khối **Tư vấn AI** nằm ngay dưới điểm số, dùng chung header, menu trái và nhân viên/kỳ đang xem.

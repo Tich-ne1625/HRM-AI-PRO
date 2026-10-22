@@ -16,6 +16,10 @@ Phase 7 is [offline CI-accepted](https://github.com/Tich-ne1625/HRM-AI-PRO/actio
 
 To use Phase 6, open **Review cycles → participant → Kết quả**. Complete KPI actuals and required SELF/MANAGER/other assignments, then HR or the current eligible direct manager calculates. Changed evidence makes the report STALE until explicit recalculation; history remains available. HR reviews the open optional assignment count and confirms finalization, which locks all evidence writers. HR closes a cycle only after every participant is finalized, then activates the next draft. Closed reports retain live access controls. ADMIN has no implicit HR access. Use `docker compose --env-file .env up --build --wait` after updating code; existing data is preserved. See the [Vietnamese walkthrough](README.vi.md#dùng-báo-cáo-hiệu-suất-và-chốt-kỳ-phase-6).
 
+## Sample data
+
+For a hands-on role walkthrough, use the [fictional office demo](docs/demo.vi.md). After rebuilding the API image, run `docker compose --env-file .env exec api python -m app.cli.seed_demo`. It adds ten accounts, eight employees and three cycles atomically, prints a generated password once, preserves existing data and practice progress on rerun, refuses production/conflicting ACTIVE cycles, and never invokes Gemini. No schema migration is required.
+
 ## Technology stack
 
 - Web: Next.js 16, React 19, strict TypeScript, Tailwind CSS
