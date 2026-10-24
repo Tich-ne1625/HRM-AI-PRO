@@ -1,5 +1,9 @@
 # Deployment and operations
 
+## Phase 10 planning status
+
+The [Phase 10 contract](phase-10-contract.md) and [eight-task plan](superpowers/plans/2026-10-24-phase-10-kubernetes-docs.md) define local Kubernetes acceptance. They are planning artifacts, not runnable manifests or a production release. Cluster creation/tool installation, ingress/TLS, migration Jobs, backup/restore and cluster CI have not yet been executed. Continue using the verified Compose instructions below until those gates pass.
+
 ## Current release: Phase 9
 
 Runtime `9821e82` passed [full CI](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/40109252558) (843 backend/140 web tests, quality/build/Docker smoke) and [isolated browser/upgrade/persistence CI](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/40109315010). Current migration head is **`20261024_0008`**. Sections below retain historical acceptance evidence; use the current head rather than an old revision mentioned in those sections.

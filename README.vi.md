@@ -8,6 +8,8 @@ Dự án sử dụng kiến trúc modular monolith gồm ứng dụng web Next.j
 
 ## Trạng thái hiện tại
 
+**Phase 10 đã có kế hoạch, chưa triển khai Kubernetes:** xem [hợp đồng](docs/phase-10-contract.md) và [kế hoạch 8 task](docs/superpowers/plans/2026-10-24-phase-10-kubernetes-docs.md). Mục tiêu là cluster local riêng, migration Job, ingress/TLS, backup/restore và hướng dẫn tiếng Việt; bạn vẫn dùng Docker Compose như hiện tại.
+
 **Phases 1–9 đã triển khai và nghiệm thu**, cập nhật ngày 24/10/2026. Hiện có:
 
 - Đăng nhập, phân quyền ADMIN / HR / quản lý / nhân viên.
