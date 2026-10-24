@@ -1,0 +1,51 @@
+name: Phase 9 isolated acceptance
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  browser-persistence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install browser test transport
+        run: python -m pip install websockets==15.0.1
+      - name: Start fresh disposable stack with offline AI harness
+        run: >-
+          docker compose --project-name insighthr-phase9-acceptance
+          --env-file infrastructure/docker/phase9.env.example
+          -f docker-compose.yml -f infrastructure/docker/phase9-test.compose.yml
+          up --build --detach --wait
+      - name: Submit real forms across four roles
+        run: python scripts/phase9_browser.py
+      - name: Verify upgrade and PostgreSQL persistence
+        run: python scripts/phase9_persistence.py
+      - name: Check oversized bodies through the web proxy
+        run: python scripts/phase9_http.py
+      - name: Upload sanitized acceptance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase9-acceptance-${{ github.sha }}
+          path: |
+            .superpowers/sdd/phase-9/browser/report.json
+            .superpowers/sdd/phase-9/browser/*.png
+            .superpowers/sdd/phase-9/browser/failure.txt
+            .superpowers/sdd/phase-9/persistence.json
+            .superpowers/sdd/phase-9/http.json
+          include-hidden-files: true
+          retention-days: 14
+      - name: Remove only the disposable test project
+        if: always()
+        run: >-
+          docker compose --project-name insighthr-phase9-acceptance
+          --env-file infrastructure/docker/phase9.env.example
+          -f docker-compose.yml -f infrastructure/docker/phase9-test.compose.yml
+          down --volumes

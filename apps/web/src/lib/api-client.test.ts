@@ -87,6 +87,18 @@ describe("cookie API client", () => {
     expect(fetcher).toHaveBeenCalledTimes(2);
   });
 
+  it("rechecks identity when a domain request cannot refresh a revoked session", async () => {
+    const listener = vi.fn();
+    window.addEventListener("insighthr-authority-recheck", listener);
+    try {
+      const fetcher = vi.fn().mockImplementation(() => Promise.resolve(unauthorized()));
+      vi.stubGlobal("fetch", fetcher);
+      await expect(apiFetch("/api/v1/ai-reports")).rejects.toMatchObject({ status: 401 });
+      expect(listener).toHaveBeenCalledTimes(1);
+      expect(fetcher).toHaveBeenCalledTimes(2);
+    } finally { window.removeEventListener("insighthr-authority-recheck", listener); }
+  });
+
   it("accepts empty 204 responses and rejects remote URLs", async () => {
     const fetcher = vi.fn().mockResolvedValue(new Response(null, { status: 204 }));
     vi.stubGlobal("fetch", fetcher);

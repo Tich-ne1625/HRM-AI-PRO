@@ -22,6 +22,13 @@ function requireSession(epoch: number): void {
   if (epoch !== sessionEpoch) throw new ApiClientError(401, "session_changed", "Phiên đăng nhập đã thay đổi.");
 }
 
+function recheckAuthority(path: string, error: unknown): void {
+  if (typeof window !== "undefined" && !path.startsWith("/api/v1/auth/") &&
+      error instanceof ApiClientError && [401, 403].includes(error.status)) {
+    window.dispatchEvent(new Event("insighthr-authority-recheck"));
+  }
+}
+
 function csrfCookie(): string | null {
   if (typeof document === "undefined") return null;
   const value = document.cookie.split(";").map((part) => part.trim())
@@ -86,7 +93,10 @@ export async function apiFetch<T = void>(
   const canRefresh = !options.skipRefresh &&
     !["/api/v1/auth/login", "/api/v1/auth/refresh"].includes(path.split("?")[0] ?? path);
   if (response.status === 401 && canRefresh) {
-    if (generation === refreshGeneration) await refreshSession(epoch);
+    if (generation === refreshGeneration) {
+      try { await refreshSession(epoch); }
+      catch (error) { requireSession(epoch); recheckAuthority(path, error); throw error; }
+    }
     requireSession(epoch);
     response = await send(path, init);
     requireSession(epoch);
@@ -94,9 +104,7 @@ export async function apiFetch<T = void>(
   if (!response.ok) {
     const error = await errorFrom(response);
     requireSession(epoch);
-    if (typeof window !== "undefined" && !path.startsWith("/api/v1/auth/") && [401, 403].includes(error.status)) {
-      window.dispatchEvent(new Event("insighthr-authority-recheck"));
-    }
+    recheckAuthority(path, error);
     throw error;
   }
   if (response.status === 204) return undefined as T;

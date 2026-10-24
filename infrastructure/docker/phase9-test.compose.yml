@@ -1,0 +1,16 @@
+# Test-runner-only overlay. Never use with the user's insighthr project/database.
+services:
+  postgres:
+    ports:
+      - "127.0.0.1:15439:5432"
+  migrate:
+    image: insighthr-api:phase9-acceptance
+  api:
+    image: insighthr-api:phase9-acceptance
+    environment:
+      PHASE9_PROJECT: insighthr-phase9-acceptance
+    volumes:
+      - ./apps/api/tests/acceptance/phase9_app.py:/test-harness/phase9_app.py:ro
+    command: ["uvicorn", "phase9_app:app", "--app-dir", "/test-harness", "--host", "0.0.0.0", "--port", "8000", "--no-access-log"]
+  web:
+    image: insighthr-web:phase9-acceptance
