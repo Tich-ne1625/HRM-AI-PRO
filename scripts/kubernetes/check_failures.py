@@ -19,7 +19,7 @@ def main():
     assert config["data"]["APP_ENV"] == "test"
     original = dict(config["data"])
     with DeployLease(t) as lease:
-        config["data"]["ALEMBIC_CONFIG_PATH"] = "/missing-phase10.ini"
+        config["data"]["COOKIE_SECURE"] = "invalid-boolean-for-negative-test"
         t.call("replace", "-f", "-", body=json.dumps(config))
         try:
             try:
