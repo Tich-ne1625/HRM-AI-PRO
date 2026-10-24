@@ -107,6 +107,11 @@ class Page:
     def fill(self, selector, value):
         self.wait(f"!!document.querySelector({json.dumps(selector)})")
         self.js(
+            "document.querySelector("
+            + json.dumps(selector)
+            + ").closest('details:not([open])')?.querySelector('summary')?.click()"
+        )
+        self.js(
             "(()=>{const e=document.querySelector(" + json.dumps(selector) + ");"
             "const p=e.tagName==='TEXTAREA'?HTMLTextAreaElement.prototype:"
             "e.tagName==='SELECT'?HTMLSelectElement.prototype:HTMLInputElement.prototype;"

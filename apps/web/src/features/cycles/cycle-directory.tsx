@@ -52,6 +52,6 @@ function Directory() {
         {!query.data.items.length && <p>Chưa có chu kỳ phù hợp trong phạm vi của bạn.</p>}
         <Pagination page={page} total={query.data.total} pending={query.isFetching} onPage={setPage} /></>}
     </section>
-    {user?.role === "HR" && <section className="auth-card"><h2>Tạo chu kỳ nháp</h2><CycleForm key={generation} pending={create.isPending} onSave={(v) => create.mutate(v)} />{create.isError && <ReviewError error={create.error} />}</section>}
+    {user?.role === "HR" && <details className="auth-card editor-disclosure"><summary>Tạo chu kỳ mới</summary><CycleForm key={generation} pending={create.isPending} onSave={(v) => create.mutate(v)} />{create.isError && <ReviewError error={create.error} />}</details>}
   </>;
 }

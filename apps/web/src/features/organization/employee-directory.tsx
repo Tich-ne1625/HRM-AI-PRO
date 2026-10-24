@@ -32,7 +32,7 @@ function Directory() {
       }}><div><label htmlFor="employee-search">Tìm nhân viên</label><input id="employee-search" name="q" maxLength={100} placeholder="Mã hoặc họ tên" /></div>
         <div><label htmlFor="employee-status-filter">Trạng thái làm việc</label><select id="employee-status-filter" name="status"><option value="">Tất cả</option><option value="ACTIVE">Đang làm việc</option><option value="INACTIVE">Ngừng làm việc</option></select></div>
         <button type="submit">Tìm kiếm</button></form>
-      <div className="directory-reference-filter"><ReferencePicker kind="departments" value={department} onChange={(value) => { setDepartment(value); setPage(1); }} labelOverride="Lọc phòng ban" activeOnly={false} /></div>
+      <details className="directory-reference-filter"><summary>Lọc theo phòng ban</summary><ReferencePicker kind="departments" value={department} onChange={(value) => { setDepartment(value); setPage(1); }} labelOverride="Lọc phòng ban" activeOnly={false} /></details>
       {query.isPending && <p role="status">Đang tải nhân viên…</p>}
       {query.isError && <div role="alert"><p>Không thể tải danh sách nhân viên.</p><button onClick={() => { void query.refetch(); }}>Thử lại</button></div>}
       {!query.isError && query.data && <>

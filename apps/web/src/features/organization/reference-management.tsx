@@ -70,10 +70,10 @@ function ReferenceList({ kind }: { kind: ReferenceKind }) {
         <button className="secondary" onClick={() => setConfirm(null)}>Hủy</button></section>}
       {mutation.isError && <p role="alert">{organizationError(mutation.error)}</p>}
     </section>
-    {hr && <section className="auth-card"><h2>{editing ? "Chỉnh sửa" : "Thêm"} {label}</h2>
+    {hr && <details className="auth-card editor-disclosure" open={editing ? true : undefined}><summary>{editing ? "Chỉnh sửa" : "Thêm mới"} {label}</summary>
       <ReferenceEditor key={editing?.id ?? `new-${editorVersion}`} kind={kind} initial={editing} pending={mutation.isPending} onSave={save} />
       {editing && <button className="secondary" onClick={() => setEditing(null)}>Hủy chỉnh sửa</button>}
-    </section>}
+    </details>}
   </>;
 }
 

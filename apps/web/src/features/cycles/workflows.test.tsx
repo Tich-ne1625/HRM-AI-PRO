@@ -49,6 +49,7 @@ it("parses percentage units exactly and rejects excess precision", () => {
 it("lets HR create a dated draft and refreshes the list", async () => {
   const user = userEvent.setup(); mount(<CycleDirectory />);
   await screen.findByRole("link", {name: "Quý IV"});
+  await user.click(screen.getByText("Tạo chu kỳ mới"));
   await user.type(screen.getByLabelText("Tên chu kỳ"), "Quý I");
   fireEvent.change(screen.getByLabelText("Ngày bắt đầu"), {target: {value: "2027-01-01"}});
   fireEvent.change(screen.getByLabelText("Ngày kết thúc"), {target: {value: "2027-03-31"}});
@@ -87,6 +88,7 @@ it("retains employee selection across enrollment pages", async () => {
 });
 it("HR creates a KPI and confirms retirement separately", async () => {
   const user = userEvent.setup(); mount(<KpiCatalog />); await screen.findByText("SALES · Doanh số");
+  await user.click(screen.getByText("Thêm định nghĩa KPI"));
   await user.type(screen.getByLabelText("Mã KPI"), "quality"); await user.type(screen.getByLabelText("Tên KPI"), "Chất lượng"); await user.type(screen.getByLabelText("Đơn vị"), "%");
   await user.click(screen.getByRole("button", {name: "Thêm định nghĩa"}));
   await waitFor(() => expect(mocks.api.saveDefinition).toHaveBeenCalledWith(null, {code: "QUALITY", name: "Chất lượng", unit: "%", direction: "HIGHER_IS_BETTER", description: ""}));
@@ -95,6 +97,7 @@ it("HR creates a KPI and confirms retirement separately", async () => {
 });
 it("keeps KPI definition input after a failed save", async () => {
   mocks.api.saveDefinition.mockRejectedValue(new Error("offline")); const user = userEvent.setup(); mount(<KpiCatalog />);
+  await user.click(screen.getByText("Thêm định nghĩa KPI"));
   await user.type(await screen.findByLabelText("Mã KPI"), "quality"); await user.type(screen.getByLabelText("Tên KPI"), "Chất lượng"); await user.type(screen.getByLabelText("Đơn vị"), "%"); await user.click(screen.getByRole("button", {name: "Thêm định nghĩa"}));
   await screen.findByRole("alert"); expect((screen.getByLabelText("Tên KPI") as HTMLInputElement).value).toBe("Chất lượng");
 });

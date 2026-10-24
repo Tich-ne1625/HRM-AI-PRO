@@ -25,6 +25,7 @@ beforeEach(() => {
 it("lets HR create reference data through labeled controls", async () => {
   const user = userEvent.setup(); mount();
   expect(await screen.findByText("Engineering")).toBeTruthy();
+  await user.click(screen.getByText("Thêm mới phòng ban"));
   await user.type(screen.getByLabelText("Mã phòng ban"), "qa");
   await user.type(screen.getByLabelText("Tên phòng ban"), "Quality");
   await user.click(screen.getByRole("button", { name: "Thêm phòng ban" }));
@@ -59,6 +60,7 @@ it("keeps entered data when a save fails", async () => {
   mocks.saveReference.mockRejectedValue(new Error("offline"));
   const user = userEvent.setup(); mount();
   await screen.findByText("Engineering");
+  await user.click(screen.getByText("Thêm mới phòng ban"));
   await user.type(screen.getByLabelText("Mã phòng ban"), "QA");
   await user.type(screen.getByLabelText("Tên phòng ban"), "Quality");
   await user.click(screen.getByRole("button", { name: "Thêm phòng ban" }));

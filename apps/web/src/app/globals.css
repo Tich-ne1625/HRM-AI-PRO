@@ -214,3 +214,18 @@ td { font-size: .9rem; }
   .create-user-form { grid-template-columns: minmax(0, 1fr); }
 }
 
+
+/* Progressive disclosure keeps routine work visible and supporting detail nearby. */
+summary { cursor: pointer; font-weight: 650; color: #1e293b; line-height: 1.5; }
+summary:focus-visible { outline: 3px solid #60a5fa; outline-offset: 4px; border-radius: .25rem; }
+details[open] > summary { margin-bottom: 1rem; }
+.editor-disclosure:not([open]), .calculation-disclosure:not([open]) { padding-block: 1.1rem; }
+.directory-reference-filter > summary { padding-block: .6rem; font-size: .9rem; color: #475569; }
+.metric small { display: block; margin-top: .4rem; font-size: .78rem; line-height: 1.5; color: #64748b; }
+.workspace-main table th { white-space: nowrap; }
+@media (min-width: 1100px) { .dashboard-summary { grid-template-columns: repeat(auto-fit,minmax(9rem,1fr)); } }
+@media (max-width: 600px) {
+  .workspace-tabs { scrollbar-width: thin; }
+  .workspace-main .row-actions { gap: .5rem; }
+  .workspace-main .section-heading { align-items: flex-start; }
+}

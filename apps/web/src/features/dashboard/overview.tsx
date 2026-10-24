@@ -35,9 +35,9 @@ export function DashboardOverview() {
           {!data.cycles?.length && <option value="">Chưa có chu kỳ trong phạm vi quyền</option>}
           {data.cycles?.map((item) => <option key={item.id} value={item.id}>{item.name} · {item.status === "ACTIVE" ? "Đang hoạt động" : item.status === "CLOSED" ? "Đã đóng" : "Bản nháp"}</option>)}
         </select>{data.cycles_truncated && <small>Hiển thị 100 chu kỳ ưu tiên gần nhất và chu kỳ đang chọn.</small>}</div>
-        <div className="row-actions"><Link href="/ai-reports">Xem tư vấn AI đã lưu →</Link><Link href="/review-cycles">Mở các chu kỳ đánh giá →</Link></div>
-        <div className="metric-grid dashboard-summary"><Metric label="Nhân viên đang làm việc" value={data.active_employees ?? 0} detail="Theo cơ cấu hiện tại và phạm vi quyền" />
-          <Metric label="Người tham gia chu kỳ" value={data.participants ?? 0} />
+
+        <div className="metric-grid dashboard-summary">{user?.role !== "EMPLOYEE" && <Metric label="Nhân viên đang làm việc" value={data.active_employees ?? 0} detail="Trong phạm vi quản lý" />}
+          {user?.role !== "EMPLOYEE" && <Metric label="Người tham gia chu kỳ" value={data.participants ?? 0} />}
           <Metric label="Chưa hoàn tất" value={data.awaiting_completion ?? 0} detail={`${data.finalized ?? 0} người đã chốt kết quả`} />
           <Metric label="Điểm trung bình hợp lệ" value={data.average ?? "—"} detail={`${data.sample_size ?? 0} kết quả hiện hành / đã chốt`} />
           <Metric label="KPI đã nhập thực tế" value={data.kpi_entry_percent != null ? `${data.kpi_entry_percent}%` : "—"} detail={`${data.kpis_entered ?? 0}/${data.kpis_assigned ?? 0} KPI đã giao; không phải tỷ lệ đạt mục tiêu`} /></div>
@@ -50,11 +50,11 @@ export function DashboardOverview() {
             <p>{data.sample_size ?? 0} mẫu trong phạm vi được phép.</p>
             {!data.sample_size ? <p>Chưa có điểm hợp lệ để thống kê.</p> : <ul className="dashboard-bars">{Object.entries(data.score_bands ?? {}).map(([band, count]) => <li key={band}><div><span>{band} điểm</span><strong>{count} người</strong></div><progress max={data.sample_size} value={count} aria-label={`${band} điểm: ${count} người`} /></li>)}</ul>}
           </section></div>
-          <section className="inbox-card dashboard-departments" aria-labelledby="departments-title"><h2 id="departments-title">Kết quả theo phòng ban</h2>
+          <details className="inbox-card dashboard-departments"><summary>Kết quả theo phòng ban</summary>
             <p className="help-text">{data.selected_cycle.status === "DRAFT" ? "Xem trước theo cơ cấu hiện tại của chu kỳ nháp." : "Phòng ban được ghi nhận lúc kích hoạt chu kỳ; quyền xem theo cơ cấu hiện tại."} Chỉ sử dụng kết quả hợp lệ, hiển thị số mẫu của từng nhóm.</p>
             <div className="table-scroll" tabIndex={0} role="region" aria-label="Kết quả phòng ban, có thể cuộn ngang"><table><thead><tr><th scope="col">Phòng ban</th><th scope="col">Tham gia</th><th scope="col">Số mẫu hợp lệ</th><th scope="col">Điểm trung bình</th></tr></thead><tbody>{data.departments?.map((item) => <tr key={item.id}><th scope="row">{item.name}</th><td>{item.participants}</td><td>{item.sample_size}</td><td>{item.average ?? "—"}</td></tr>)}</tbody></table></div>
             {data.departments_truncated && <p>Hiển thị tối đa 100 nhóm phòng ban.</p>}
-          </section>
+          </details>
         </>}
       </>}
       <RecentActivities items={data.recent_activities ?? []} admin={admin} />

@@ -41,5 +41,9 @@ export function WorkspaceNavigation() {
     ...(user?.role === "ADMIN" ? [{ label: "Quản trị", items: [{ href: "/admin/users", label: "Quản lý tài khoản" }, { href: "/settings/scoring", label: "Cấu hình chấm điểm" }] }] : []),
     { label: "Hệ thống", items: [{ href: "/", label: "Trạng thái hệ thống" }] },
   ];
-  return <><button className="navigation-toggle secondary" type="button" aria-controls="workspace-navigation" aria-expanded={expanded} onClick={() => setExpanded((v) => !v)}>{expanded ? "Đóng menu" : "Mở menu"}</button><nav id="workspace-navigation" data-expanded={expanded} aria-label="Điều hướng không gian làm việc">{groups.map((group) => <div className="navigation-group" key={group.label}><span className="navigation-label">{group.label}</span>{group.items.map(({ href, label }) => <Link key={href} href={href} onClick={() => setExpanded(false)} aria-current={isCurrent(href) ? "page" : undefined}>{label}</Link>)}</div>)}</nav></>;
+  const section = user?.role === "ADMIN" ? "Quản trị" :
+    /^\/(employees|departments|positions)(\/[^/]+)?$/.test(pathname ?? "") ? "Tổ chức" :
+    pathname === "/account" || pathname === "/feedback" || pathname?.startsWith("/feedback/") || pathname === "/" ? "Cá nhân" : "Đánh giá";
+  const visible = groups.filter((group) => group.label === "Không gian làm việc" || group.label === "Cá nhân" || group.label === section || group.label === "Hệ thống" && pathname === "/account");
+  return <><button className="navigation-toggle secondary" type="button" aria-controls="workspace-navigation" aria-expanded={expanded} onClick={() => setExpanded((v) => !v)}>{expanded ? "Đóng menu" : "Mở menu"}</button><nav id="workspace-navigation" data-expanded={expanded} aria-label="Điều hướng không gian làm việc">{visible.map((group) => <div className="navigation-group" key={group.label}><span className="navigation-label">{group.label}</span>{group.items.map(({ href, label }) => <Link key={href} href={href} onClick={() => setExpanded(false)} aria-current={isCurrent(href) ? "page" : undefined}>{label}</Link>)}</div>)}</nav></>;
 }

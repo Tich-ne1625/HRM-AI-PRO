@@ -41,7 +41,15 @@ it("shows ADMIN system tabs without HR workspace shortcuts", () => {
 it("keeps employee evaluation pages in the cycle workflow on the left", () => {
   state.path = "/employees/e1/performance"; render(<WorkspaceNavigation />);
   expect(screen.getByRole("link", { name: "Chu kỳ đánh giá" }).getAttribute("aria-current")).toBe("page");
-  expect(screen.getByRole("link", { name: "Nhân viên" }).getAttribute("aria-current")).toBeNull();
+  expect(screen.queryByRole("link", { name: "Nhân viên" })).toBeNull();
+});
+
+it("keeps the sidebar focused on the selected organization group", () => {
+  state.path = "/employees"; render(<><WorkspaceHeader /><WorkspaceNavigation /></>);
+  expect(screen.getByRole("link", { name: "Nhân viên" }).getAttribute("aria-current")).toBe("page");
+  expect(screen.getByRole("link", { name: "Phòng ban" })).toBeTruthy();
+  expect(screen.queryByRole("link", { name: "Danh mục KPI" })).toBeNull();
+  expect(screen.getByRole("link", { name: "Đánh giá hiệu suất" })).toBeTruthy();
 });
 it("keeps saved AI advice in evaluation navigation and hides it from ADMIN", () => {
   state.path = "/ai-reports";

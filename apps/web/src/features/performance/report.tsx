@@ -64,13 +64,13 @@ function ScoreMetrics({ row }: { row: Calculation }) {
 }
 
 function CalculationDetail({ row }: { row: Calculation }) {
-  return <section className="auth-card wide"><h2>Chi tiết lần tính {row.calculation_version}</h2>
+  return <details className="auth-card wide calculation-disclosure"><summary>Chi tiết lần tính {row.calculation_version}</summary>
     <p className="help-text">Tính lúc {new Date(row.calculated_at).toLocaleString("vi-VN")} · Điểm KPI giới hạn ở {row.policy.kpi_cap ?? "không giới hạn"}. Điểm thành phần và tổng được làm tròn riêng đến hai chữ số thập phân.</p>
     <div className="table-scroll" tabIndex={0} role="region" aria-label="Kết quả và lịch sử tính điểm, có thể cuộn ngang"><table className="score-table"><caption>Kết quả KPI theo dữ liệu của lần tính này</caption><thead><tr><th>KPI</th><th>Mục tiêu</th><th>Thực tế</th><th>Trọng số</th><th>Điểm gốc</th><th>Sau giới hạn</th><th>Đóng góp</th></tr></thead><tbody>{row.items.map((item) => <tr key={item.id}><td><strong>{item.name}</strong><br /><small>{item.code} · {item.unit} · {item.direction === "LOWER_IS_BETTER" ? "Càng thấp càng tốt" : "Càng cao càng tốt"}</small></td><td>{item.target}</td><td>{item.actual}</td><td>{item.weight}%</td><td>{item.raw_score}</td><td>{item.normalized_score}</td><td>{item.weighted_score}</td></tr>)}</tbody></table></div>
     <h3>Phản hồi được tính vào kết quả</h3><p>{row.feedback.count} phản hồi · Trung bình {row.feedback.mean ?? "—"}/5. Mỗi phản hồi đã gửi có trọng số bằng nhau.</p>
     <div className="feedback-cards">{row.feedback.groups.map((group) => <article className="inbox-card" key={group.relationship}><h3>{relationships[group.relationship]}</h3><p>{group.suppressed ? "Chưa đủ ba người gửi để hiển thị thống kê nhóm." : `${group.mean ?? "—"}/5 · ${group.count} phản hồi`}</p></article>)}</div>
     {row.feedback.own_submission && <><h3>Phản hồi do bạn gửi trong lần tính này</h3><SubmissionContent {...row.feedback.own_submission} /></>}
-  </section>;
+  </details>;
 }
 
 function FinalizeReview({ report, onDone, onCancel }: { report: Report; onDone: () => Promise<void>; onCancel: () => void }) {

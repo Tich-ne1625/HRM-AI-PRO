@@ -1,0 +1,7 @@
+resources:
+- ../../base
+namespace: insighthr-phase10-acceptance
+labels:
+- pairs:
+    app.kubernetes.io/part-of: insighthr-phase10
+  includeTemplates: true
