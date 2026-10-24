@@ -71,7 +71,7 @@ export function EmployeeForm({ initial, onSaved }: { initial?: Employee; onSaved
       <button type="submit" disabled={lookup.isFetching}>Tìm tài khoản</button>
     </form>
     {lookup.isError && <p role="alert">Không thể tra cứu tài khoản. Hãy thử lại.</p>}
-    {lookup.data && !lookup.data.items.length && <p>Không tìm thấy tài khoản với email này.</p>}
+    {!lookup.isError && lookup.data && !lookup.data.items.length && <p>Không tìm thấy tài khoản với email này.</p>}
     {lookup.data?.items.map((account) => <div className="confirmation" key={account.id}>
       <p>{account.email}</p><p>{account.is_active ? "Tài khoản hoạt động" : "Tài khoản đã bị vô hiệu hóa"}</p>
       {account.employee_id && account.employee_id !== initial?.id
@@ -101,7 +101,7 @@ export function ReferencePicker({ kind, value, onChange, current, inputRef, labe
       {selected && !query.data?.items.some((row) => row.id === selected.id) && <option value={selected.id}>{selected.label} (đã chọn)</option>}
       {query.data?.items.map((row) => <option key={row.id} value={row.id}>{referenceLabel(row)} ({row.code})</option>)}
     </select>{query.isError && <p role="alert">Không thể tải {label.toLowerCase()}.</p>}
-    {query.data && query.data.total > 20 && <Pagination page={page} total={query.data.total} pending={query.isFetching} onPage={setPage} />}
+    {!query.isError && query.data && query.data.total > 20 && <Pagination page={page} total={query.data.total} pending={query.isFetching} onPage={setPage} />}
   </div>;
 }
 
@@ -120,6 +120,6 @@ function ManagerPicker({ value, onChange, self, current }: {
       <option value="">Không có</option>{selected && !query.data?.items.some((row) => row.id === selected.id) && <option value={selected.id}>{selected.label} (đã chọn)</option>}
       {query.data?.items.filter((row) => row.id !== self).map((row) => <option key={row.id} value={row.id}>{row.display_name} ({row.employee_code})</option>)}
     </select>{query.isError && <p role="alert">Không thể tải danh sách người quản lý.</p>}
-    {query.data && query.data.total > 20 && <Pagination page={page} total={query.data.total} pending={query.isFetching} onPage={setPage} />}
+    {!query.isError && query.data && query.data.total > 20 && <Pagination page={page} total={query.data.total} pending={query.isFetching} onPage={setPage} />}
   </div>;
 }

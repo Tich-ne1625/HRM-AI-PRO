@@ -2,6 +2,7 @@
 
 from app.modules.ai.models import AIAnalysis, AnalysisStatus
 from app.modules.audit.models import AuditLog
+from app.modules.auth.limiter import LoginLimit
 from app.modules.auth.models import AuthSession
 from app.modules.employees.models import Employee, EmploymentStatus
 from app.modules.feedback.models import AssignmentStatus, Feedback, FeedbackAssignment, Relationship
@@ -28,6 +29,7 @@ __all__ = [
     "FeedbackAssignment",
     "KPIDefinition",
     "KPIDirection",
+    "LoginLimit",
     "PerformanceReview",
     "PerformanceReviewRevision",
     "Position",

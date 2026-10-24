@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useAuth } from "./auth-provider";
+import { ApiClientError } from "../../lib/api-client";
 
 const schema = z.object({
   email: z.email("Nhập địa chỉ email hợp lệ."),
@@ -35,7 +36,11 @@ export function LoginForm() {
     <form onSubmit={form.handleSubmit(async (values) => {
       setError("");
       try { await auth.login.mutateAsync(values); router.replace(target); }
-      catch { setError("Email hoặc mật khẩu không đúng."); }
+      catch (error) { setError(error instanceof ApiClientError && error.code === "login_rate_limited"
+        ? "Đã thử đăng nhập quá nhiều lần. Vui lòng chờ ít phút rồi thử lại."
+        : error instanceof ApiClientError && error.code === "login_temporarily_unavailable"
+          ? "Đăng nhập tạm thời chưa khả dụng. Vui lòng thử lại sau."
+          : "Email hoặc mật khẩu không đúng."); }
     })}>
       <label htmlFor="email">Email</label>
       <input id="email" type="email" autoComplete="username" {...form.register("email")} />

@@ -35,7 +35,7 @@ function Directory() {
       <div className="directory-reference-filter"><ReferencePicker kind="departments" value={department} onChange={(value) => { setDepartment(value); setPage(1); }} labelOverride="Lọc phòng ban" activeOnly={false} /></div>
       {query.isPending && <p role="status">Đang tải nhân viên…</p>}
       {query.isError && <div role="alert"><p>Không thể tải danh sách nhân viên.</p><button onClick={() => { void query.refetch(); }}>Thử lại</button></div>}
-      {query.data && <>
+      {!query.isError && query.data && <>
         {!query.data.items.length && <p>Không có nhân viên phù hợp.</p>}
         <div className="table-scroll" tabIndex={0} role="region" aria-label="Nhân viên, có thể cuộn ngang"><table><caption>{query.data.total} nhân viên</caption><thead><tr><th>Mã nhân viên</th><th>Họ và tên</th><th>Phòng ban</th><th>Chức danh</th><th>Trạng thái</th></tr></thead>
           <tbody>{query.data.items.map((row) => <tr key={row.id}><td>{row.employee_code}</td><td><Link href={`/employees/${row.id}`}>{row.display_name}</Link></td>

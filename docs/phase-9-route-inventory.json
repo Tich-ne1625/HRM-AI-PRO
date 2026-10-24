@@ -1,0 +1,386 @@
+[
+  {
+    "method": "GET",
+    "path": "/api/v1/ai-reports",
+    "policy": "Reader",
+    "source": "apps/api/app/modules/ai/router.py:38"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/performance/{review_id}/ai-analysis",
+    "policy": "Reader",
+    "source": "apps/api/app/modules/ai/router.py:52"
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/performance/{review_id}/ai-analysis",
+    "policy": "HR",
+    "source": "apps/api/app/modules/ai/router.py:68"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/reviews/{review_id}/ai-analyses",
+    "policy": "Reader",
+    "source": "apps/api/app/modules/ai/router.py:85"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/reviews/{review_id}/ai-analyses/{analysis_id}",
+    "policy": "Reader",
+    "source": "apps/api/app/modules/ai/router.py:99"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/audit-logs",
+    "policy": "Annotated[AuthContext, Depends(require_roles(UserRole.ADMIN, UserRole.HR))]",
+    "source": "apps/api/app/modules/audit/router.py:62"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/auth/me",
+    "policy": "Annotated[AuthContext, Depends(get_auth_context)]",
+    "source": "apps/api/app/modules/auth/router.py:27"
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/auth/login",
+    "policy": "service/public",
+    "source": "apps/api/app/modules/auth/router.py:51"
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/auth/refresh",
+    "policy": "service/public",
+    "source": "apps/api/app/modules/auth/router.py:78"
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/auth/logout",
+    "policy": "service/public",
+    "source": "apps/api/app/modules/auth/router.py:94"
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/auth/change-password",
+    "policy": "service/public",
+    "source": "apps/api/app/modules/auth/router.py:109"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/dashboard",
+    "policy": "Annotated[AuthContext, Depends(get_auth_context)]",
+    "source": "apps/api/app/modules/dashboard/router.py:16"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/employees",
+    "policy": "Reader",
+    "source": "apps/api/app/modules/employees/router.py:31"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/employees/linkable-users",
+    "policy": "HR",
+    "source": "apps/api/app/modules/employees/router.py:59"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/employees/{employee_id}",
+    "policy": "Reader",
+    "source": "apps/api/app/modules/employees/router.py:70"
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/employees",
+    "policy": "HR",
+    "source": "apps/api/app/modules/employees/router.py:80"
+  },
+  {
+    "method": "PATCH",
+    "path": "/api/v1/employees/{employee_id}",
+    "policy": "HR",
+    "source": "apps/api/app/modules/employees/router.py:96"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/feedback-context",
+    "policy": "HR",
+    "source": "apps/api/app/modules/feedback/router.py:49"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/feedback-assignments",
+    "policy": "Actor",
+    "source": "apps/api/app/modules/feedback/router.py:79"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/feedback-assignments/{identifier}",
+    "policy": "Actor",
+    "source": "apps/api/app/modules/feedback/router.py:108"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/feedback-reviewer-options",
+    "policy": "HR",
+    "source": "apps/api/app/modules/feedback/router.py:119"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/feedback-coverage",
+    "policy": "HR",
+    "source": "apps/api/app/modules/feedback/router.py:140"
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/feedback-assignments",
+    "policy": "HR",
+    "source": "apps/api/app/modules/feedback/router.py:158"
+  },
+  {
+    "method": "PATCH",
+    "path": "/api/v1/feedback-assignments/{identifier}",
+    "policy": "HR",
+    "source": "apps/api/app/modules/feedback/router.py:179"
+  },
+  {
+    "method": "DELETE",
+    "path": "/api/v1/feedback-assignments/{identifier}",
+    "policy": "HR",
+    "source": "apps/api/app/modules/feedback/router.py:202"
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/feedback-assignments/{identifier}/replace",
+    "policy": "HR",
+    "source": "apps/api/app/modules/feedback/router.py:225"
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/feedback",
+    "policy": "Actor",
+    "source": "apps/api/app/modules/feedback/router.py:249"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/employees/{employee_id}/feedback",
+    "policy": "Reader",
+    "source": "apps/api/app/modules/feedback/router.py:266"
+  },
+  {
+    "method": "GET",
+    "path": "/health/live",
+    "policy": "service/public",
+    "source": "apps/api/app/modules/health/router.py:23"
+  },
+  {
+    "method": "GET",
+    "path": "/health/ready",
+    "policy": "service/public",
+    "source": "apps/api/app/modules/health/router.py:28"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/employees/{employee_id}/kpis",
+    "policy": "Reader",
+    "source": "apps/api/app/modules/kpis/allocation_router.py:26"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/employees/{employee_id}/kpi-options",
+    "policy": "Writer",
+    "source": "apps/api/app/modules/kpis/allocation_router.py:34"
+  },
+  {
+    "method": "PUT",
+    "path": "/api/v1/employees/{employee_id}/kpis",
+    "policy": "Writer",
+    "source": "apps/api/app/modules/kpis/allocation_router.py:65"
+  },
+  {
+    "method": "PATCH",
+    "path": "/api/v1/employee-kpis/{identifier}",
+    "policy": "Writer",
+    "source": "apps/api/app/modules/kpis/allocation_router.py:90"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/kpis",
+    "policy": "Reader",
+    "source": "apps/api/app/modules/kpis/router.py:25"
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/kpis",
+    "policy": "HR",
+    "source": "apps/api/app/modules/kpis/router.py:55"
+  },
+  {
+    "method": "PATCH",
+    "path": "/api/v1/kpis/{identifier}",
+    "policy": "HR",
+    "source": "apps/api/app/modules/kpis/router.py:70"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/departments",
+    "policy": "Reader",
+    "source": "apps/api/app/modules/organization/router.py:31"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/positions",
+    "policy": "Reader",
+    "source": "apps/api/app/modules/organization/router.py:53"
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/departments",
+    "policy": "HR",
+    "source": "apps/api/app/modules/organization/router.py:80"
+  },
+  {
+    "method": "PATCH",
+    "path": "/api/v1/departments/{record_id}",
+    "policy": "HR",
+    "source": "apps/api/app/modules/organization/router.py:98"
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/positions",
+    "policy": "HR",
+    "source": "apps/api/app/modules/organization/router.py:123"
+  },
+  {
+    "method": "PATCH",
+    "path": "/api/v1/positions/{record_id}",
+    "policy": "HR",
+    "source": "apps/api/app/modules/organization/router.py:141"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/performance/{employee_id}",
+    "policy": "Reader",
+    "source": "apps/api/app/modules/performance/router.py:40"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/performance/{employee_id}/readiness",
+    "policy": "Reader",
+    "source": "apps/api/app/modules/performance/router.py:48"
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/performance/{employee_id}/calculate",
+    "policy": "Calculator",
+    "source": "apps/api/app/modules/performance/router.py:60"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/reviews/{identifier}/revisions",
+    "policy": "Reader",
+    "source": "apps/api/app/modules/performance/router.py:81"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/reviews/{identifier}/revisions/{version}",
+    "policy": "Reader",
+    "source": "apps/api/app/modules/performance/router.py:96"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/reviews/{identifier}/finalization-context",
+    "policy": "HR",
+    "source": "apps/api/app/modules/performance/router.py:108"
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/reviews/{identifier}/finalize",
+    "policy": "HR",
+    "source": "apps/api/app/modules/performance/router.py:120"
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/review-cycles/{identifier}/close",
+    "policy": "HR",
+    "source": "apps/api/app/modules/performance/router.py:143"
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/review-cycles/{identifier}/activate",
+    "policy": "HR",
+    "source": "apps/api/app/modules/review_cycles/router.py:36"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/review-cycles",
+    "policy": "Reader",
+    "source": "apps/api/app/modules/review_cycles/router.py:55"
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/review-cycles",
+    "policy": "HR",
+    "source": "apps/api/app/modules/review_cycles/router.py:74"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/review-cycles/{identifier}",
+    "policy": "Reader",
+    "source": "apps/api/app/modules/review_cycles/router.py:87"
+  },
+  {
+    "method": "PATCH",
+    "path": "/api/v1/review-cycles/{identifier}",
+    "policy": "HR",
+    "source": "apps/api/app/modules/review_cycles/router.py:97"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/review-cycles/{identifier}/participants",
+    "policy": "Reader",
+    "source": "apps/api/app/modules/review_cycles/router.py:116"
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/review-cycles/{identifier}/participants",
+    "policy": "HR",
+    "source": "apps/api/app/modules/review_cycles/router.py:138"
+  },
+  {
+    "method": "DELETE",
+    "path": "/api/v1/review-cycles/{identifier}/participants/{participant_id}",
+    "policy": "HR",
+    "source": "apps/api/app/modules/review_cycles/router.py:161"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/settings/scoring",
+    "policy": "Admin",
+    "source": "apps/api/app/modules/settings/router.py:19"
+  },
+  {
+    "method": "PATCH",
+    "path": "/api/v1/settings/scoring",
+    "policy": "Admin",
+    "source": "apps/api/app/modules/settings/router.py:25"
+  },
+  {
+    "method": "GET",
+    "path": "/api/v1/users",
+    "policy": "Admin",
+    "source": "apps/api/app/modules/users/router.py:21"
+  },
+  {
+    "method": "POST",
+    "path": "/api/v1/users",
+    "policy": "Admin",
+    "source": "apps/api/app/modules/users/router.py:42"
+  },
+  {
+    "method": "PATCH",
+    "path": "/api/v1/users/{user_id}",
+    "policy": "Admin",
+    "source": "apps/api/app/modules/users/router.py:61"
+  }
+]

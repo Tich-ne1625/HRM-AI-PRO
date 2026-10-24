@@ -8,8 +8,10 @@ from fastapi import FastAPI
 from app.core.config import Settings, get_settings
 from app.core.database import get_engine, get_session_factory
 from app.core.errors import register_error_handling
+from app.core.http_boundary import HTTPBoundary
 from app.modules.ai.provider import GeminiProvider
 from app.modules.ai.router import router as ai_router
+from app.modules.audit.router import router as audit_router
 from app.modules.auth.router import router as auth_router
 from app.modules.dashboard.router import router as dashboard_router
 from app.modules.employees.router import router as employees_router
@@ -43,6 +45,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     )
     app.state.ai_provider = GeminiProvider(application_settings)
     register_error_handling(app)
+    app.add_middleware(
+        HTTPBoundary,
+        limit=application_settings.api_max_request_bytes,
+        https=application_settings.app_env == "production",
+    )
     app.include_router(health_router)
     app.include_router(auth_router)
     app.include_router(users_router)
@@ -56,8 +63,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(performance_router)
     app.include_router(ai_router)
     app.include_router(dashboard_router)
+    app.include_router(audit_router)
     return app
 
 
 app = create_app()
-

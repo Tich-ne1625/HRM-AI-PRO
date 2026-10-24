@@ -104,7 +104,7 @@ function KpiOptions({employee, cycle, selected, disabled, onAdd}: {employee: str
   const query = useQuery({queryKey: ["reviews", "options", employee, cycle, page, q], queryFn: () => reviewApi.options(employee, cycle, {page, q})});
   return <section><h3>Chọn KPI đang sử dụng</h3><form className="filters" onSubmit={(e) => {e.preventDefault(); setQ(String(new FormData(e.currentTarget).get("q") ?? "")); setPage(1);}}><label htmlFor="options-search">Tìm KPI để gán</label><input id="options-search" name="q" maxLength={100} /><button>Tìm KPI</button></form>
     {query.isPending && <p role="status">Đang tải lựa chọn KPI…</p>}{query.isError && <ReviewError error={query.error} />}
-    {query.data && <>{query.data.items.map((r) => <p key={r.id}>{r.code} · {r.name} ({r.unit}) <button className="secondary" disabled={disabled || selected.includes(r.id)} onClick={() => onAdd(r)}>Thêm {r.code}</button></p>)}
+    {!query.isError && query.data && <>{query.data.items.map((r) => <p key={r.id}>{r.code} · {r.name} ({r.unit}) <button className="secondary" disabled={disabled || selected.includes(r.id)} onClick={() => onAdd(r)}>Thêm {r.code}</button></p>)}
       {!query.data.items.length && <p>Không có KPI đang sử dụng phù hợp.</p>}<Pagination page={page} total={query.data.total} pending={query.isFetching} onPage={setPage} /></>}
   </section>;
 }

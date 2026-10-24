@@ -52,7 +52,7 @@ function ReferenceList({ kind }: { kind: ReferenceKind }) {
         <button type="submit">Lọc</button></form>
       {query.isPending && <p role="status">Đang tải…</p>}
       {query.isError && <div role="alert"><p>Không thể tải danh sách.</p><button onClick={() => { void query.refetch(); }}>Thử lại</button></div>}
-      {query.data && <>
+      {!query.isError && query.data && <>
         {!query.data.items.length && <p>Chưa có {label} phù hợp.</p>}
         <div className="table-scroll" tabIndex={0} role="region" aria-label="Danh mục tổ chức, có thể cuộn ngang"><table><caption>{query.data.total} {label}</caption><thead><tr><th>Mã</th><th>Tên</th><th>Trạng thái</th>{hr && <th>Thao tác</th>}</tr></thead>
           <tbody>{query.data.items.map((row) => <tr key={row.id}><td>{row.code}</td><td>{referenceLabel(row)}</td>

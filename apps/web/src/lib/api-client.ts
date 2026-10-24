@@ -8,6 +8,19 @@ export class ApiClientError extends Error {
 
 let refreshPromise: Promise<void> | null = null;
 let refreshGeneration = 0;
+let sessionEpoch = 0;
+let sessionController = new AbortController();
+
+export function resetApiSession(): void {
+  sessionEpoch += 1;
+  sessionController.abort();
+  sessionController = new AbortController();
+  refreshPromise = null;
+}
+
+function requireSession(epoch: number): void {
+  if (epoch !== sessionEpoch) throw new ApiClientError(401, "session_changed", "Phiên đăng nhập đã thay đổi.");
+}
 
 function csrfCookie(): string | null {
   if (typeof document === "undefined") return null;
@@ -28,7 +41,8 @@ async function send(path: string, init: RequestInit): Promise<Response> {
   if (init.body && !headers.has("Content-Type") && typeof init.body === "string") {
     headers.set("Content-Type", "application/json");
   }
-  return fetch(path, { ...init, headers, credentials: "include", cache: "no-store" });
+  const signal = init.signal ? AbortSignal.any([init.signal, sessionController.signal]) : sessionController.signal;
+  return fetch(path, { ...init, signal, headers, credentials: "include", cache: "no-store" });
 }
 
 async function errorFrom(response: Response): Promise<ApiClientError> {
@@ -45,13 +59,16 @@ async function errorFrom(response: Response): Promise<ApiClientError> {
   return new ApiClientError(response.status, "request_failed", "Yêu cầu không thành công.");
 }
 
-async function refreshSession(): Promise<void> {
+async function refreshSession(epoch: number): Promise<void> {
   if (!refreshPromise) {
-    refreshPromise = (async () => {
+    const pending = (async () => {
       const response = await send("/api/v1/auth/refresh", { method: "POST" });
+      requireSession(epoch);
       if (!response.ok) throw await errorFrom(response);
       refreshGeneration += 1;
-    })().finally(() => { refreshPromise = null; });
+    })();
+    refreshPromise = pending;
+    void pending.finally(() => { if (refreshPromise === pending) refreshPromise = null; }).catch(() => {});
   }
   await refreshPromise;
 }
@@ -63,14 +80,27 @@ export async function apiFetch<T = void>(
     throw new Error("API requests must use the same-origin /api/v1/ prefix");
   }
   const generation = refreshGeneration;
+  const epoch = sessionEpoch;
   let response = await send(path, init);
+  requireSession(epoch);
   const canRefresh = !options.skipRefresh &&
     !["/api/v1/auth/login", "/api/v1/auth/refresh"].includes(path.split("?")[0] ?? path);
   if (response.status === 401 && canRefresh) {
-    if (generation === refreshGeneration) await refreshSession();
+    if (generation === refreshGeneration) await refreshSession(epoch);
+    requireSession(epoch);
     response = await send(path, init);
+    requireSession(epoch);
   }
-  if (!response.ok) throw await errorFrom(response);
+  if (!response.ok) {
+    const error = await errorFrom(response);
+    requireSession(epoch);
+    if (typeof window !== "undefined" && !path.startsWith("/api/v1/auth/") && [401, 403].includes(error.status)) {
+      window.dispatchEvent(new Event("insighthr-authority-recheck"));
+    }
+    throw error;
+  }
   if (response.status === 204) return undefined as T;
-  return response.json() as Promise<T>;
+  const value: T = await response.json();
+  requireSession(epoch);
+  return value;
 }

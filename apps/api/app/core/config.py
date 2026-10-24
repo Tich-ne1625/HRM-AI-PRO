@@ -37,6 +37,9 @@ class Settings(BaseSettings):
     cookie_secure: bool = False
     access_token_minutes: int = Field(default=15, gt=0)
     refresh_session_days: int = Field(default=7, gt=0)
+    api_max_request_bytes: int = Field(default=131072, ge=1024, le=1048576)
+    auth_login_max_attempts: int = Field(default=10, ge=1, le=1000)
+    auth_login_window_seconds: int = Field(default=300, ge=1, le=86400)
     gemini_enabled: bool = False
     gemini_api_key: SecretStr = SecretStr("")
     gemini_model: str = Field(default="", max_length=128, pattern=r"^[A-Za-z0-9._/-]*$")

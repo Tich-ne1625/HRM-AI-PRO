@@ -57,6 +57,9 @@ services:
       CORS_ALLOWED_ORIGINS: '["http://localhost:${WEB_PORT:-3000}"]'
       ALEMBIC_CONFIG_PATH: /app/alembic.ini
       GEMINI_ENABLED: ${GEMINI_ENABLED:-false}
+      AUTH_LOGIN_MAX_ATTEMPTS: ${AUTH_LOGIN_MAX_ATTEMPTS:-10}
+      AUTH_LOGIN_WINDOW_SECONDS: ${AUTH_LOGIN_WINDOW_SECONDS:-300}
+      API_MAX_REQUEST_BYTES: ${API_MAX_REQUEST_BYTES:-131072}
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
       GEMINI_MODEL: ${GEMINI_MODEL:-}
       GEMINI_TIMEOUT_SECONDS: ${GEMINI_TIMEOUT_SECONDS:-20}
@@ -83,6 +86,8 @@ services:
     user: "10001:10001"
     environment:
       API_INTERNAL_URL: http://api:8000
+      APP_ENV: ${APP_ENV:-development}
+      WEB_ORIGIN: ${WEB_ORIGIN:-http://localhost:3000}
       NEXT_PUBLIC_API_BASE_URL: /api/v1
     ports:
       - "${WEB_PORT:-3000}:3000"

@@ -9,9 +9,12 @@ export const metadata: Metadata = {
   description: "AI-assisted employee performance management",
 };
 
+// CSP nonces belong to one request, never to a prerendered HTML document.
+export const dynamic = "force-dynamic";
+
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="vi">
       <body><Providers>{children}</Providers></body>
     </html>
   );

@@ -26,7 +26,7 @@ function Settings() {
   const save = useMutation({mutationFn: ({version, policy}: {version: number; policy: Policy}) => reviewApi.saveDefaults(version, policy), onSuccess: async () => {await cache.invalidateQueries({queryKey: ["reviews"]}); setGeneration((v) => v + 1);}});
   return <section className="auth-card"><h1>Cấu hình chấm điểm mặc định</h1><p>Chỉ áp dụng khi kích hoạt chu kỳ tiếp theo. Chu kỳ đã kích hoạt giữ nguyên cấu hình đã đóng băng.</p>
     {query.isPending && <p role="status">Đang tải cấu hình…</p>}{query.isError && <ReviewError error={query.error} reload={() => {void query.refetch();}} />}
-    {query.data && <SettingsForm key={generation} initial={query.data} pending={save.isPending} onSave={(policy, version) => save.mutate({policy, version})} />}
+    {!query.isError && query.data && <SettingsForm key={generation} initial={query.data} pending={save.isPending} onSave={(policy, version) => save.mutate({policy, version})} />}
     {save.isSuccess && <p role="status">Đã lưu cấu hình mặc định.</p>}
     {save.isError && <ReviewError error={save.error} reload={() => {void query.refetch().then(() => setGeneration((v) => v + 1));}} />}
   </section>;

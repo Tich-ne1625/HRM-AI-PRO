@@ -1,8 +1,11 @@
 // @vitest-environment jsdom
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, expect, it, vi } from "vitest";
 import { AuthProvider } from "./auth-provider";
+import { useAuth } from "./auth-provider";
+import { useState } from "react";
+import userEvent from "@testing-library/user-event";
 import { ProtectedRoute } from "./protected-route";
 
 const nav = vi.hoisted(() => ({ replace: vi.fn() }));
@@ -44,4 +47,26 @@ it("redirects a revoked or inactive session after refresh is rejected", async ()
   mount();
   await waitFor(() => expect(nav.replace).toHaveBeenCalledWith("/login"));
   expect(screen.queryByText("Protected account")).toBeNull();
+});
+
+it("purges other caches and local form state when the server changes role", async () => {
+  let role = "HR";
+  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  vi.stubGlobal("fetch", vi.fn(async () => new Response(JSON.stringify({
+    id: "same-user", email: "fictional@example.com", role, is_active: true, employee_id: "e1",
+  }))));
+  function Form() {
+    const { user } = useAuth(); const [text, setText] = useState("");
+    return <><p>{user?.role}</p><input aria-label="Draft" value={text} onChange={(e) => setText(e.target.value)} /></>;
+  }
+  render(<QueryClientProvider client={client}><AuthProvider><ProtectedRoute><Form /></ProtectedRoute></AuthProvider></QueryClientProvider>);
+  await screen.findByText("HR");
+  await userEvent.setup().type(screen.getByLabelText("Draft"), "PRIVATE_DRAFT");
+  client.setQueryData(["feedback", "administration"], { secret: "PRIVATE_CACHE" });
+  role = "MANAGER";
+  await act(async () => { await client.invalidateQueries({ queryKey: ["auth", "me"] }); });
+  await screen.findByText("MANAGER");
+  expect(screen.getByLabelText("Draft")).toHaveProperty("value", "");
+  expect(client.getQueryData(["feedback", "administration"])).toBeUndefined();
+  client.clear();
 });

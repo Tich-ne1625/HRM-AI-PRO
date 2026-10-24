@@ -17,6 +17,7 @@ from app.core.security import (
     new_opaque_token,
 )
 from app.modules.audit.service import AuditWriter
+from app.modules.auth.limiter import reserve_login
 from app.modules.auth.models import AuthSession
 from app.modules.auth.repository import AuthSessionRepository
 from app.modules.auth.schemas import ChangePasswordRequest, CurrentUser, LoginCommand
@@ -58,6 +59,7 @@ class AuthService:
             email = ""
 
         result = None
+        reserve_login(self.session, self.settings, email)
         with self.session.begin():
             # Share the mutation lock before verifying credentials: an in-flight
             # old-password login must not outlive password-change revocation.

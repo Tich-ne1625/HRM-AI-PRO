@@ -46,7 +46,7 @@ function Detail({ id }: { id: string }) {
     <section className="auth-card wide"><h2>Người tham gia</h2>
       <form className="filters" onSubmit={(e) => {e.preventDefault(); setQ(String(new FormData(e.currentTarget).get("q") ?? "")); setPage(1);}}><label htmlFor="participant-search">Tìm người tham gia</label><input id="participant-search" name="q" maxLength={100} /><button>Tìm</button></form>
       {participants.isPending && <p role="status">Đang tải người tham gia…</p>}{participants.isError && <ReviewError error={participants.error} />}
-      {participants.data && <><div className="table-scroll" tabIndex={0} role="region" aria-label="Người tham gia chu kỳ, có thể cuộn ngang"><table><caption>{participants.data.total} người tham gia trong phạm vi</caption><thead><tr><th>Nhân viên</th><th>Phòng ban</th><th>Chức danh</th><th>Thao tác</th></tr></thead><tbody>
+      {!participants.isError && participants.data && <><div className="table-scroll" tabIndex={0} role="region" aria-label="Người tham gia chu kỳ, có thể cuộn ngang"><table><caption>{participants.data.total} người tham gia trong phạm vi</caption><thead><tr><th>Nhân viên</th><th>Phòng ban</th><th>Chức danh</th><th>Thao tác</th></tr></thead><tbody>
         {participants.data.items.map((p) => <tr key={p.id}><td>{p.employee_code} · {p.display_name}</td><td>{p.department_name}</td><td>{p.position_title}</td><td>{row.can_edit
           ? <button className="secondary" disabled={remove.isPending} onClick={() => remove.mutate(p.id)}>Bỏ {p.employee_code} khỏi nháp</button>
           : <div className="row-actions"><Link href={`/employees/${p.employee_id}/performance?cycle_id=${id}`}>Kết quả</Link><Link href={`/employees/${p.employee_id}/kpis?cycle_id=${id}`}>{p.can_manage_kpis ? "Quản lý KPI" : "Xem KPI"}</Link><Link href={`/employees/${p.employee_id}/feedback?cycle_id=${id}`}>Tổng hợp phản hồi</Link>{user?.role === "HR" && <Link href={`/feedback-administration?participant_id=${p.id}&cycle_id=${id}`}>Phân công phản hồi</Link>}</div>}</td></tr>)}</tbody></table></div>
@@ -67,7 +67,7 @@ function Enrollment({ cycle }: {cycle: Cycle}) {
   return <section className="auth-card wide"><h2>Thêm người tham gia bản nháp</h2>
     <form className="filters" onSubmit={(e) => {e.preventDefault(); setQ(String(new FormData(e.currentTarget).get("q") ?? "")); setPage(1);}}><label htmlFor="enroll-search">Tìm nhân viên để thêm</label><input id="enroll-search" name="q" maxLength={100} /><button>Tìm nhân viên</button></form>
     {employees.isPending && <p role="status">Đang tải nhân viên…</p>}{employees.isError && <ReviewError error={employees.error} />}
-    {employees.data && <>{employees.data.items.map((e) => <label className="checkbox-label" key={e.id}><input type="checkbox" checked={!!selected[e.id]} disabled={mutation.isPending || (!selected[e.id] && count >= 100)} onChange={(event) => {
+    {!employees.isError && employees.data && <>{employees.data.items.map((e) => <label className="checkbox-label" key={e.id}><input type="checkbox" checked={!!selected[e.id]} disabled={mutation.isPending || (!selected[e.id] && count >= 100)} onChange={(event) => {
       setSelected((previous) => {const next = {...previous}; if (event.target.checked) next[e.id] = e.display_name; else delete next[e.id]; return next;});
     }} />{e.employee_code} · {e.display_name}</label>)}
       {!employees.data.items.length && <p>Không có nhân viên phù hợp.</p>}

@@ -21,12 +21,14 @@ class ApiError(Exception):
         code: str,
         message: str,
         details: list[dict[str, object]] | None = None,
+        headers: dict[str, str] | None = None,
     ) -> None:
         super().__init__(code)
         self.status_code = status_code
         self.code = code
         self.message = message
         self.details = details or []
+        self.headers = headers or {}
 
 
 class RequestIdMiddleware(BaseHTTPMiddleware):
@@ -47,13 +49,15 @@ def register_error_handling(app: FastAPI) -> None:
 
     @app.exception_handler(ApiError)
     async def handle_api_error(request: Request, error: ApiError) -> JSONResponse:
-        return _response(
+        response = _response(
             request,
             error.status_code,
             error.code,
             error.message,
             error.details,
         )
+        response.headers.update(error.headers)
+        return response
 
     @app.exception_handler(StarletteHTTPException)
     async def handle_http_error(
@@ -114,7 +118,13 @@ def _response(
             },
             "request_id": request_id,
         },
-        headers={"X-Request-ID": request_id},
+        headers={
+            "X-Request-ID": request_id,
+            "Cache-Control": "no-store",
+            "X-Content-Type-Options": "nosniff",
+            "X-Frame-Options": "DENY",
+            "Referrer-Policy": "strict-origin-when-cross-origin",
+        },
     )
 
 
@@ -129,4 +139,3 @@ def _request_id(request: Request) -> str:
     ):
         return candidate
     return uuid4().hex
-

@@ -1,9 +1,9 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createContext, useContext, type ReactNode } from "react";
+import { createContext, useContext, useEffect, type ReactNode } from "react";
 
-import { ApiClientError } from "../../lib/api-client";
+import { ApiClientError, resetApiSession } from "../../lib/api-client";
 import { authApi } from "./api";
 import type { CurrentUser } from "./types";
 
@@ -18,7 +18,8 @@ interface AuthState {
 
 function useLogin() {
   const cache = useQueryClient();
-  return useMutation({ mutationFn: authApi.login, onSuccess: (user) => {
+  return useMutation({ mutationFn: authApi.login, onMutate: () => { resetApiSession(); }, onSuccess: (user) => {
+    resetApiSession();
     cache.clear();
     cache.setQueryData(["auth", "me"], user);
   } });
@@ -26,7 +27,8 @@ function useLogin() {
 
 function useLogout() {
   const cache = useQueryClient();
-  return useMutation({ mutationFn: authApi.logout, onSuccess: () => {
+  return useMutation({ mutationFn: authApi.logout, onMutate: () => { resetApiSession(); }, onSuccess: () => {
+    resetApiSession();
     cache.clear();
     cache.setQueryData(["auth", "me"], null);
   } });
@@ -35,19 +37,34 @@ function useLogout() {
 const AuthContext = createContext<AuthState | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const cache = useQueryClient();
+  useEffect(() => {
+    const recheck = () => { void cache.invalidateQueries({ queryKey: ["auth", "me"] }); };
+    window.addEventListener("insighthr-authority-recheck", recheck);
+    return () => window.removeEventListener("insighthr-authority-recheck", recheck);
+  }, [cache]);
   const query = useQuery({
     queryKey: ["auth", "me"],
     queryFn: async () => {
-      try { return await authApi.me(); }
+      let next: CurrentUser | null;
+      try { next = await authApi.me(); }
       catch (error) {
-        if (error instanceof ApiClientError && error.status === 401) return null;
-        throw error;
+        if (error instanceof ApiClientError && error.status === 401) next = null;
+        else throw error;
       }
+      const previous = cache.getQueryData<CurrentUser | null>(["auth", "me"]);
+      const identity = (value: CurrentUser | null) => value ? `${value.id}:${value.role}:${value.employee_id}` : "anonymous";
+      if (previous !== undefined && identity(previous) !== identity(next)) {
+        resetApiSession();
+        const filter = { predicate: (item: { queryKey: readonly unknown[] }) => item.queryKey[0] !== "auth" };
+        await cache.cancelQueries(filter); cache.removeQueries(filter);
+      }
+      return next;
     }, retry: false, staleTime: 30_000,
   });
   const login = useLogin();
   const logout = useLogout();
-  return <AuthContext.Provider value={{
+  return <AuthContext.Provider key={`${query.data?.id}:${query.data?.role}:${query.data?.employee_id}`} value={{
     user: query.data ?? null, pending: query.isPending, error: query.error,
     retry: () => { void query.refetch(); }, login, logout,
   }}>{children}</AuthContext.Provider>;

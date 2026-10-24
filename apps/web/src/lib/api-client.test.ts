@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { apiFetch, ApiClientError } from "./api-client";
+import { apiFetch, ApiClientError, resetApiSession } from "./api-client";
 
 const ok = (value: unknown = { ok: true }) =>
   new Response(JSON.stringify(value), { status: 200 });
@@ -10,7 +10,7 @@ const unauthorized = () => new Response(JSON.stringify({
 }), { status: 401 });
 
 describe("cookie API client", () => {
-  beforeEach(() => { document.cookie = "insighthr_csrf=family-proof; path=/"; });
+  beforeEach(() => { resetApiSession(); document.cookie = "insighthr_csrf=family-proof; path=/"; });
   afterEach(() => { vi.unstubAllGlobals(); });
 
   it("includes cookies and attaches CSRF only to mutations", async () => {
@@ -94,4 +94,39 @@ describe("cookie API client", () => {
     await expect(apiFetch("https://elsewhere.example/api/v1/users")).rejects.toThrow();
     expect(fetcher).toHaveBeenCalledTimes(1);
   });
+});
+
+it("discards an old account response even if its transport ignores abort", async () => {
+  let release!: (value: Response) => void;
+  vi.stubGlobal("fetch", vi.fn(() => new Promise<Response>((resolve) => { release = resolve; })));
+  const old = apiFetch("/api/v1/employees");
+  resetApiSession(); release(ok({ private: "OLD_ACCOUNT" }));
+  await expect(old).rejects.toMatchObject({ code: "session_changed" });
+  vi.unstubAllGlobals();
+});
+
+it("does not replay an old mutation after late refresh completes during logout", async () => {
+  resetApiSession();
+  let release!: (value: Response) => void;
+  const fetcher = vi.fn((path: string) => path.endsWith("/refresh")
+    ? new Promise<Response>((resolve) => { release = resolve; }) : Promise.resolve(unauthorized()));
+  vi.stubGlobal("fetch", fetcher);
+  const old = apiFetch("/api/v1/employee-kpis/id", { method: "PATCH", body: "{}" });
+  while (!release) await Promise.resolve();
+  resetApiSession(); release(new Response(null, { status: 204 }));
+  await expect(old).rejects.toMatchObject({ code: "session_changed" });
+  expect(fetcher.mock.calls.filter(([path]) => path.includes("employee-kpis"))).toHaveLength(1);
+  vi.unstubAllGlobals();
+});
+
+it("does not reveal a delayed JSON body from the previous session", async () => {
+  resetApiSession();
+  let release!: (value: unknown) => void;
+  const response = ok(); response.json = () => new Promise((resolve) => { release = resolve; });
+  vi.stubGlobal("fetch", vi.fn().mockResolvedValue(response));
+  const old = apiFetch("/api/v1/ai-reports");
+  while (!release) await Promise.resolve();
+  resetApiSession(); release({ secret: "OLD_PRIVATE_CONTENT" });
+  await expect(old).rejects.toMatchObject({ code: "session_changed" });
+  vi.unstubAllGlobals();
 });
