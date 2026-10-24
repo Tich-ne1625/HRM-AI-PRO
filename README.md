@@ -8,13 +8,13 @@ The project is a modular monolith: a Next.js web application, a FastAPI backend,
 
 ## Current scope
 
-Phases 1–6 are CI-accepted. [Phase 6 CI](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/39715137000) passed **767 backend tests, 104 web tests**, quality/build and Docker smoke/persistence at runtime `f595f23`. Phase 6 implements exact scoring, scoped reports and immutable calculation history, HR finalization and cycle closure. A shared top header plus role-based left navigation and contextual KPI/feedback/report tabs serve existing pages. See the [Phase 6 plan](docs/superpowers/plans/2026-10-22-phase-6-performance.md). Dashboard work remains planned; Phase 7 implementation is described below.
+Phases 1–8 are implemented and accepted as of 2026-10-24. Final runtime `88700d8` passed [CI 40086271058](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/40086271058): **830 backend tests, 133 web tests**, Ruff/mypy (99 source files), lint/typecheck/build and Docker smoke/persistence. The workspace covers role-scoped organization, cycles, KPIs, feedback, scoring/history/finalization, optional AI advice, dashboards and saved advice listings. See the [Vietnamese Phase 8 report](docs/phase-8-report.vi.md).
 
 Phase 7 is [offline CI-accepted](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/39728715722) at `b16efd6`: **811 backend and 117 web tests**, quality/build and Docker persistence passed. It implements explicit Gemini generation on the existing report: PUBLIC numeric advice and separate HR_PRIVATE sanitized-comment analysis. AI is disabled and keyless by default. HR confirms each generation; saved advice/history remain readable without a configured provider. See the [plan and acceptance](docs/superpowers/plans/2026-10-22-phase-7-gemini.md), [contract](docs/phase-7-contract.md), [review](docs/phase-7-review.md) and [Vietnamese guide](README.vi.md). Live Gemini acceptance is separate from offline provider tests.
 
 ## Performance workflow
 
-Phase 8 is in progress: `/dashboard` is the new default login destination, with scoped cycle metrics, valid-score sample sizes/distribution, department snapshots and own feedback tasks. ADMIN receives account metrics only. See the [contract](docs/phase-8-contract.md) and [plan](docs/superpowers/plans/2026-10-22-phase-8-dashboard.md). The central AI report list, sanitized activity feed and complete UX acceptance remain subsequent work.
+`/dashboard` is the default login destination: scoped metrics, valid-score samples/distribution, department snapshots, own feedback tasks and sanitized activity. `/ai-reports` lists saved successful generations with cycle/audience filters, pagination and explicit content access; HR_PRIVATE remains HR-only. The shared role-aware layout, keyboard-scrollable tables, focus management and mutation refresh flow are accepted. See the [contract](docs/phase-8-contract.md) and [completed plan](docs/superpowers/plans/2026-10-22-phase-8-dashboard.md). Phase 9 security/integration and Phase 10 Kubernetes/docs remain next.
 
 A bounded live adapter probe with fictional numbers succeeded on `gemini-3.5-flash-lite` on 2026-10-22, validating all six output fields. This verifies connectivity/schema, not full live business acceptance or advice quality. Provider HTTP 404 now maps to `provider_model_unavailable`; raw provider errors and keys are never exposed.
 
@@ -172,7 +172,7 @@ Set `AUTH_ACCESS_SECRET` to a nondefault key of at least 32 characters outside d
 
 ## Future phases
 
-The [Phase 4 plan](docs/superpowers/plans/2026-10-19-phase-4-cycles-kpis.md) and [contract](docs/phase-4-contract.md) record implementation and CI acceptance on 2026-10-20. Phase 5 feedback assignments/submission are also accepted. Phase 6 implements scoring and closes cycles after review finalization. Gemini, dashboards, seed data and Kubernetes follow [the architecture](docs/architecture.md).
+The [Phase 4 plan](docs/superpowers/plans/2026-10-19-phase-4-cycles-kpis.md) and [contract](docs/phase-4-contract.md) record implementation and CI acceptance on 2026-10-20. Phase 5 feedback assignments/submission are also accepted. Phase 6 implements scoring and closes cycles after review finalization. Gemini, dashboards and demo data are delivered in Phases 7–8; security/integration and Kubernetes/docs remain in Phases 9–10 of [the architecture](docs/architecture.md).
 
 Phase 5 is complete against the [plan](docs/superpowers/plans/2026-10-20-phase-5-feedback.md) and [contract](docs/phase-5-contract.md), with CI acceptance at `bf04fe2`. It separates historical reviewer rights from live report scope and suppresses small peer/subordinate groups without promising anonymity. All 26 concurrency cases passed in each of five runs.
 

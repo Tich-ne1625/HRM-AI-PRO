@@ -1,6 +1,10 @@
 # API contract
 
-## Dashboard (Phase 8, part 1)
+## Dashboard and saved advice (Phase 8)
+
+`GET /api/v1/ai-reports?audience=PUBLIC&cycle_id=<optional>&page=1&page_size=20` lists SUCCEEDED generations only. It returns scoped metadata, not analysis output. HR_PRIVATE is HR-only and rejected before count; ADMIN is forbidden. Employee scope is applied in SQL before count/offset/limit, DRAFT is excluded, and count/items use REPEATABLE READ. Sort is generated_at/UUID descending. The `matches_current_calculation` flag compares calculation/hash plus current/finalized validity; it does not mean latest generation. Use existing `/reviews/{review_id}/ai-analyses/{id}` for explicit content access.
+
+Dashboard now includes `recent_activities` (maximum six), using explicit action/type allowlists. ADMIN gets user created/role/status events with no subject identity. Other roles get scoped performance calculated/finalized events for the selected cycle, with snapshot name and report context. Neither DTO exposes actor, metadata, request ID, login or AI events. See the [complete contract](phase-8-contract.md).
 
 `GET /api/v1/dashboard?cycle_id=<optional UUID>` is authenticated, read-only and `no-store`. ADMIN receives only account totals by active status/role and own pending feedback count; an explicit cycle returns 404. HR/MANAGER/EMPLOYEE use existing SQL employee/cycle scope and receive cycle choices, selected-cycle participant states, valid-score average/sample/distribution, KPI actual-entry coverage and department snapshots. The own pending-feedback count spans active cycles and never exposes other reviewers.
 

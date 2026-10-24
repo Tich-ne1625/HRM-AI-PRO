@@ -202,6 +202,12 @@ The local Docker engine could not start because this Windows installation requir
 
 
 
+## Phase 8 final acceptance — 2026-10-24
+
+Runtime `88700d8` passed [CI 40086271058](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/40086271058): **830 backend/133 web tests**, Ruff/mypy (99 source files), lint/typecheck/build and Docker smoke/persistence. `/ai-reports` lists SQL-scoped saved successes without output, with HR-only private scope and explicit detail reads. Dashboard includes six allowlisted activity projections. Shared mutation settlement invalidates dashboard/AI-list GET caches without retrying a write; dashboard hides cached personal metrics after a failed refresh.
+
+The user stack was rebuilt with `docker compose --env-file .env up --build --detach --wait`, reusing its PostgreSQL volume; no new migration or service. Edge production acceptance covered 32 cases/80 screenshots at 390 and 1280px, seven representative accounts, saved-detail focus and keyboard table scrolling, with no document overflow/runtime exceptions/API writes. Read-only fingerprints of the checked domain tables and non-secret account attributes matched before/after, retaining all three existing AI attempts; no demo reset or new Gemini call. See the [Vietnamese report](phase-8-report.vi.md) for the role matrix, exact evidence and Phase 9 boundaries. Earlier records below are historical milestones.
+
 ## Phase 7 optional Gemini operations
 
 ### Local follow-up on 2026-10-22

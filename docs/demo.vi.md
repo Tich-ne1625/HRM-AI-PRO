@@ -4,6 +4,8 @@ Toàn bộ người, tài khoản, KPI và nhận xét trong bộ `[DEMO]` đề
 
 ## Nạp dữ liệu một lần
 
+**Tư vấn đã lưu và hoạt động:** mở `/ai-reports` hoặc menu **Tư vấn AI đã lưu**; chọn chu kỳ, bấm xem nội dung hoặc mở báo cáo liên quan. HR có thêm bộ lọc nội bộ HR; quản lý/nhân viên chỉ xem tư vấn chung được phép. Trạng thái trống là bình thường nếu HR chưa tạo tư vấn. Dashboard có tối đa 6 hoạt động gần đây theo quyền và chu kỳ; ADMIN thấy cập nhật tài khoản. Không cần seed lại khi cập nhật Phase 8.
+
 Sau khi đăng nhập, mở **Tổng quan** trên header hoặc menu trái để xem phạm vi của role. Với bộ mẫu chưa thao tác thêm, HR thấy chu kỳ ACTIVE có 5 người, 1 đã chốt, 1 cần tính lại, 2 chưa tính; trung bình hợp lệ **84.90** trên **2 mẫu**, KPI đã nhập **9/10**. Các số này sẽ thay đổi theo bài thực hành của bạn. ADMIN chỉ thấy tổng quan tài khoản, quản lý chỉ thấy nhóm trực tiếp và nhân viên chỉ thấy bản thân.
 
 Tại thư mục `hrm-ai`, sau khi cập nhật code:

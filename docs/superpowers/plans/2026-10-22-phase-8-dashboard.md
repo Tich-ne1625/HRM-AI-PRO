@@ -1,5 +1,7 @@
 # Phase 8 — kế hoạch thực hiện
 
+**Đã hoàn thành cả ba phần ngày 24/10/2026.** Runtime cuối `88700d8` qua [CI 40086271058](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/40086271058): 830 backend/133 web tests, Ruff/mypy 99 file, lint/types/build và Docker smoke/persistence. Xem [báo cáo đầy đủ](../../phase-8-report.vi.md). Các mục bên dưới giữ lại kế hoạch và bằng chứng theo mốc; phần 1 riêng không đại diện cho nghiệm thu cuối.
+
 Đối chiếu: `docs/architecture.md`, `docs/phase-8-contract.md`, các module performance/AI hiện có và dữ liệu thực hành trong `docs/demo.vi.md`.
 
 ## Phần 1: Dashboard
@@ -23,3 +25,14 @@ Rà soát điều hướng theo role, bảng/form và thao tác trên màn hình
 ## Bằng chứng phần 1
 
 [CI 39745189991](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/39745189991) cho `7d10da5` đạt cả backend, frontend và Docker smoke/persistence: **821 test backend, 122 test web**, Ruff/mypy 97 source file, lint/typecheck và production build. Phần 1 đã kiểm chứng; phần 2 và rà soát UX toàn bộ ở phần 3 vẫn còn. Không coi dashboard riêng là hoàn tất Phase 8.
+
+## Nghiệm thu cuối — 24/10/2026
+
+- [x] GET danh sách tư vấn có phân trang, metadata projection, kiểm tra HR_PRIVATE trước count, không gọi provider.
+- [x] Hoạt động allowlist theo quyền/chu kỳ, không metadata/actor/request hoặc sự kiện AI/đăng nhập.
+- [x] Trang tư vấn trong layout hiện có, xem nội dung/lịch sử, bộ lọc/empty/error, quản lý focus.
+- [x] Cache dashboard/danh sách cập nhật sau mutation; dashboard ẩn cache khi làm mới lỗi.
+- [x] Rà soát các màn hình hiện có, sửa hướng dẫn lỗi thời, vùng cuộn bảng bằng bàn phím và bố cục responsive.
+- [x] Kiểm tra role/quyền chuyển quản lý, count/trang cùng snapshot khi có ghi đồng thời; đầy đủ CI nêu trên.
+- [x] Local Docker giữ volume, fingerprint dữ liệu nghiệp vụ không đổi; không seed lại hoặc tạo lời gọi Gemini mới.
+- [x] README, API, kiến trúc, demo, vận hành và báo cáo được cập nhật. Công đoạn tiếp theo theo kiến trúc là Phase 9 bảo mật/tích hợp.

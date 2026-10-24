@@ -8,25 +8,20 @@ Dự án sử dụng kiến trúc modular monolith gồm ứng dụng web Next.j
 
 ## Trạng thái hiện tại
 
-Phase 1 đã hoàn thành:
+**Phases 1–8 đã triển khai và nghiệm thu**, cập nhật ngày 24/10/2026. Hiện có:
 
-- Quy ước repository và hợp đồng biến môi trường.
-- FastAPI với cấu hình được kiểm tra, định dạng lỗi ổn định và request ID.
-- Endpoint liveness và readiness có kiểm tra PostgreSQL cùng Alembic revision.
-- Trang trạng thái hệ thống bằng Next.js.
-- Docker image chạy bằng người dùng không phải root.
-- Docker Compose thực hiện migration trước khi khởi động API và web.
-- GitHub Actions kiểm tra backend, frontend, image, migration và khả năng giữ dữ liệu sau khi khởi động lại.
+- Đăng nhập, phân quyền ADMIN / HR / quản lý / nhân viên.
+- Hồ sơ, phòng ban/chức danh, chu kỳ, KPI và phản hồi 360.
+- Tính điểm, lịch sử, chốt đánh giá và đóng chu kỳ.
+- Tư vấn Gemini có xác nhận; danh sách tư vấn đã lưu và nội dung riêng HR.
+- Dashboard theo role, hoạt động gần đây và giao diện có header/menu trái dùng được trên desktop/mobile.
+- Bộ demo để thực hành đủ các role; Docker giữ dữ liệu sau khi khởi động lại.
 
-Phases 1–6 đã hoàn tất và qua [CI nghiệm thu Phase 6](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/39715137000): **767 test backend, 104 test web**, kiểm tra chất lượng, build và Docker smoke/persistence đều đạt. Phase 6 có tính điểm, báo cáo/lịch sử, chốt đánh giá và đóng chu kỳ. Giao diện chung có **tab nhóm chức năng phía trên và menu trái theo quyền**, cùng tab KPI/phản hồi/kết quả giữ nguyên nhân viên và kỳ đang xem. Xem bằng chứng trong [kế hoạch Phase 6](docs/superpowers/plans/2026-10-22-phase-6-performance.md). Dashboard tổng thể chưa triển khai; Phase 7 được cập nhật bên dưới.
-
-**Phase 7 — tư vấn Gemini** đã qua [CI nghiệm thu](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/39728715722): **811 test backend, 117 test web**, quality/build và Docker persistence đạt. Đã triển khai trên trang kết quả: tư vấn chung từ số liệu và phân tích nhận xét riêng HR, có xác nhận trước khi gửi. Mặc định AI tắt, không cần API key để chạy dự án. Xem [kế hoạch và bằng chứng nghiệm thu](docs/superpowers/plans/2026-10-22-phase-7-gemini.md), [hợp đồng](docs/phase-7-contract.md) và [review](docs/phase-7-review.md). Dashboard tổng thể chưa triển khai; kiểm thử Gemini thật được ghi riêng với kiểm thử offline.
+[CI cuối Phase 8](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/40086271058) tại runtime `88700d8` đạt **830 test backend, 133 test web**, Ruff/mypy, lint/typecheck/build và Docker smoke/persistence. Xem [báo cáo Phase 8 bằng tiếng Việt](docs/phase-8-report.vi.md). Công đoạn tiếp theo là Phase 9 bảo mật/tích hợp; Phase 10 là Kubernetes và tài liệu triển khai.
 
 ## Chạy và xem nhanh
 
-**Phase 8 đang triển khai:** trang **Tổng quan** tại `/dashboard` dùng chung header và menu trái. Đăng nhập sẽ vào trang này; có chọn chu kỳ, tiến độ, điểm trung bình kèm số mẫu, phân bố điểm và bảng phòng ban theo quyền. ADMIN xem tổng quan tài khoản. Xem [hợp đồng](docs/phase-8-contract.md) và [kế hoạch Phase 8](docs/superpowers/plans/2026-10-22-phase-8-dashboard.md). Danh sách tư vấn AI tập trung, hoạt động gần đây và nghiệm thu UX toàn bộ còn ở các phần tiếp theo; Phase 8 chưa hoàn tất.
-
-Phần dashboard đã qua [CI](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/39745189991) tại `7d10da5`: **821 test backend, 122 test web**, chất lượng/build và Docker smoke/persistence đều đạt. Kiểm tra trình duyệt local có đủ ADMIN/HR/quản lý/nhân viên trên desktop và mobile.
+Đăng nhập vào **Tổng quan** tại `/dashboard` để xem tiến độ theo role; mở **Tư vấn AI đã lưu** tại `/ai-reports` để lọc và đọc các bản đã tạo. HR có bộ lọc nội bộ; ADMIN có tổng quan tài khoản riêng. Mở/tải lại các trang không gọi Gemini. Xem [hợp đồng](docs/phase-8-contract.md) và [kế hoạch đã nghiệm thu](docs/superpowers/plans/2026-10-22-phase-8-dashboard.md).
 
 Nếu đã có `.env`, mở Docker Desktop, rồi chạy tại thư mục `hrm-ai`:
 
@@ -292,7 +287,7 @@ Lệnh build lại và áp head hiện tại `20261022_0006`; chức năng chu k
 
 ## Các phase tiếp theo
 
-Phase 4 đã hoàn tất theo [kế hoạch chi tiết](docs/superpowers/plans/2026-10-19-phase-4-cycles-kpis.md) và [hợp đồng nghiệp vụ](docs/phase-4-contract.md), nghiệm thu CI ngày 2026-10-20. Phase 5 phản hồi cũng đã nghiệm thu. Gemini, dashboard, seed và Kubernetes là các công đoạn tiếp theo.
+Phases 1–8 đã hoàn tất theo các hợp đồng/kế hoạch tương ứng. Công đoạn tiếp theo theo kiến trúc là **Phase 9 — bảo mật và tích hợp**, rồi **Phase 10 — Kubernetes và tài liệu triển khai**. Xem [báo cáo Phase 8](docs/phase-8-report.vi.md) để biết phạm vi đã kiểm tra và giới hạn còn lại.
 
 Phase 5 hoàn tất theo [kế hoạch 8 task](docs/superpowers/plans/2026-10-20-phase-5-feedback.md) và [hợp đồng](docs/phase-5-contract.md); runtime `bf04fe2` đã qua đầy đủ CI. Năm lượt test cạnh tranh đều đạt 26/26. Giới hạn bảo mật và account lịch sử được mô tả trong hướng dẫn dưới đây.
 

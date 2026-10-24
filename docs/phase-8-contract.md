@@ -1,5 +1,7 @@
 # Phase 8 — Dashboard và trải nghiệm làm việc
 
+Trạng thái ngày 24/10/2026: đã triển khai và nghiệm thu theo [báo cáo Phase 8](phase-8-report.vi.md), runtime `88700d8`, [CI 40086271058](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/40086271058).
+
 Phạm vi được triển khai tiếp sau Phase 7, dùng lại header, menu trái và các trang nghiệp vụ hiện có. Không thay đổi cách tính điểm hoặc tự động gọi AI.
 
 ## Quyền và số liệu
