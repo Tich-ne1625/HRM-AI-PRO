@@ -8,6 +8,8 @@ The project is a modular monolith: a Next.js web application, a FastAPI backend,
 
 ## Current scope
 
+Phase 9 security/integration planning is prepared, with no runtime changes yet: [contract](docs/phase-9-contract.md), [eight-task plan](docs/superpowers/plans/2026-10-24-phase-9-security-integration.md). It targets authorization/session/cache boundaries, HTTP/login limits, transactional races, AI isolation, scoped audit reads, isolated browser E2E and measured performance. Phase 8 remains the accepted runtime baseline.
+
 Phases 1–8 are implemented and accepted as of 2026-10-24. Final runtime `88700d8` passed [CI 40086271058](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/40086271058): **830 backend tests, 133 web tests**, Ruff/mypy (99 source files), lint/typecheck/build and Docker smoke/persistence. The workspace covers role-scoped organization, cycles, KPIs, feedback, scoring/history/finalization, optional AI advice, dashboards and saved advice listings. See the [Vietnamese Phase 8 report](docs/phase-8-report.vi.md).
 
 Phase 7 is [offline CI-accepted](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/39728715722) at `b16efd6`: **811 backend and 117 web tests**, quality/build and Docker persistence passed. It implements explicit Gemini generation on the existing report: PUBLIC numeric advice and separate HR_PRIVATE sanitized-comment analysis. AI is disabled and keyless by default. HR confirms each generation; saved advice/history remain readable without a configured provider. See the [plan and acceptance](docs/superpowers/plans/2026-10-22-phase-7-gemini.md), [contract](docs/phase-7-contract.md), [review](docs/phase-7-review.md) and [Vietnamese guide](README.vi.md). Live Gemini acceptance is separate from offline provider tests.

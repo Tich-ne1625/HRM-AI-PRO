@@ -287,6 +287,8 @@ Lệnh build lại và áp head hiện tại `20261022_0006`; chức năng chu k
 
 ## Các phase tiếp theo
 
+**Phase 9 đã có kế hoạch, chưa triển khai:** xem [hợp đồng bảo mật/tích hợp](docs/phase-9-contract.md) và [kế hoạch 8 task](docs/superpowers/plans/2026-10-24-phase-9-security-integration.md). Trọng tâm: ma trận phân quyền, phiên/cache, HTTP và giới hạn đăng nhập/request, tính nguyên tử/race, AI isolation, API đọc audit, E2E cô lập và baseline hiệu năng. Đây là kế hoạch, không phải kết quả kiểm thử mới; không thay `.env` hoặc dữ liệu demo.
+
 Phases 1–8 đã hoàn tất theo các hợp đồng/kế hoạch tương ứng. Công đoạn tiếp theo theo kiến trúc là **Phase 9 — bảo mật và tích hợp**, rồi **Phase 10 — Kubernetes và tài liệu triển khai**. Xem [báo cáo Phase 8](docs/phase-8-report.vi.md) để biết phạm vi đã kiểm tra và giới hạn còn lại.
 
 Phase 5 hoàn tất theo [kế hoạch 8 task](docs/superpowers/plans/2026-10-20-phase-5-feedback.md) và [hợp đồng](docs/phase-5-contract.md); runtime `bf04fe2` đã qua đầy đủ CI. Năm lượt test cạnh tranh đều đạt 26/26. Giới hạn bảo mật và account lịch sử được mô tả trong hướng dẫn dưới đây.
