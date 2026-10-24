@@ -1,6 +1,6 @@
 # Hợp đồng Phase 10 — Kubernetes và tài liệu triển khai
 
-Ngày lập: **24/10/2026**. Trạng thái: **đã xây dựng kế hoạch, chưa triển khai/nghiệm thu Kubernetes**.
+Ngày lập: **24/10/2026**, nghiệm thu **25/10/2026**. Trạng thái: **đã triển khai và nghiệm thu local**, tooling `d4a78bc`; bằng chứng và CI trong [báo cáo Phase 10](phase-10-report.vi.md).
 
 Baseline: runtime Phase 9 `9821e82`, tài liệu `845676a`; [full CI](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/40109252558) đạt 843 backend/140 web tests, [browser/upgrade/persistence CI](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/40109315010) đạt. Tham chiếu [báo cáo Phase 9](phase-9-report.vi.md), [kiến trúc](architecture.md) và [kế hoạch thực hiện](superpowers/plans/2026-10-24-phase-10-kubernetes-docs.md).
 
@@ -9,6 +9,8 @@ Baseline: runtime Phase 9 `9821e82`, tài liệu `845676a`; [full CI](https://gi
 Đưa ứng dụng đã có lên **Kubernetes local có thể tái lập**, kiểm chứng ingress, cấu hình/secret, migration, khởi động, bảo toàn dữ liệu và khôi phục backup. Hoàn thiện hướng dẫn tiếng Việt để người dùng chọn Compose cho chạy thường ngày hoặc Kubernetes cho học/nghiệm thu triển khai.
 
 Không thêm nghiệp vụ, màn hình, API hoặc schema domain mới. Không đổi công thức điểm, phân quyền, xác nhận gọi AI hay snapshot lịch sử. Không chuyển dữ liệu demo của người dùng sang cluster tự động. Không triển khai cloud/production, registry riêng, HA PostgreSQL, Helm/operator, service mesh, autoscaling hoặc hệ thống giám sát ngoài phạm vi. NetworkPolicy chỉ được tuyên bố có hiệu lực nếu CNI thật sự enforce và có thử deny; phase này không dùng một YAML chưa kiểm chứng để gọi là network isolation.
+
+Bổ sung theo yêu cầu triển khai của người dùng: tinh gọn UI trên các trang hiện có (menu theo nhóm đang mở, form/chi tiết mở khi cần, dashboard theo role) và README Việt. Phân quyền, dữ liệu/công thức và xác nhận thao tác vẫn giữ nguyên; không thêm màn hình nghiệp vụ mới. Xem [các thay đổi và kiểm chứng UI](phase-10-report.vi.md#giao-diện-đã-tinh-gọn).
 
 Kubernetes không thay thế Compose đang chạy. Cluster thử nghiệm, cổng, namespace, volume và secrets tách biệt. Không đổi `.env`, Docker context hoặc kube context mặc định của người dùng để triển khai tự động.
 
@@ -107,7 +109,7 @@ Cluster acceptance chạy CI riêng có timeout/concurrency và target disposabl
 
 Đầu ra bắt buộc: manifests/overlays và runner có guard; hướng dẫn tiếng Việt `docs/kubernetes.vi.md`; cập nhật README/deployment; báo cáo `docs/phase-10-report.vi.md` với CI/version/config/fingerprint/restore evidence và giới hạn. Chỉ tạo báo cáo hoàn tất khi có kết quả thực thi, không tạo số test giả ngay lúc lập kế hoạch.
 
-Compose vẫn là cách chạy hằng ngày đơn giản. Không cần thay bố cục UI trong Phase 10; các luồng chức năng dùng lại toàn bộ trang hiện có. Kết thúc phase này hoàn thành 10 công đoạn đã liệt kê trong kiến trúc, nhưng không đồng nghĩa đã triển khai production hoặc hết nhu cầu sửa đổi sản phẩm.
+Compose vẫn là cách chạy hằng ngày đơn giản. UI được tinh gọn theo bổ sung phạm vi của người dùng; các luồng chức năng dùng lại toàn bộ trang hiện có. Kết thúc phase này hoàn thành 10 công đoạn đã liệt kê trong kiến trúc, nhưng không đồng nghĩa đã triển khai production hoặc hết nhu cầu sửa đổi sản phẩm.
 
 ## Nguồn kỹ thuật
 

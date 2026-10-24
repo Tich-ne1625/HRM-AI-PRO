@@ -1,6 +1,6 @@
 # Kế hoạch Phase 10 — Kubernetes và tài liệu triển khai
 
-Ngày lập: **24/10/2026**. Trạng thái: **chưa triển khai**. Gồm **8 task**, thực hiện theo thứ tự phụ thuộc. Runtime đầu vào `9821e82`, docs `845676a`; 843 backend/140 web tests là baseline Phase 9, không phải kết quả Kubernetes.
+Ngày lập: **24/10/2026**, nghiệm thu **25/10/2026**. Trạng thái: **đã triển khai 8/8 task**; [báo cáo](../../phase-10-report.vi.md) ghi từng gate, CI và giới hạn. Runtime UI `559e74a`, tooling cuối `d4a78bc`. Runtime đầu vào `9821e82`, docs `845676a`; 843 backend/140 web tests là baseline Phase 9, không phải kết quả Kubernetes.
 
 Đọc [hợp đồng Phase 10](../../phase-10-contract.md), [báo cáo Phase 9](../../phase-9-report.vi.md), [kiến trúc](../../architecture.md), Dockerfile/Compose, Next rewrite và health/config hiện có trước khi thực hiện. Giữ nguyên `.env`, dữ liệu và stack Compose của người dùng; không gọi Gemini thật.
 
@@ -107,6 +107,6 @@ Ngày lập: **24/10/2026**. Trạng thái: **chưa triển khai**. Gồm **8 ta
 
 ## Phụ thuộc và cách triển khai từng phần
 
-`1 → 2 → 3 → 4 → 5 → 6 → 7 → 8`. Mỗi task đóng bằng gate trước khi chuyển bước; lỗi hạ tầng phải được tái hiện/giải quyết trong target disposable. Các tệp nêu trên là **dự kiến**, chưa tồn tại lúc lập kế hoạch; chưa có lệnh deploy Phase 10 để người dùng chạy ngay. Lệnh thật chỉ được đưa vào hướng dẫn khi runner/manifests đã tạo và kiểm tra.
+`1 → 2 → 3 → 4 → 5 → 6 → 7 → 8`. Mỗi task đóng bằng gate trước khi chuyển bước; lỗi hạ tầng phải được tái hiện/giải quyết trong target disposable. Các đường dẫn ở từng task ghi phạm vi dự kiến lúc lập kế hoạch; triển khai thực tế dùng `cluster.py` cho preflight/create, `validate.py` cho strict server schema và các runner trong `scripts/kubernetes/`. Lệnh đã thử nằm trong [hướng dẫn Kubernetes](../../kubernetes.vi.md). UI/README được tinh gọn theo yêu cầu bổ sung của người dùng; chi tiết kiểm chứng trong báo cáo.
 
 Nguồn chính thức và quyết định topology/security nằm trong [hợp đồng](../../phase-10-contract.md#nguồn-kỹ-thuật). Không cần thêm app/plugin ngoài để lập hoặc thực hiện kế hoạch này.

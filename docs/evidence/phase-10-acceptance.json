@@ -1,0 +1,818 @@
+{
+  "source_commit": "d4a78bc142019b1418213dd7e98e9850073527eb",
+  "full_ci": "https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/40118504207",
+  "cluster_ci": "https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/40118509036",
+  "artifact_id": 12569358891,
+  "ci": {
+    "runtime.json": {
+      "commit": "d4a78bc142019b1418213dd7e98e9850073527eb",
+      "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+      "python": "3.12.15",
+      "tools": {
+        "PyYAML": "6.0.3",
+        "cryptography": "50.0.2",
+        "websockets": "16.0"
+      },
+      "kubectl": "v1.36.1",
+      "kustomize": "v5.8.1",
+      "server": "v1.35.5+k3s1",
+      "pods": [
+        {
+          "name": "api-5b5795ddf6-gz5k7",
+          "phase": "Running",
+          "containers": [
+            {
+              "name": "api",
+              "image_id": "sha256:6173ac64894dd51965cdeccf207792121131f6e11586b8598ffe41bc281632ed",
+              "ready": false,
+              "restarts": 0
+            }
+          ]
+        },
+        {
+          "name": "api-77869f5b7-wlxsj",
+          "phase": "Running",
+          "containers": [
+            {
+              "name": "api",
+              "image_id": "sha256:6173ac64894dd51965cdeccf207792121131f6e11586b8598ffe41bc281632ed",
+              "ready": true,
+              "restarts": 0
+            }
+          ]
+        },
+        {
+          "name": "migrate-f812a61f64-plfz5",
+          "phase": "Succeeded",
+          "containers": [
+            {
+              "name": "migrate",
+              "image_id": "sha256:6173ac64894dd51965cdeccf207792121131f6e11586b8598ffe41bc281632ed",
+              "ready": false,
+              "restarts": 0
+            }
+          ]
+        },
+        {
+          "name": "postgres-0",
+          "phase": "Running",
+          "containers": [
+            {
+              "name": "postgres",
+              "image_id": "docker.io/library/postgres@sha256:d81f7b51697014367236d07ec58b54153fc28f828b72bf247fe5c7487520bcb0",
+              "ready": true,
+              "restarts": 0
+            }
+          ]
+        },
+        {
+          "name": "web-b7fbdfbc9-h4ggw",
+          "phase": "Running",
+          "containers": [
+            {
+              "name": "web",
+              "image_id": "sha256:d1ebfabdae2f5424c9360e7c5a6cd033733cd62039ca63a5f6b25218a14c64b8",
+              "ready": true,
+              "restarts": 0
+            }
+          ]
+        }
+      ]
+    },
+    "restore.json": {
+      "status": "passed",
+      "source": "insighthr-phase10-acceptance",
+      "target": "insighthr-phase10-restore",
+      "archive_bytes": 60398,
+      "scope": "all ORM columns/tables including sessions, audit, limiter; no records exported",
+      "fingerprint": {
+        "head": "20261024_0008",
+        "tables": {
+          "ai_analyses": {
+            "count": 3,
+            "sha256": "1c234662bce7fa016d27f32effc9a4b66b4a46b7ea90864515b5b4eed2b57411"
+          },
+          "audit_logs": {
+            "count": 37,
+            "sha256": "5fa6c404eb395f3b71e64408faa4c72813dffc399132a2489836da04e3f2a8a2"
+          },
+          "auth_login_limits": {
+            "count": 5,
+            "sha256": "8824b98dc6cfbb905128af7878cdd737839d928e0551846efc6abbdeaed6d59c"
+          },
+          "auth_sessions": {
+            "count": 5,
+            "sha256": "7804306a72dcebfae9570f38f772aa68d171104be0a660890df08e35b1779a96"
+          },
+          "cycle_participants": {
+            "count": 1,
+            "sha256": "f7a7719ebde540c5b5196c6ebf476867c5f5d93e382b55cd366ef2ccd892f918"
+          },
+          "departments": {
+            "count": 1,
+            "sha256": "f5c3dd10433d76a382af0cc1f5097c817e1244d2f6fa6c85d814eb9ce86b8e28"
+          },
+          "employee_kpis": {
+            "count": 1,
+            "sha256": "da609ea3cd782b365030161d9546fd46d0759547bb0727beb2cca4ab902af0fb"
+          },
+          "employees": {
+            "count": 2,
+            "sha256": "8e48c43a1b4b9b7200c8d54aa1293d91e1c04aebaca8bcaa160cab5e3dcc0269"
+          },
+          "feedback": {
+            "count": 2,
+            "sha256": "1618ab9623687f2a31447f0fd207d52a7e5ae916e74a81915352c8c8980d1391"
+          },
+          "feedback_assignments": {
+            "count": 2,
+            "sha256": "6826fcb75bf82c2dfe0113aa30a3db9e2a82a1fe5f5214e42efdbe68ede9d261"
+          },
+          "kpi_definitions": {
+            "count": 1,
+            "sha256": "13613340c38a691b8aaf99e3a1d8b8f7625b70606430f26b62ea73c2cd009223"
+          },
+          "performance_review_revisions": {
+            "count": 2,
+            "sha256": "497bbbc7c838eb89d8fb6137bf9840396e3223e1ce770358df757c903d20495f"
+          },
+          "performance_reviews": {
+            "count": 1,
+            "sha256": "1f3bdf64b922bfc26e658bcabb8f751d9d4155b72f6d51caeb8b9b0280ce36e7"
+          },
+          "positions": {
+            "count": 1,
+            "sha256": "71486d8ca2cf5c341acb3d9779516e2eb29f1d5401dc052c1bab45c436a22ed4"
+          },
+          "review_cycles": {
+            "count": 1,
+            "sha256": "5e0b1fd4e6ce409fbdebad6b48c7dce2840e4cd64341405e8cf5b9ac7b5a705b"
+          },
+          "system_config": {
+            "count": 1,
+            "sha256": "39496c6549e92febd3e247833c8cce6f628cafc9d766939369d5148819c435fb"
+          },
+          "users": {
+            "count": 5,
+            "sha256": "3f850983a8a2fbd633329af29e69f663d5528eca55ac78ceb0fe8d15d5fb885d"
+          }
+        }
+      }
+    },
+    "recovery.json": {
+      "status": "passed",
+      "concurrent_deploy_denied": true,
+      "database_outage": {
+        "live": 200,
+        "ready": 503
+      },
+      "pg_pod_replacement": true,
+      "application_rollout": true,
+      "cluster_stop_start": true,
+      "read_before_rerunning_migrations": true,
+      "fingerprint": {
+        "head": "20261024_0008",
+        "tables": {
+          "ai_analyses": {
+            "count": 3,
+            "sha256": "1c234662bce7fa016d27f32effc9a4b66b4a46b7ea90864515b5b4eed2b57411"
+          },
+          "audit_logs": {
+            "count": 35,
+            "sha256": "28246b8bff92791b91bf63961a453af40e81c44e6336a2a6bf9951d8fa9af92d"
+          },
+          "auth_login_limits": {
+            "count": 4,
+            "sha256": "b0e60dd7be7c097162111cc7098d8675a01a22ded95c50fe55bfbf5199263309"
+          },
+          "auth_sessions": {
+            "count": 4,
+            "sha256": "81429e80cc7327534dc3e70af382c4fafd630421d9cd6f4c524f2160491bdd7c"
+          },
+          "cycle_participants": {
+            "count": 1,
+            "sha256": "f7a7719ebde540c5b5196c6ebf476867c5f5d93e382b55cd366ef2ccd892f918"
+          },
+          "departments": {
+            "count": 1,
+            "sha256": "f5c3dd10433d76a382af0cc1f5097c817e1244d2f6fa6c85d814eb9ce86b8e28"
+          },
+          "employee_kpis": {
+            "count": 1,
+            "sha256": "da609ea3cd782b365030161d9546fd46d0759547bb0727beb2cca4ab902af0fb"
+          },
+          "employees": {
+            "count": 2,
+            "sha256": "8e48c43a1b4b9b7200c8d54aa1293d91e1c04aebaca8bcaa160cab5e3dcc0269"
+          },
+          "feedback": {
+            "count": 2,
+            "sha256": "1618ab9623687f2a31447f0fd207d52a7e5ae916e74a81915352c8c8980d1391"
+          },
+          "feedback_assignments": {
+            "count": 2,
+            "sha256": "6826fcb75bf82c2dfe0113aa30a3db9e2a82a1fe5f5214e42efdbe68ede9d261"
+          },
+          "kpi_definitions": {
+            "count": 1,
+            "sha256": "13613340c38a691b8aaf99e3a1d8b8f7625b70606430f26b62ea73c2cd009223"
+          },
+          "performance_review_revisions": {
+            "count": 2,
+            "sha256": "497bbbc7c838eb89d8fb6137bf9840396e3223e1ce770358df757c903d20495f"
+          },
+          "performance_reviews": {
+            "count": 1,
+            "sha256": "1f3bdf64b922bfc26e658bcabb8f751d9d4155b72f6d51caeb8b9b0280ce36e7"
+          },
+          "positions": {
+            "count": 1,
+            "sha256": "71486d8ca2cf5c341acb3d9779516e2eb29f1d5401dc052c1bab45c436a22ed4"
+          },
+          "review_cycles": {
+            "count": 1,
+            "sha256": "5e0b1fd4e6ce409fbdebad6b48c7dce2840e4cd64341405e8cf5b9ac7b5a705b"
+          },
+          "system_config": {
+            "count": 1,
+            "sha256": "39496c6549e92febd3e247833c8cce6f628cafc9d766939369d5148819c435fb"
+          },
+          "users": {
+            "count": 4,
+            "sha256": "1d090552fa0604a9d36896464046ca8da6f2cfa0015b9f3f399feda4aeabda6d"
+          }
+        }
+      }
+    },
+    "tls-http.json": {
+      "status": "passed",
+      "chain_hostname_verified": true,
+      "host": "insighthr.test",
+      "secure_cookies": true,
+      "hsts_nonce": true,
+      "oversize": [
+        {
+          "chunked": false,
+          "status": 413
+        },
+        {
+          "chunked": true,
+          "status": 413
+        }
+      ],
+      "browser_tls_trust_tested": false
+    },
+    "failure-gates.json": {
+      "status": "passed",
+      "failed_migration_stops_before_rollout": true,
+      "expired_lease_active_job_denied": true,
+      "deployment_generation_unchanged": true
+    },
+    "validation.json": {
+      "status": "passed",
+      "tool": "kubectl server-side strict validation",
+      "objects": {
+        "local-http": 8,
+        "local-https": 8
+      }
+    },
+    "deployment.json": {
+      "namespace": "insighthr-phase10-acceptance",
+      "context": "k3d-insighthr-phase10",
+      "mode": "local-https",
+      "release": "phase10-d4a78bc142019b1418213dd7e98e9850073527eb",
+      "migration_job": "migrate-f812a61f64",
+      "status": "ready"
+    },
+    "browser/report.json": {
+      "status": "passed",
+      "roles": [
+        "ADMIN",
+        "HR",
+        "MANAGER",
+        "EMPLOYEE"
+      ],
+      "form_writes": true,
+      "numeric_before": "87.00",
+      "numeric_final": "80.00",
+      "closed_sample_size": 1,
+      "offline_ai_generations": 3,
+      "live_gemini_calls": 0,
+      "quota_preserves_success": true,
+      "private_uuid_denied": true,
+      "revoked_session_denied": true,
+      "demoted_role_applied_without_logout": true,
+      "widths": [
+        1280,
+        390
+      ],
+      "runtime_exceptions": 0,
+      "nonce_csp_hydrates": true,
+      "writes": [
+        {
+          "method": "POST",
+          "path": "/api/v1/auth/login",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/users",
+          "status": 201
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/users",
+          "status": 201
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/users",
+          "status": 201
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/auth/login",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/departments",
+          "status": 201
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/positions",
+          "status": 201
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/employees",
+          "status": 201
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/employees",
+          "status": 201
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/review-cycles",
+          "status": 201
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/review-cycles/00e1069a-2af3-43b1-912b-3d17f051d67d/participants",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/review-cycles/00e1069a-2af3-43b1-912b-3d17f051d67d/activate",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/review-cycles/00e1069a-2af3-43b1-912b-3d17f051d67d/close",
+          "status": 409
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/kpis",
+          "status": 201
+        },
+        {
+          "method": "PUT",
+          "path": "/api/v1/employees/5c44505d-5f89-4139-9fed-263ed9a2b813/kpis",
+          "status": 200
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/v1/employee-kpis/5573b495-0297-4375-9554-d72977a2dc88",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/feedback-assignments",
+          "status": 201
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/feedback-assignments",
+          "status": 201
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/auth/login",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/feedback",
+          "status": 201
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/auth/login",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/feedback",
+          "status": 201
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/performance/5c44505d-5f89-4139-9fed-263ed9a2b813/calculate",
+          "status": 201
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/v1/employee-kpis/5573b495-0297-4375-9554-d72977a2dc88",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/performance/5c44505d-5f89-4139-9fed-263ed9a2b813/calculate",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/reviews/c08f97ac-9e5b-4b89-8167-a9734259c0fb/finalize",
+          "status": 200
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/performance/c08f97ac-9e5b-4b89-8167-a9734259c0fb/ai-analysis",
+          "status": 201
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/performance/c08f97ac-9e5b-4b89-8167-a9734259c0fb/ai-analysis",
+          "status": 201
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/performance/c08f97ac-9e5b-4b89-8167-a9734259c0fb/ai-analysis",
+          "status": 503
+        },
+        {
+          "method": "POST",
+          "path": "/api/v1/review-cycles/00e1069a-2af3-43b1-912b-3d17f051d67d/close",
+          "status": 200
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/v1/users/74cb3865-b3a8-4e95-98ab-e9f562dff1f4",
+          "status": 200
+        },
+        {
+          "method": "PATCH",
+          "path": "/api/v1/users/74cb3865-b3a8-4e95-98ab-e9f562dff1f4",
+          "status": 200
+        }
+      ],
+      "browser": "Chrome/155.0.8059.39",
+      "commit": "d4a78bc142019b1418213dd7e98e9850073527eb"
+    }
+  },
+  "local": {
+    "runtime.json": {
+      "commit": "59ae73ea45551eb81720d8fd07af63439dfeb3db",
+      "platform": "Windows-11-10.0.26200-SP0",
+      "python": "3.12.10",
+      "tools": {
+        "PyYAML": "6.0.3",
+        "cryptography": "50.0.2",
+        "websockets": "16.0"
+      },
+      "kubectl": "v1.36.1",
+      "kustomize": "v5.8.1",
+      "server": "v1.35.5+k3s1",
+      "pods": [
+        {
+          "name": "api-65867bcd8b-7d89d",
+          "phase": "Running",
+          "containers": [
+            {
+              "name": "api",
+              "image_id": "sha256:1c21004bb0be97e5a8120b93191dea0b6df09269be6965ad1c5ab65a6d9520f2",
+              "ready": true,
+              "restarts": 0
+            }
+          ]
+        },
+        {
+          "name": "migrate-28cde521cf-kwk4s",
+          "phase": "Succeeded",
+          "containers": [
+            {
+              "name": "migrate",
+              "image_id": "sha256:1c21004bb0be97e5a8120b93191dea0b6df09269be6965ad1c5ab65a6d9520f2",
+              "ready": false,
+              "restarts": 0
+            }
+          ]
+        },
+        {
+          "name": "migrate-9307b63a57-9lvph",
+          "phase": "Failed",
+          "containers": [
+            {
+              "name": "migrate",
+              "image_id": "sha256:1c21004bb0be97e5a8120b93191dea0b6df09269be6965ad1c5ab65a6d9520f2",
+              "ready": false,
+              "restarts": 0
+            }
+          ]
+        },
+        {
+          "name": "migrate-ac84718caf-rj8ld",
+          "phase": "Succeeded",
+          "containers": [
+            {
+              "name": "migrate",
+              "image_id": "sha256:1c21004bb0be97e5a8120b93191dea0b6df09269be6965ad1c5ab65a6d9520f2",
+              "ready": false,
+              "restarts": 0
+            }
+          ]
+        },
+        {
+          "name": "postgres-0",
+          "phase": "Running",
+          "containers": [
+            {
+              "name": "postgres",
+              "image_id": "docker.io/library/postgres@sha256:d81f7b51697014367236d07ec58b54153fc28f828b72bf247fe5c7487520bcb0",
+              "ready": true,
+              "restarts": 0
+            }
+          ]
+        },
+        {
+          "name": "web-5b49f8fc84-ggwkc",
+          "phase": "Running",
+          "containers": [
+            {
+              "name": "web",
+              "image_id": "sha256:9169a634daaab1ee0163c2403d575f54045e98a1f87b93ae06af2cf15d67f0f1",
+              "ready": true,
+              "restarts": 0
+            }
+          ]
+        }
+      ]
+    },
+    "restore.json": {
+      "status": "passed",
+      "source": "insighthr-phase10-acceptance",
+      "target": "insighthr-phase10-restore",
+      "archive_bytes": 60424,
+      "scope": "all ORM columns/tables including sessions, audit, limiter; no records exported",
+      "fingerprint": {
+        "head": "20261024_0008",
+        "tables": {
+          "ai_analyses": {
+            "count": 3,
+            "sha256": "5d9087fe5f1ae1cb584dd6a78593e98e9a5e87979cb58564406fabe6bdb6c396"
+          },
+          "audit_logs": {
+            "count": 37,
+            "sha256": "c63b1268c1d92e3b7c42ac68f1e6f8ac7b6cc273bb881cbbc53e561791c3687e"
+          },
+          "auth_login_limits": {
+            "count": 5,
+            "sha256": "b0d4c279a03bae985822344fa4da126c9dad5196ee6ce1c657027b3166236eb9"
+          },
+          "auth_sessions": {
+            "count": 5,
+            "sha256": "58573fac84320a0ec5cc942aa063cea65b4d936dd953d5d4f135fbd263d39c77"
+          },
+          "cycle_participants": {
+            "count": 1,
+            "sha256": "e588eef2e0e5510c58de4cdcbef3f8413155e1bb89999a4b8dcaa1d1cfbb3560"
+          },
+          "departments": {
+            "count": 1,
+            "sha256": "0b455748ef6f63ac2e9d70a88a1ad4fea6fb8dc765f1339bb64f07586554267c"
+          },
+          "employee_kpis": {
+            "count": 1,
+            "sha256": "2528476b254cf3942803f2f6a7f08ad6c53f040ddbe51fcc076e23d1f99bf112"
+          },
+          "employees": {
+            "count": 2,
+            "sha256": "ac8176d9d551bf585f54b598e358b78d5dc4a2bfdf9f79a80b00553c7dc4245e"
+          },
+          "feedback": {
+            "count": 2,
+            "sha256": "3f4e47079426f2c0f2cb38bb97b93ca5ae2e06d77c2d381274a4edd442db0428"
+          },
+          "feedback_assignments": {
+            "count": 2,
+            "sha256": "6792b71cb196bd6962b2d76d06f1efedfd140dcadeb586de194612b1c910e1a2"
+          },
+          "kpi_definitions": {
+            "count": 1,
+            "sha256": "228788674904e14f2faefbd22a88eb9175edb9d47b54c5f386721e497ee709dc"
+          },
+          "performance_review_revisions": {
+            "count": 2,
+            "sha256": "ae7407d07b1a301a089942579387568b91982f76905f22871f0de0d4676791a3"
+          },
+          "performance_reviews": {
+            "count": 1,
+            "sha256": "8069732a6c21c315c4c1a1c69b4b4a351152ce69b0e65e8d62e1068e7b858756"
+          },
+          "positions": {
+            "count": 1,
+            "sha256": "790a4bf3755acf1ace02d27723441c762d3b561e559ac3b22065e1852c86dce0"
+          },
+          "review_cycles": {
+            "count": 1,
+            "sha256": "ec6fe2d3dbea56352b87231a84970e1710114517b4ea4adcb94d7d0c20192edf"
+          },
+          "system_config": {
+            "count": 1,
+            "sha256": "03afdfd3eb8b0482816e9f17ff6a3ab9a177210c3ddebf3c71c3968c1dec88b4"
+          },
+          "users": {
+            "count": 5,
+            "sha256": "699b94b3e4313725c04eb14b16833ce7393ed68abce909651959af73059a3c01"
+          }
+        }
+      }
+    },
+    "recovery.json": {
+      "status": "passed",
+      "concurrent_deploy_denied": true,
+      "database_outage": {
+        "live": 200,
+        "ready": 503
+      },
+      "pg_pod_replacement": true,
+      "application_rollout": true,
+      "cluster_stop_start": true,
+      "read_before_rerunning_migrations": true,
+      "fingerprint": {
+        "head": "20261024_0008",
+        "tables": {
+          "ai_analyses": {
+            "count": 3,
+            "sha256": "5d9087fe5f1ae1cb584dd6a78593e98e9a5e87979cb58564406fabe6bdb6c396"
+          },
+          "audit_logs": {
+            "count": 35,
+            "sha256": "4eaf41a52f8c3f3e9f6cfdad06031ef6cfa2cc29a0a437aa6333d08f532b44e4"
+          },
+          "auth_login_limits": {
+            "count": 4,
+            "sha256": "7babf6245df540e401d52d0788e25eb40575f55b87ff55afbee3f393ac891a19"
+          },
+          "auth_sessions": {
+            "count": 4,
+            "sha256": "017ec6c3e0746403a5a4cebffc910f32c481139b64a0b61a898ec489649eb876"
+          },
+          "cycle_participants": {
+            "count": 1,
+            "sha256": "e588eef2e0e5510c58de4cdcbef3f8413155e1bb89999a4b8dcaa1d1cfbb3560"
+          },
+          "departments": {
+            "count": 1,
+            "sha256": "0b455748ef6f63ac2e9d70a88a1ad4fea6fb8dc765f1339bb64f07586554267c"
+          },
+          "employee_kpis": {
+            "count": 1,
+            "sha256": "2528476b254cf3942803f2f6a7f08ad6c53f040ddbe51fcc076e23d1f99bf112"
+          },
+          "employees": {
+            "count": 2,
+            "sha256": "ac8176d9d551bf585f54b598e358b78d5dc4a2bfdf9f79a80b00553c7dc4245e"
+          },
+          "feedback": {
+            "count": 2,
+            "sha256": "3f4e47079426f2c0f2cb38bb97b93ca5ae2e06d77c2d381274a4edd442db0428"
+          },
+          "feedback_assignments": {
+            "count": 2,
+            "sha256": "6792b71cb196bd6962b2d76d06f1efedfd140dcadeb586de194612b1c910e1a2"
+          },
+          "kpi_definitions": {
+            "count": 1,
+            "sha256": "228788674904e14f2faefbd22a88eb9175edb9d47b54c5f386721e497ee709dc"
+          },
+          "performance_review_revisions": {
+            "count": 2,
+            "sha256": "ae7407d07b1a301a089942579387568b91982f76905f22871f0de0d4676791a3"
+          },
+          "performance_reviews": {
+            "count": 1,
+            "sha256": "8069732a6c21c315c4c1a1c69b4b4a351152ce69b0e65e8d62e1068e7b858756"
+          },
+          "positions": {
+            "count": 1,
+            "sha256": "790a4bf3755acf1ace02d27723441c762d3b561e559ac3b22065e1852c86dce0"
+          },
+          "review_cycles": {
+            "count": 1,
+            "sha256": "ec6fe2d3dbea56352b87231a84970e1710114517b4ea4adcb94d7d0c20192edf"
+          },
+          "system_config": {
+            "count": 1,
+            "sha256": "03afdfd3eb8b0482816e9f17ff6a3ab9a177210c3ddebf3c71c3968c1dec88b4"
+          },
+          "users": {
+            "count": 4,
+            "sha256": "96a0726b4f50f5a5d3a6b4076b2c2f5fbac484fa1b5658bf20c516e196b3c327"
+          }
+        }
+      }
+    },
+    "tls-http.json": {
+      "status": "passed",
+      "chain_hostname_verified": true,
+      "host": "insighthr.test",
+      "secure_cookies": true,
+      "hsts_nonce": true,
+      "oversize": [
+        {
+          "chunked": false,
+          "status": 413
+        },
+        {
+          "chunked": true,
+          "status": 413
+        }
+      ],
+      "browser_tls_trust_tested": false
+    },
+    "failure-gates.json": {
+      "status": "passed",
+      "failed_migration_stops_before_rollout": true,
+      "expired_lease_active_job_denied": true,
+      "deployment_generation_unchanged": true
+    },
+    "validation.json": {
+      "status": "passed",
+      "tool": "kubectl server-side strict validation",
+      "objects": {
+        "local-http": 8,
+        "local-https": 8
+      }
+    },
+    "domain-before.json": {
+      "counts": {
+        "users": 13,
+        "employees": 8,
+        "departments": 2,
+        "positions": 2,
+        "review_cycles": 3,
+        "cycle_participants": 9,
+        "employee_kpis": 14,
+        "feedback_assignments": 19,
+        "feedback": 16,
+        "performance_reviews": 5,
+        "performance_review_revisions": 6,
+        "ai_analyses": 3,
+        "kpi_definitions": 2,
+        "system_config": 1
+      },
+      "sha256": "26e60bf40a5fb09f4b2561f671b5f2ae3ca4bab9d82ae785681dd9d995c45cf6"
+    },
+    "domain-after.json": {
+      "counts": {
+        "users": 13,
+        "employees": 8,
+        "departments": 2,
+        "positions": 2,
+        "review_cycles": 3,
+        "cycle_participants": 9,
+        "employee_kpis": 14,
+        "feedback_assignments": 19,
+        "feedback": 16,
+        "performance_reviews": 5,
+        "performance_review_revisions": 6,
+        "ai_analyses": 3,
+        "kpi_definitions": 2,
+        "system_config": 1
+      },
+      "sha256": "26e60bf40a5fb09f4b2561f671b5f2ae3ca4bab9d82ae785681dd9d995c45cf6"
+    },
+    "extra-checks.json": {
+      "status": "passed",
+      "invalid_archive_denied_source_unchanged": true,
+      "user_namespace_denied": true,
+      "wrong_head_ready503_live200": true
+    },
+    "linux-body-probes.json": [
+      {
+        "chunked": false,
+        "status": 413
+      },
+      {
+        "chunked": true,
+        "status": 413
+      }
+    ],
+    "practice_namespace_initialized": true
+  }
+}
