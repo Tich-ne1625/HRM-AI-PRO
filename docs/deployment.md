@@ -1,5 +1,11 @@
 # Deployment and operations
 
+## Current release: Phase 9
+
+Runtime `9821e82` passed [full CI](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/40109252558) (843 backend/140 web tests, quality/build/Docker smoke) and [isolated browser/upgrade/persistence CI](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/40109315010). Current migration head is **`20261024_0008`**. Sections below retain historical acceptance evidence; use the current head rather than an old revision mentioned in those sections.
+
+Run `docker compose --env-file .env up --build --wait` to upgrade without resetting data. The [Vietnamese operations guide](phase-9-operations.vi.md) documents request/login limits, expiry cleanup, nonce CSP/HSTS, role/session semantics, audit reads and exact isolated test commands. Defaults are compatible with existing `.env`; no extra runtime service/dependency or Gemini call is required. Read the [report](phase-9-report.vi.md) for the workload-specific performance baseline and remaining limitations. Kubernetes/production deployment is Phase 10.
+
 ## Phase 6 performance operations
 
 Accepted runtime `f595f23ca2c8a11605a833784bcf55648ee31712`: [InsightHR CI 39715137000](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/39715137000), backend/frontend/docker-smoke all success. Final logs show 767 backend tests without skips, Ruff/mypy clean (85 files), 104 web tests and clean lint/types/build. All 15 new concurrency/read-consistency/revalidation cases passed five local rounds. Both local acceptance stacks are stopped with their volumes retained.

@@ -8,7 +8,7 @@ The project is a modular monolith: a Next.js web application, a FastAPI backend,
 
 ## Current scope
 
-Phase 9 security/integration planning is prepared, with no runtime changes yet: [contract](docs/phase-9-contract.md), [eight-task plan](docs/superpowers/plans/2026-10-24-phase-9-security-integration.md). It targets authorization/session/cache boundaries, HTTP/login limits, transactional races, AI isolation, scoped audit reads, isolated browser E2E and measured performance. Phase 8 remains the accepted runtime baseline.
+Phases 1–9 are implemented and accepted. Phase 9 runtime `9821e82` passed [full CI](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/40109252558): **843 backend / 140 web tests**, quality/build and Docker smoke. [Isolated browser/persistence CI](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/40109315010) also passed. It adds session/cache fencing, request/login limits, security headers/CSP and a scoped audit reader. Five race rounds passed 145 tests each; the fictional 1,000-profile baseline completed 1,472 reads with zero errors. See the [Vietnamese report](docs/phase-9-report.vi.md), [operations guide](docs/phase-9-operations.vi.md), [contract](docs/phase-9-contract.md) and [completed plan](docs/superpowers/plans/2026-10-24-phase-9-security-integration.md). Phase 10 Kubernetes/docs is next.
 
 Phases 1–8 are implemented and accepted as of 2026-10-24. Final runtime `88700d8` passed [CI 40086271058](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/40086271058): **830 backend tests, 133 web tests**, Ruff/mypy (99 source files), lint/typecheck/build and Docker smoke/persistence. The workspace covers role-scoped organization, cycles, KPIs, feedback, scoring/history/finalization, optional AI advice, dashboards and saved advice listings. See the [Vietnamese Phase 8 report](docs/phase-8-report.vi.md).
 
@@ -16,7 +16,7 @@ Phase 7 is [offline CI-accepted](https://github.com/Tich-ne1625/HRM-AI-PRO/actio
 
 ## Performance workflow
 
-`/dashboard` is the default login destination: scoped metrics, valid-score samples/distribution, department snapshots, own feedback tasks and sanitized activity. `/ai-reports` lists saved successful generations with cycle/audience filters, pagination and explicit content access; HR_PRIVATE remains HR-only. The shared role-aware layout, keyboard-scrollable tables, focus management and mutation refresh flow are accepted. See the [contract](docs/phase-8-contract.md) and [completed plan](docs/superpowers/plans/2026-10-22-phase-8-dashboard.md). Phase 9 security/integration and Phase 10 Kubernetes/docs remain next.
+`/dashboard` is the default login destination: scoped metrics, valid-score samples/distribution, department snapshots, own feedback tasks and sanitized activity. `/ai-reports` lists saved successful generations with cycle/audience filters, pagination and explicit content access; HR_PRIVATE remains HR-only. The shared role-aware layout, keyboard-scrollable tables, focus management and mutation refresh flow are accepted. See the [contract](docs/phase-8-contract.md) and [completed plan](docs/superpowers/plans/2026-10-22-phase-8-dashboard.md). Phase 10 Kubernetes/docs remains next.
 
 A bounded live adapter probe with fictional numbers succeeded on `gemini-3.5-flash-lite` on 2026-10-22, validating all six output fields. This verifies connectivity/schema, not full live business acceptance or advice quality. Provider HTTP 404 now maps to `provider_model_unavailable`; raw provider errors and keys are never exposed.
 

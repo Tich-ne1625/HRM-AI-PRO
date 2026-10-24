@@ -9,7 +9,7 @@ Mốc kiểm kê 24/10/2026, baseline `88700d8`. Đây là review trực tiếp,
 | health/live, ready | Public; ready chỉ DB/migration, không Gemini | Không ghi | unit health, integration readiness, container contract |
 | auth/login | Public; Origin đúng, limiter trước Argon2 | Login tạo family/audit nguyên tử; không token JSON | auth_login, auth_mutations, auth_end_to_end |
 | auth/me, refresh/logout/password | Phiên còn hiệu lực, role/status hiện tại | Origin + CSRF family-bound; rotation/replay/revoke, absolute expiry | auth_me, auth_refresh, auth_mutations |
-| users GET/POST/PATCH | ADMIN; DTO user an toàn | ADMIN dưới lock, giữ ADMIN cuối; role/status revoke sessions | users_api, last_admin_concurrency |
+| users GET/POST/PATCH | ADMIN; DTO user an toàn | ADMIN dưới lock, giữ ADMIN cuối; role mới ở request sau, inactive thu hồi sessions | users_api, last_admin_concurrency |
 | departments/positions GET | HR toàn bộ; manager/self scope từ nhân viên hiện tại | HR create/update; reference active và mã duy nhất | organization_api/end_to_end/concurrency |
 | employees GET/detail | HR toàn bộ; MGR bản thân/direct reports; EMP bản thân | HR create/update/link; guard reporting tree và tài khoản liên quan | employees_api, organization_concurrency |
 | account lookup | HR; chỉ match được phép cho liên kết | Không ghi; không mở user listing cho HR | employees_api |
@@ -37,16 +37,18 @@ HR: create/update cho `department`, `position`, `employee`, `kpi_definition`, `r
 
 ## Finding ledger
 
-| ID | Bằng chứng / ảnh hưởng | Sửa và regression dự kiến | Trạng thái |
+Đóng ledger tại runtime `9821e82`: [full CI 843 backend/140 web tests](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/40109252558), [browser/persistence CI](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/40109315010). Chi tiết 5 lượt race, baseline và giới hạn trong [báo cáo](phase-9-report.vi.md); cách chạy lại trong [vận hành](phase-9-operations.vi.md). Review trực tiếp cùng tác giả, không phải review độc lập.
+
+| ID | Bằng chứng / ảnh hưởng | Sửa và regression đã kiểm tra | Trạng thái |
 | --- | --- | --- | --- |
-| P9-01 | API client chỉ có refresh generation, không chặn response của tài khoản cũ sau transition; nghi ngờ cross-session cache | Session epoch/abort và test deferred response/late refresh/logout | Đang kiểm chứng |
-| P9-02 | Nhiều list render query.data dù refetch lỗi; dữ liệu cũ/form có thể còn trên DOM sau mất quyền | Hide cached data on error; AuthProvider bỏ query/state khi identity/role đổi; tests revoked refetch | Đang kiểm chứng |
-| P9-03 | Error handler không đặt no-store trên mọi response lỗi | API boundary + error handler headers; test 401/403/404/422/429/500 | Đang kiểm chứng |
-| P9-04 | Không có body cap trước JSON parse/domain work | ASGI byte cap 128 KiB, chunked/missing header/forged length tests, 413 không ghi | Đang kiểm chứng |
-| P9-05 | Login không có hạn mức chung worker trước verify | PostgreSQL HMAC buckets + migration/cleanup; atomic reservation/expiry/503/no secret tests | Đang kiểm chứng |
-| P9-06 | Web chưa có CSP nonce/security headers tường minh | Per-request nonce, dynamic HTML, no unsafe-eval production; thực kiểm tra hydration qua browser | Đang kiểm chứng |
-| P9-07 | Kiến trúc có audit read API nhưng chưa có router ở baseline | Scoped projection API + count/UUID/action/entity/snapshot tests | Đang kiểm chứng |
-| P9-08 | Chưa có baseline đo tải 1.000 hồ sơ; UI Phase 8 chủ yếu đọc | Isolated E2E có ghi + upgrade/persistence + 5 race rounds + benchmark có cấu hình/counts | Chưa nghiệm thu |
+| P9-01 | API client chỉ có refresh generation, không chặn response của tài khoản cũ sau transition; nghi ngờ cross-session cache | Session epoch/abort và test deferred response/late refresh/logout | Đã sửa; regression/CI đạt |
+| P9-02 | Nhiều list render query.data dù refetch lỗi; dữ liệu cũ/form có thể còn trên DOM sau mất quyền | Hide cached data on error; AuthProvider bỏ query/state khi identity/role đổi; tests revoked refetch | Đã sửa; regression/CI đạt |
+| P9-03 | Error handler không đặt no-store trên mọi response lỗi | API boundary + error handler headers; test 401/403/404/422/429/500 | Đã sửa; regression/CI đạt |
+| P9-04 | Không có body cap trước JSON parse/domain work | ASGI byte cap 128 KiB, chunked/missing header/forged length tests, 413 không ghi | Đã sửa; regression/CI đạt |
+| P9-05 | Login không có hạn mức chung worker trước verify | PostgreSQL HMAC buckets + migration/cleanup; atomic reservation/expiry/503/no secret tests | Đã sửa; regression/CI đạt |
+| P9-06 | Web chưa có CSP nonce/security headers tường minh | Per-request nonce, dynamic HTML, no unsafe-eval production; thực kiểm tra hydration qua browser | Đã sửa; regression/CI đạt |
+| P9-07 | Kiến trúc có audit read API nhưng chưa có router ở baseline | Scoped projection API + count/UUID/action/entity/snapshot tests | Đã sửa; regression/CI đạt |
+| P9-08 | Chưa có baseline đo tải 1.000 hồ sơ; UI Phase 8 chủ yếu đọc | Isolated E2E có ghi + upgrade/persistence + 5 race rounds + benchmark có cấu hình/counts | Đã nghiệm thu; xem báo cáo Phase 9 |
 
 ## Thay đổi vận hành được chọn
 

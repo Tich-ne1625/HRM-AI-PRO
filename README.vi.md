@@ -8,7 +8,7 @@ Dự án sử dụng kiến trúc modular monolith gồm ứng dụng web Next.j
 
 ## Trạng thái hiện tại
 
-**Phases 1–8 đã triển khai và nghiệm thu**, cập nhật ngày 24/10/2026. Hiện có:
+**Phases 1–9 đã triển khai và nghiệm thu**, cập nhật ngày 24/10/2026. Hiện có:
 
 - Đăng nhập, phân quyền ADMIN / HR / quản lý / nhân viên.
 - Hồ sơ, phòng ban/chức danh, chu kỳ, KPI và phản hồi 360.
@@ -16,8 +16,9 @@ Dự án sử dụng kiến trúc modular monolith gồm ứng dụng web Next.j
 - Tư vấn Gemini có xác nhận; danh sách tư vấn đã lưu và nội dung riêng HR.
 - Dashboard theo role, hoạt động gần đây và giao diện có header/menu trái dùng được trên desktop/mobile.
 - Bộ demo để thực hành đủ các role; Docker giữ dữ liệu sau khi khởi động lại.
+- Giới hạn đăng nhập/request, bảo vệ phiên/cache, CSP và API audit theo quyền.
 
-[CI cuối Phase 8](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/40086271058) tại runtime `88700d8` đạt **830 test backend, 133 test web**, Ruff/mypy, lint/typecheck/build và Docker smoke/persistence. Xem [báo cáo Phase 8 bằng tiếng Việt](docs/phase-8-report.vi.md). Công đoạn tiếp theo là Phase 9 bảo mật/tích hợp; Phase 10 là Kubernetes và tài liệu triển khai.
+[CI Phase 9](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/40109252558) tại runtime `9821e82` đạt **843 test backend, 140 test web**, Ruff/mypy, lint/typecheck/build và Docker smoke/persistence. [Nghiệm thu trình duyệt riêng](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/40109315010) cũng đạt; 5 lượt race đều 145/145. Xem [báo cáo Phase 9](docs/phase-9-report.vi.md) và [cấu hình/cách chạy lại](docs/phase-9-operations.vi.md). Công đoạn tiếp theo là **Phase 10 — Kubernetes và tài liệu triển khai**.
 
 ## Chạy và xem nhanh
 
@@ -287,9 +288,9 @@ Lệnh build lại và áp head hiện tại `20261022_0006`; chức năng chu k
 
 ## Các phase tiếp theo
 
-**Phase 9 đã có kế hoạch, chưa triển khai:** xem [hợp đồng bảo mật/tích hợp](docs/phase-9-contract.md) và [kế hoạch 8 task](docs/superpowers/plans/2026-10-24-phase-9-security-integration.md). Trọng tâm: ma trận phân quyền, phiên/cache, HTTP và giới hạn đăng nhập/request, tính nguyên tử/race, AI isolation, API đọc audit, E2E cô lập và baseline hiệu năng. Đây là kế hoạch, không phải kết quả kiểm thử mới; không thay `.env` hoặc dữ liệu demo.
+**Phase 9 đã hoàn thành 8 task:** xem [báo cáo nghiệm thu](docs/phase-9-report.vi.md), [hợp đồng bảo mật/tích hợp](docs/phase-9-contract.md) và [kế hoạch](docs/superpowers/plans/2026-10-24-phase-9-security-integration.md). Đã bổ sung giới hạn đăng nhập/request, session/cache fencing, security headers/CSP và API audit; nghiệm thu E2E có ghi, upgrade/persistence, race và baseline 1.000 hồ sơ bằng dữ liệu giả. Không thay `.env` hoặc đặt lại dữ liệu demo.
 
-Phases 1–8 đã hoàn tất theo các hợp đồng/kế hoạch tương ứng. Công đoạn tiếp theo theo kiến trúc là **Phase 9 — bảo mật và tích hợp**, rồi **Phase 10 — Kubernetes và tài liệu triển khai**. Xem [báo cáo Phase 8](docs/phase-8-report.vi.md) để biết phạm vi đã kiểm tra và giới hạn còn lại.
+Phases 1–9 đã hoàn tất theo các hợp đồng/kế hoạch tương ứng. Công đoạn tiếp theo theo kiến trúc là **Phase 10 — Kubernetes và tài liệu triển khai**. Xem [báo cáo Phase 9](docs/phase-9-report.vi.md) để biết phạm vi đã kiểm tra và giới hạn còn lại.
 
 Phase 5 hoàn tất theo [kế hoạch 8 task](docs/superpowers/plans/2026-10-20-phase-5-feedback.md) và [hợp đồng](docs/phase-5-contract.md); runtime `bf04fe2` đã qua đầy đủ CI. Năm lượt test cạnh tranh đều đạt 26/26. Giới hạn bảo mật và account lịch sử được mô tả trong hướng dẫn dưới đây.
 

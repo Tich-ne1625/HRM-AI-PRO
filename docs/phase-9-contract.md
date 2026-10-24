@@ -1,6 +1,6 @@
 # Hợp đồng Phase 9 — Bảo mật và tích hợp
 
-Ngày lập: **24/10/2026**. Trạng thái: **kế hoạch, chưa triển khai hoặc nghiệm thu Phase 9**.
+Ngày lập: **24/10/2026**. Trạng thái: **đã triển khai và nghiệm thu** tại runtime `9821e82`; kết quả, CI và giới hạn trong [báo cáo Phase 9](phase-9-report.vi.md).
 
 Đầu vào: runtime Phase 8 `88700d8`, tài liệu `758e93a`, [CI đã đạt](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/40086271058) với 830 test backend và 133 test web. Xem [kiến trúc](architecture.md), [báo cáo Phase 8](phase-8-report.vi.md), [kế hoạch thực hiện](superpowers/plans/2026-10-24-phase-9-security-integration.md).
 

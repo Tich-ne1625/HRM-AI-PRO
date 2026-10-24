@@ -1,5 +1,11 @@
 # Database design status
 
+## Current head: Phase 9 login reservations
+
+Revision `20261024_0008` (parent `20261022_0007`) adds only `auth_login_limits`: `bucket_key VARCHAR(64)` primary key constrained to lowercase hex, positive integer `attempts`, non-null timezone-aware `expires_at` with an expiry index. The key is a domain-separated HMAC of normalized email, never a raw email. Reservations use atomic PostgreSQL upsert and database statement time, committed before password work. Counts saturate at configured cap+1; an expired window resets on the next attempt.
+
+The bounded TTL cleanup CLI deletes only expired rows with SKIP LOCKED. There is no background cleanup or foreign-key coupling to users/sessions. Downgrade drops only the new limiter table. [Phase 9 acceptance](phase-9-report.vi.md) verifies all old tables/columns across 0007/0008 roundtrip and PostgreSQL restart, including existing AI/revisions; no domain evidence or password backfill.
+
 ## Phase 6 performance schema
 
 Revision `20261022_0006` introduces `performance_reviews` and `performance_review_revisions`, with no score backfill. The header has a UNIQUE participant FK; history has UNIQUE(review_id,calculation_version). FKs use RESTRICT. Both store calculation/evidence versions, numeric engine version, a 64-character canonical SHA-256 evidence hash, exact NUMERIC(20,2) nonnegative finite scores, object JSONB evidence/policy snapshots and a UTC calculation timestamp. The header also has created/updated/finalized timestamps. Each calculation inserts an immutable revision, including version 1; no revision mutation endpoint exists.

@@ -1,6 +1,6 @@
 # Kế hoạch Phase 9 — Bảo mật và tích hợp
 
-Ngày lập: **24/10/2026**. Trạng thái: **chưa triển khai**. Kế thừa Phase 8 runtime `88700d8`, docs `758e93a`, [CI baseline](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/40086271058): 830 backend/133 web tests. Không coi đây là số test nghiệm thu Phase 9.
+Ngày lập: **24/10/2026**. Trạng thái: **hoàn thành 8/8 task**, runtime `9821e82`; xem [báo cáo nghiệm thu](../../phase-9-report.vi.md), [full CI](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/40109252558) và [browser/persistence CI](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/40109315010). Kế thừa Phase 8 runtime `88700d8`, docs `758e93a`, [CI baseline](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/40086271058): 830 backend/133 web tests. Không coi đây là số test nghiệm thu Phase 9.
 
 Đọc [hợp đồng Phase 9](../../phase-9-contract.md), [báo cáo Phase 8](../../phase-8-report.vi.md), [kiến trúc](../../architecture.md) trước khi code. Làm tuần tự các task có phụ thuộc; không giao nhiều tiến trình integration cùng sử dụng một database `_test`.
 

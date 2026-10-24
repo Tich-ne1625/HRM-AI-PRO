@@ -1,5 +1,13 @@
 # API contract
 
+## Security boundaries and audit reads (Phase 9)
+
+All `/api/v1/` responses, including errors, use no-store. The API reads and bounds actual body bytes before domain processing (default 131072); excess returns 413 `request_too_large`, including chunked/forged-length ASGI requests. Same-origin/CSRF and SQL role/resource checks remain authoritative.
+
+Login reserves a shared PostgreSQL HMAC-email bucket before password verification. Defaults: 10 attempts per 300 seconds, counting success/failure; expired windows reset atomically. Exhaustion returns 429 `login_rate_limited` plus `Retry-After`; storage failure returns 503 `login_temporarily_unavailable`. Responses do not disclose whether the email exists. See [operations/configuration](phase-9-operations.vi.md).
+
+`GET /api/v1/audit-logs?page=1&page_size=20&action=<optional>` permits ADMIN/HR only; anonymous 401, other roles 403. Page >=1, page_size 1–100, action length 1–100. Response is `{items,total,page,page_size}`; each item has only `{id,action,entity_type,entity_id,created_at}`. The exact role-specific [action/entity allowlist](phase-9-security-matrix.md) is applied before count, with REPEATABLE READ and created_at/UUID descending. Unknown/out-of-scope action returns an empty page; no auth/password/AI events, actor, request ID or raw metadata. No audit mutation/export endpoints are introduced.
+
 ## Dashboard and saved advice (Phase 8)
 
 `GET /api/v1/ai-reports?audience=PUBLIC&cycle_id=<optional>&page=1&page_size=20` lists SUCCEEDED generations only. It returns scoped metadata, not analysis output. HR_PRIVATE is HR-only and rejected before count; ADMIN is forbidden. Employee scope is applied in SQL before count/offset/limit, DRAFT is excluded, and count/items use REPEATABLE READ. Sort is generated_at/UUID descending. The `matches_current_calculation` flag compares calculation/hash plus current/finalized validity; it does not mean latest generation. Use existing `/reviews/{review_id}/ai-analyses/{id}` for explicit content access.

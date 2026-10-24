@@ -1,0 +1,435 @@
+{
+  "note": "Fictional isolated local acceptance; final commit also verified by linked CI workflows.",
+  "runtime_commit": "9821e82e17dede2d74682909560bfe5c2a6a0f83",
+  "core_ci": "https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/40109252558",
+  "browser_ci": "https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/40109315010",
+  "artifact_id": 12564899906,
+  "races": [
+    {
+      "round": 1,
+      "returncode": 0,
+      "passed": 145
+    },
+    {
+      "round": 2,
+      "returncode": 0,
+      "passed": 145
+    },
+    {
+      "round": 3,
+      "returncode": 0,
+      "passed": 145
+    },
+    {
+      "round": 4,
+      "returncode": 0,
+      "passed": 145
+    },
+    {
+      "round": 5,
+      "returncode": 0,
+      "passed": 145
+    }
+  ],
+  "benchmark": {
+    "fixture": "fictional, exact scoring/evidence collected before measurement; no Gemini",
+    "scope": "in-process TestClient API + real PostgreSQL; excludes proxy/network/browser",
+    "commit": "d5e7b213105ec80ffcdd3f79b7a65e41b71b89c6",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python": "3.12.10",
+    "logical_cpus": 8,
+    "seconds": 60,
+    "clients": 5,
+    "errors": 0,
+    "counts": {
+      "employees": 1000,
+      "departments": 20,
+      "review_cycles": 2,
+      "cycle_participants": 1998,
+      "employee_kpis": 9990,
+      "feedback": 5994,
+      "ai_analyses": 3996,
+      "audit_logs": 3008
+    },
+    "requests": 1472,
+    "scenarios": {
+      "hr-dashboard": {
+        "requests": 133,
+        "p50_ms": 240.95,
+        "p95_ms": 403.18,
+        "max_ms": 811.53,
+        "max_sql_queries": 11
+      },
+      "hr-closed": {
+        "requests": 134,
+        "p50_ms": 235.55,
+        "p95_ms": 424.74,
+        "max_ms": 800.13,
+        "max_sql_queries": 11
+      },
+      "manager-dashboard": {
+        "requests": 135,
+        "p50_ms": 238.52,
+        "p95_ms": 426.06,
+        "max_ms": 728.12,
+        "max_sql_queries": 11
+      },
+      "employee-dashboard": {
+        "requests": 134,
+        "p50_ms": 202.11,
+        "p95_ms": 369.56,
+        "max_ms": 557.03,
+        "max_sql_queries": 11
+      },
+      "hr-ai-first": {
+        "requests": 135,
+        "p50_ms": 175.92,
+        "p95_ms": 316.09,
+        "max_ms": 470.22,
+        "max_sql_queries": 5
+      },
+      "hr-ai-page10": {
+        "requests": 135,
+        "p50_ms": 172.33,
+        "p95_ms": 278.03,
+        "max_ms": 385.7,
+        "max_sql_queries": 5
+      },
+      "hr-private": {
+        "requests": 135,
+        "p50_ms": 176.77,
+        "p95_ms": 277.69,
+        "max_ms": 464.81,
+        "max_sql_queries": 5
+      },
+      "manager-ai": {
+        "requests": 134,
+        "p50_ms": 168.72,
+        "p95_ms": 267.12,
+        "max_ms": 631.9,
+        "max_sql_queries": 5
+      },
+      "employee-ai": {
+        "requests": 133,
+        "p50_ms": 142.77,
+        "p95_ms": 256.76,
+        "max_ms": 324.73,
+        "max_sql_queries": 5
+      },
+      "admin-audit": {
+        "requests": 132,
+        "p50_ms": 144.16,
+        "p95_ms": 261.58,
+        "max_ms": 596.98,
+        "max_sql_queries": 5
+      },
+      "hr-audit-page10": {
+        "requests": 132,
+        "p50_ms": 152.3,
+        "p95_ms": 277.19,
+        "max_ms": 631.96,
+        "max_sql_queries": 5
+      }
+    }
+  },
+  "http": [
+    {
+      "chunked": false,
+      "bytes": 131073,
+      "status": 413
+    },
+    {
+      "chunked": true,
+      "bytes": 131073,
+      "status": 413
+    }
+  ],
+  "local_persistence": {
+    "status": "passed",
+    "head": "20261024_0008",
+    "roundtrip_0007_0008": true,
+    "postgres_only_restart_read_before_migration": true,
+    "scope": "all columns of all pre-Phase-9 ORM tables; auth_login_limits excluded",
+    "tables": {
+      "ai_analyses": {
+        "count": 3,
+        "sha256": "d31dce72005ceb9a188d52e44ab65f057152acd38ac2e3b954da55d6283e01e8"
+      },
+      "audit_logs": {
+        "count": 35,
+        "sha256": "00206fe1e90804eecbfc7ae1e5a177bfc7f5e530dd4317b289816ca89e979891"
+      },
+      "auth_sessions": {
+        "count": 4,
+        "sha256": "6034e15e31718925d6e4c95e8c0ae2e550f0a4bc9c54903a7f681a146280248a"
+      },
+      "cycle_participants": {
+        "count": 1,
+        "sha256": "f937dcb3104cda95b64e25f0046a515cc2cbd67f59e3bd512a52f4196c4a48ae"
+      },
+      "departments": {
+        "count": 1,
+        "sha256": "144f1f896e794982c48aad1a30b41c073c24a70e38a7c144221290d6c4ea22b7"
+      },
+      "employee_kpis": {
+        "count": 1,
+        "sha256": "2cd69bca05cde3097c282aa48d6f99712437ffc72c814486884ade29d078d3ec"
+      },
+      "employees": {
+        "count": 2,
+        "sha256": "f57741a509635ab2603eaa9cc08bf42ca71d642c5219f83397787c44deede8dd"
+      },
+      "feedback": {
+        "count": 2,
+        "sha256": "e48bde2050b083024163abbf85c534971982a7877b55326f95e7ee01136ab965"
+      },
+      "feedback_assignments": {
+        "count": 2,
+        "sha256": "19a502a4108e8d72a73de0df87ccfd857046d2bef5efef25b8e4e00c872496da"
+      },
+      "kpi_definitions": {
+        "count": 1,
+        "sha256": "97af8bb6fde5481a04186966812703d990da569689a1e9f653830793ea733404"
+      },
+      "performance_review_revisions": {
+        "count": 2,
+        "sha256": "3d62abd333bcdf845dfd9661d83c2d1145e629f3a83c174f0c2d54fa1f2cf97d"
+      },
+      "performance_reviews": {
+        "count": 1,
+        "sha256": "1df04e15b6df9f11d4b64722862df75af85167440eadfa06c25704242d239521"
+      },
+      "positions": {
+        "count": 1,
+        "sha256": "3a160ee79f18c1779c2107399c6b2287fb8a4797381da2cc9b187bf349c3c3b7"
+      },
+      "review_cycles": {
+        "count": 1,
+        "sha256": "4b5ab656af92789fb8b219b6146cccf294006aa5d748051333e3ecd5d29c71a3"
+      },
+      "system_config": {
+        "count": 1,
+        "sha256": "d56305ddc2cef6512ca3275c3ec0771489bb9a080179829e7e64e908c8eca7c6"
+      },
+      "users": {
+        "count": 4,
+        "sha256": "75bf23682686fa26b153987088c23d1efaf8dfd849ab4b9ea0584777c77277c4"
+      }
+    }
+  },
+  "ci_browser": {
+    "status": "passed",
+    "roles": [
+      "ADMIN",
+      "HR",
+      "MANAGER",
+      "EMPLOYEE"
+    ],
+    "form_writes": true,
+    "numeric_before": "87.00",
+    "numeric_final": "80.00",
+    "closed_sample_size": 1,
+    "offline_ai_generations": 3,
+    "live_gemini_calls": 0,
+    "quota_preserves_success": true,
+    "private_uuid_denied": true,
+    "revoked_session_denied": true,
+    "demoted_role_applied_without_logout": true,
+    "widths": [
+      1280,
+      390
+    ],
+    "runtime_exceptions": 0,
+    "nonce_csp_hydrates": true,
+    "writes": [
+      {
+        "method": "POST",
+        "path": "/api/v1/auth/login",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/users",
+        "status": 201
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/users",
+        "status": 201
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/users",
+        "status": 201
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/auth/login",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/departments",
+        "status": 201
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/positions",
+        "status": 201
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/employees",
+        "status": 201
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/employees",
+        "status": 201
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/review-cycles",
+        "status": 201
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/review-cycles/3493c6e1-5dc9-4c08-9b08-b279cd2fdc03/participants",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/review-cycles/3493c6e1-5dc9-4c08-9b08-b279cd2fdc03/activate",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/review-cycles/3493c6e1-5dc9-4c08-9b08-b279cd2fdc03/close",
+        "status": 409
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/kpis",
+        "status": 201
+      },
+      {
+        "method": "PUT",
+        "path": "/api/v1/employees/90128796-2701-48d5-b739-35552975bd9d/kpis",
+        "status": 200
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/employee-kpis/21f84712-d399-4e42-9eeb-123d5fbbf3cd",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/feedback-assignments",
+        "status": 201
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/feedback-assignments",
+        "status": 201
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/auth/login",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/feedback",
+        "status": 201
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/auth/login",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/feedback",
+        "status": 201
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/performance/90128796-2701-48d5-b739-35552975bd9d/calculate",
+        "status": 201
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/employee-kpis/21f84712-d399-4e42-9eeb-123d5fbbf3cd",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/performance/90128796-2701-48d5-b739-35552975bd9d/calculate",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/reviews/7ef5ca35-0470-4734-ab5e-6f5c16c0f5c8/finalize",
+        "status": 200
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/performance/7ef5ca35-0470-4734-ab5e-6f5c16c0f5c8/ai-analysis",
+        "status": 201
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/performance/7ef5ca35-0470-4734-ab5e-6f5c16c0f5c8/ai-analysis",
+        "status": 201
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/performance/7ef5ca35-0470-4734-ab5e-6f5c16c0f5c8/ai-analysis",
+        "status": 503
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/review-cycles/3493c6e1-5dc9-4c08-9b08-b279cd2fdc03/close",
+        "status": 200
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/users/a65e5727-933e-4035-abbd-bffb673fe93d",
+        "status": 200
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/v1/users/a65e5727-933e-4035-abbd-bffb673fe93d",
+        "status": 200
+      }
+    ],
+    "browser": "Chrome/155.0.8059.39",
+    "commit": "9821e82e17dede2d74682909560bfe5c2a6a0f83"
+  },
+  "local_deployment": {
+    "status": "healthy",
+    "user_domain_unchanged": true,
+    "fingerprint_scope": "User id/email/role/is_active plus all columns of organization/cycle/KPI/feedback/performance/AI/config; excludes auth_sessions/audit/password hashes",
+    "counts": {
+      "users": 13,
+      "employees": 8,
+      "departments": 2,
+      "positions": 2,
+      "review_cycles": 3,
+      "cycle_participants": 9,
+      "employee_kpis": 14,
+      "feedback_assignments": 19,
+      "feedback": 16,
+      "performance_reviews": 5,
+      "performance_review_revisions": 6,
+      "ai_analyses": 3,
+      "kpi_definitions": 2,
+      "system_config": 1
+    },
+    "sha256": "26e60bf40a5fb09f4b2561f671b5f2ae3ca4bab9d82ae785681dd9d995c45cf6"
+  },
+  "runtime_route_inventory": {
+    "operations": 64,
+    "matches_local_openapi": true
+  }
+}
