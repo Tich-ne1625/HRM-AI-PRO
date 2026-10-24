@@ -11,6 +11,16 @@ def main():
     t = Target()
     pods = t.json("get", "pods")["items"]
     client = json.loads(run(["kubectl", "version", "--client", "-o", "json"]))
+    server = t.json("get", "node", "k3d-insighthr-phase10-server-0")["status"][
+        "nodeInfo"
+    ]["kubeletVersion"]
+    assert (
+        abs(
+            int(client["clientVersion"]["minor"].rstrip("+"))
+            - int(server.split(".")[1])
+        )
+        <= 1
+    ), "Unsupported kubectl/server version skew"
     t.report(
         "runtime.json",
         {
