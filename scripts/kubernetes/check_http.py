@@ -6,6 +6,7 @@ import http.client
 import json
 import socket
 import ssl
+import time
 from datetime import UTC, datetime, timedelta
 
 from common import OUT, Target
@@ -82,10 +83,20 @@ class LocalTLS(http.client.HTTPSConnection):
 
 def check(t, ca):
     context = ssl.create_default_context(cafile=str(ca))
-    connection = LocalTLS("insighthr.test", 13443, context=context, timeout=15)
-    connection.request("GET", "/login")
-    response = connection.getresponse()
-    response.read()
+    for _ in range(30):
+        connection = LocalTLS("insighthr.test", 13443, context=context, timeout=15)
+        try:
+            connection.request("GET", "/login")
+            response = connection.getresponse()
+            response.read()
+            if response.status == 200:
+                break
+        except (ssl.SSLError, OSError):
+            pass  # Certificate verification remains enabled on every attempt.
+        connection.close()
+        time.sleep(1)
+    else:
+        raise RuntimeError("Verified TLS ingress did not become ready")
     assert response.status == 200
     assert response.getheader("Strict-Transport-Security") == "max-age=31536000"
     assert "'nonce-" in response.getheader("Content-Security-Policy", "")
@@ -93,7 +104,7 @@ def check(t, ca):
     # HTTP ingress + Next proxy enforce real byte counts before JSON parsing.
     results = []
     for chunked in [False, True]:
-        c = http.client.HTTPConnection("localhost", 13010, timeout=15)
+        c = LocalTLS("insighthr.test", 13443, context=context, timeout=15)
         body = b"x" * 131073
         c.request(
             "POST",
