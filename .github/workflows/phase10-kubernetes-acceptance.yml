@@ -40,6 +40,8 @@ jobs:
         run: python scripts/kubernetes/check_recovery.py --release phase10-${{ github.sha }}
       - name: Verified TLS cookies and proxy boundaries
         run: python scripts/kubernetes/check_http.py --release phase10-${{ github.sha }}
+      - name: Record actual versions and image identities
+        run: python scripts/kubernetes/status_report.py
       - name: Upload sanitized evidence only
         if: always()
         uses: actions/upload-artifact@v4
@@ -52,6 +54,7 @@ jobs:
             .superpowers/sdd/phase-10/recovery.json
             .superpowers/sdd/phase-10/restore.json
             .superpowers/sdd/phase-10/tls-http.json
+            .superpowers/sdd/phase-10/runtime.json
             .superpowers/sdd/phase-10/browser/report.json
             .superpowers/sdd/phase-10/browser/*.png
             .superpowers/sdd/phase-10/browser/failure.txt

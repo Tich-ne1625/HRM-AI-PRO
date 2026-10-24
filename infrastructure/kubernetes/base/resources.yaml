@@ -236,7 +236,7 @@ spec:
           type: RuntimeDefault
       containers:
       - name: postgres
-        image: postgres:16.15-bookworm
+        image: postgres:16.15-bookworm@sha256:d81f7b51697014367236d07ec58b54153fc28f828b72bf247fe5c7487520bcb0
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:

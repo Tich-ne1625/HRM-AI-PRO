@@ -1,1 +1,11 @@
-{"k3d":"v5.8.3","k3s":"v1.35.5-k3s1","postgres":"16.15-bookworm","pyyaml":"6.0.3","api_service":"http://api:8000"}
+{
+  "k3d": "v5.8.3",
+  "k3s": "v1.35.5-k3s1",
+  "postgres": "16.15-bookworm",
+  "pyyaml": "6.0.3",
+  "api_service": "http://api:8000",
+  "postgres_image_id": "docker.io/library/postgres@sha256:d81f7b51697014367236d07ec58b54153fc28f828b72bf247fe5c7487520bcb0",
+  "kubectl_local": "v1.36.1",
+  "cryptography": "50.0.2",
+  "websockets": "16.0"
+}

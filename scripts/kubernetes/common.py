@@ -36,7 +36,14 @@ def run(args, *, body=None, binary=False, timeout=300):
 
 
 def k3d():
-    return shutil.which("k3d") or str(ROOT / ".superpowers/tools/k3d.exe")
+    return shutil.which("k3d") or str(
+        ROOT
+        / (
+            ".superpowers/tools/k3d.exe"
+            if os.name == "nt"
+            else ".superpowers/tools/k3d"
+        )
+    )
 
 
 class Target:
