@@ -270,6 +270,8 @@ spec:
           exec:
             command:
             - pg_isready
+            - -h
+            - 127.0.0.1
             - -U
             - insighthr
             - -d
@@ -280,6 +282,8 @@ spec:
           exec:
             command:
             - pg_isready
+            - -h
+            - 127.0.0.1
             - -U
             - insighthr
             - -d

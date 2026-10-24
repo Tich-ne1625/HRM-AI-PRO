@@ -58,6 +58,7 @@ jobs:
             .superpowers/sdd/phase-10/restore.json
             .superpowers/sdd/phase-10/tls-http.json
             .superpowers/sdd/phase-10/runtime.json
+            .superpowers/sdd/phase-10/migration-failure.json
             .superpowers/sdd/phase-10/browser/report.json
             .superpowers/sdd/phase-10/browser/*.png
             .superpowers/sdd/phase-10/browser/failure.txt

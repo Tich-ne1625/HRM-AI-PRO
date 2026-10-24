@@ -2,7 +2,9 @@
 
 import argparse
 import json
+import re
 import secrets
+import subprocess
 import threading
 import time
 from datetime import UTC, datetime, timedelta
@@ -192,6 +194,55 @@ def migrate(t, release, lease):
         lease.check()
         status = t.json("get", "job", name).get("status", {})
         if status.get("failed"):
+            pods = t.json("get", "pods", "-l", "job-name=" + name)["items"]
+            diagnostics = []
+            for pod in pods:
+                diagnostics.append(
+                    {
+                        "phase": pod.get("status", {}).get("phase"),
+                        "containers": [
+                            {
+                                "name": c["name"],
+                                "restarts": c.get("restartCount"),
+                                "waiting_reason": c.get("state", {})
+                                .get("waiting", {})
+                                .get("reason"),
+                                "termination_reason": c.get("state", {})
+                                .get("terminated", {})
+                                .get("reason"),
+                                "exit_code": c.get("state", {})
+                                .get("terminated", {})
+                                .get("exitCode"),
+                            }
+                            for c in pod.get("status", {}).get("containerStatuses", [])
+                        ],
+                    }
+                )
+            try:
+                logs = t.call("logs", "job/" + name, "--tail=120", timeout=10)
+                classes = sorted(
+                    set(
+                        re.findall(
+                            r"\b(?:OperationalError|ValidationError|CommandError|ProgrammingError|ModuleNotFoundError|PermissionError|TimeoutError|InvalidPassword|InsufficientPrivilege)\b",
+                            logs,
+                        )
+                    )
+                )
+            except (RuntimeError, subprocess.TimeoutExpired):
+                classes = ["logs-unavailable"]
+            t.report(
+                "migration-failure.json",
+                {
+                    "job": name,
+                    "namespace": t.namespace,
+                    "exception_classes": classes,
+                    "conditions": [
+                        {k: c.get(k) for k in ["type", "status", "reason"]}
+                        for c in status.get("conditions", [])
+                    ],
+                    "pods": diagnostics,
+                },
+            )
             raise RuntimeError(
                 "Migration failed; rollout stopped (inspect sanitized Job status)"
             )
