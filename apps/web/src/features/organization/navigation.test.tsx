@@ -43,3 +43,11 @@ it("keeps employee evaluation pages in the cycle workflow on the left", () => {
   expect(screen.getByRole("link", { name: "Chu kỳ đánh giá" }).getAttribute("aria-current")).toBe("page");
   expect(screen.getByRole("link", { name: "Nhân viên" }).getAttribute("aria-current")).toBeNull();
 });
+it("keeps saved AI advice in evaluation navigation and hides it from ADMIN", () => {
+  state.path = "/ai-reports";
+  const view = render(<><WorkspaceHeader /><WorkspaceNavigation /></>);
+  expect(screen.getByRole("link", { name: "Đánh giá hiệu suất" }).getAttribute("aria-current")).toBe("location");
+  expect(screen.getByRole("link", { name: "Tư vấn AI đã lưu" }).getAttribute("aria-current")).toBe("page");
+  state.role = "ADMIN"; view.rerender(<><WorkspaceHeader /><WorkspaceNavigation /></>);
+  expect(screen.queryByRole("link", { name: "Tư vấn AI đã lưu" })).toBeNull();
+});

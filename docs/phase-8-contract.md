@@ -26,3 +26,24 @@ Phase 8 chia thành các phần kiểm chứng riêng:
 3. Rà soát UX toàn bộ màn hình, kiểm thử trình duyệt và nghiệm thu tích hợp.
 
 Chỉ đánh dấu hoàn thành Phase 8 khi cả ba phần đạt kiểm tra. Dữ liệu demo hiện có (10 tài khoản, 8 hồ sơ, 2 phòng ban, 3 chu kỳ) được giữ nguyên; không tự đặt lại tiến độ thực hành.
+
+## Danh sách tư vấn đã lưu
+
+`GET /api/v1/ai-reports?audience=PUBLIC&cycle_id=<optional>&page=1&page_size=20` chỉ dành cho HR/MANAGER/EMPLOYEE. ADMIN nhận 403; HR_PRIVATE kiểm tra HR trước mọi truy vấn/count. Dùng quyền nhân viên hiện tại và loại chu kỳ DRAFT ngay trong SQL. Chu kỳ chỉ định ngoài quyền hoặc không tồn tại đều trả 404. Không chỉ định chu kỳ thì tổng là tổng trong phạm vi được phép.
+
+Chỉ liệt kê SUCCEEDED, mỗi dòng là một lần tạo, không phải mỗi người. Sắp xếp `generated_at DESC, id DESC`; page >= 1, page_size 1–100; tổng và trang thuộc cùng snapshot REPEATABLE READ. Projection chỉ có ID tư vấn/báo cáo/nhân viên/chu kỳ, tên snapshot, phạm vi, phiên bản, model, thời điểm và cờ `matches_current_calculation`. Không nạp output, nhận xét, hash, người yêu cầu hoặc mã idempotency vào danh sách. Cờ khớp đòi hỏi đúng lần tính/hash và kết quả hiện hành hoặc đã chốt; nhiều thế hệ cùng bằng chứng có thể cùng khớp, không gọi đó là “mới nhất”.
+
+Mở nội dung dùng lại endpoint chi tiết có phân quyền của Phase 7 và renderer React hiện có. Tư vấn cũ có nhãn lịch sử. Chuyển bộ lọc trả về trang 1 và đóng nội dung; chuyển role tạo lại state phù hợp. Không gọi Gemini từ danh sách, tải lại hoặc mở nội dung. Bộ lọc chu kỳ dùng API hiện có, tối đa 100 lựa chọn với thông báo giới hạn; “tất cả” vẫn truy cập được lịch sử cũ qua phân trang.
+
+## Hoạt động gần đây
+
+- Tối đa 6 sự kiện, sắp xếp `created_at DESC, id DESC`, trong cùng snapshot dashboard.
+- ADMIN chỉ nhận `user.created`, `user.role_changed`, `user.status_changed` với entity_type=user; chỉ hành động và thời gian, không tên/tài khoản đích.
+- HR/MANAGER/EMPLOYEE chỉ nhận `performance.calculated`, `performance.finalized` với entity_type=performance_review, JOIN báo cáo/nhân viên trong quyền hiện tại và chu kỳ được chọn. Tên lấy snapshot; chuyển quản lý đổi phạm vi đọc sự kiện.
+- DTO không có actor, metadata, request_id, nhận xét, sự kiện AI hoặc đăng nhập. So sánh entity_id dạng chuỗi để lịch sử audit có ID không phải UUID không gây lỗi.
+
+## UX và cập nhật dữ liệu
+
+Header/menu trái giữ nhóm chức năng theo role; tư vấn nằm trong nhóm đánh giá. Bảng cuộn được bằng bàn phím, có nhãn; mở/đóng nội dung tư vấn quản lý focus. Form và thẻ dùng lại layout, màu sắc hiện có, có focus-visible và tôn trọng reduced-motion. Loại hướng dẫn “sẽ bổ sung chốt/đóng kỳ” đã lỗi thời.
+
+QueryClient chung vô hiệu hóa cache dashboard và danh sách AI sau khi mutation kết thúc, kể cả phản hồi lỗi có thể đã lưu attempt. Chỉ tải lại GET; không thử lại mutation hoặc tự tạo tư vấn. Cache đăng nhập/đăng xuất tiếp tục được xóa và các query mới gắn user/role/phạm vi vào key. Không thêm thư viện UI, migration hoặc cơ chế reset demo.

@@ -5,6 +5,7 @@ from sqlalchemy import String, and_, case, cast, func, or_, select
 from sqlalchemy.orm import Session
 
 from app.core.errors import ApiError
+from app.modules.dashboard.activities import recent_activities
 from app.modules.dashboard.schemas import AdminDashboard, CycleOption, Dashboard, DepartmentMetric
 from app.modules.employees.models import Employee, EmploymentStatus
 from app.modules.employees.repository import employee_scope
@@ -59,6 +60,7 @@ class DashboardService:
                 account_roles={
                     r.value: sum(n for role, _, n in rows if role == r) for r in UserRole
                 },
+                recent_activities=recent_activities(self.session, user, None),
             )
         result = Dashboard(role=user.role, pending_feedback=pending)
         result.active_employees = (
@@ -99,6 +101,7 @@ class DashboardService:
         result.selected_cycle = CycleOption(
             id=selected.id, name=selected.name, status=selected.status
         )
+        result.recent_activities = recent_activities(self.session, user, selected.id)
         # A pinned older cycle remains selectable even when outside the latest 100.
         if all(c.id != selected.id for c in result.cycles):
             result.cycles.append(result.selected_cycle)

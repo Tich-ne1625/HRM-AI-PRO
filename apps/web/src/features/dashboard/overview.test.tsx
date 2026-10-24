@@ -14,7 +14,8 @@ const overview = { role: "HR", pending_feedback: 2, active_employees: 8,
   finalized: 1, current: 1, stale: 1, not_calculated: 2, awaiting_completion: 4,
   average: "84.90", sample_size: 2, score_bands: { "<65": 0, "65-<80": 0, "80-<90": 2, "≥90": 0 },
   kpis_assigned: 10, kpis_entered: 9, kpi_entry_percent: "90.00",
-  departments: [{ name: "Kỹ thuật", participants: 3, sample_size: 1, average: "82.80" }] };
+  departments: [{ id: "d1", name: "Kỹ thuật", participants: 3, sample_size: 1, average: "82.80" }],
+  recent_activities: [{ id: "event1", action: "performance.calculated", occurred_at: "2026-10-24T00:00:00Z", employee_id: "e1", display_name: "An", cycle_id: "c1" }] };
 function mount() {
   const cache = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   render(<QueryClientProvider client={cache}><DashboardOverview /></QueryClientProvider>);
@@ -26,6 +27,8 @@ it("shows scoped metrics, sample sizes and links to existing workflows", async (
   expect(screen.getByText("90.00%")).toBeTruthy();
   expect(screen.getByRole("link", { name: /Mở chu kỳ/ }).getAttribute("href")).toBe("/review-cycles/c1");
   expect(screen.getByRole("progressbar", { name: "80-<90 điểm: 2 người" })).toHaveProperty("value", 2);
+  expect(screen.getByText("Đã tính điểm đánh giá")).toBeTruthy();
+  expect(screen.getByRole("link", { name: "An →" }).getAttribute("href")).toBe("/employees/e1/performance?cycle_id=c1");
 });
 it("changes cycles and refreshes with read requests only", async () => {
   const user = userEvent.setup(); mount(); await screen.findByText("84.90");

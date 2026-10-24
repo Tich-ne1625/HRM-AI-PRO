@@ -41,13 +41,13 @@ function Directory() {
   } });
   return <>
     <section className="auth-card wide"><p className="eyebrow">ĐÁNH GIÁ NHÂN SỰ</p><h1>Chu kỳ đánh giá</h1>
-      <p>Mỗi lần chỉ có một chu kỳ đang đánh giá. Chức năng chốt đánh giá và đóng chu kỳ sẽ được bổ sung sau.</p>
+      <p>Mỗi lần chỉ có một chu kỳ đang đánh giá. HR chốt kết quả từng nhân viên trước khi đóng kỳ và kích hoạt chu kỳ tiếp theo.</p>
       <form className="filters" onSubmit={(e) => { e.preventDefault(); const data = new FormData(e.currentTarget); setQ(String(data.get("q") ?? "")); setStatus(String(data.get("status") ?? "")); setPage(1); }}>
         <div><label htmlFor="cycles-search">Tìm chu kỳ</label><input id="cycles-search" name="q" maxLength={100} /></div>
         <div><label htmlFor="cycles-status">Trạng thái chu kỳ</label><select id="cycles-status" name="status"><option value="">Tất cả</option>{Object.entries(cycleStatus).map(([key, value]) => <option key={key} value={key}>{value}</option>)}</select></div><button>Lọc</button>
       </form>
       {query.isPending && <p role="status">Đang tải chu kỳ…</p>}{query.isError && <ReviewError error={query.error} reload={() => { void query.refetch(); }} />}
-      {query.data && <><div className="table-scroll"><table><caption>{query.data.total} chu kỳ trong phạm vi của bạn</caption><thead><tr><th>Tên</th><th>Thời gian</th><th>Trạng thái</th><th>Người tham gia</th></tr></thead><tbody>
+      {query.data && <><div className="table-scroll" tabIndex={0} role="region" aria-label="Chu kỳ đánh giá, có thể cuộn ngang"><table><caption>{query.data.total} chu kỳ trong phạm vi của bạn</caption><thead><tr><th>Tên</th><th>Thời gian</th><th>Trạng thái</th><th>Người tham gia</th></tr></thead><tbody>
         {query.data.items.map((row) => <tr key={row.id}><td><Link href={`/review-cycles/${row.id}`}>{row.name}</Link></td><td>{row.start_date} – {row.end_date}</td><td>{cycleStatus[row.status]}</td><td>{row.participant_count}</td></tr>)}</tbody></table></div>
         {!query.data.items.length && <p>Chưa có chu kỳ phù hợp trong phạm vi của bạn.</p>}
         <Pagination page={page} total={query.data.total} pending={query.isFetching} onPage={setPage} /></>}

@@ -37,7 +37,7 @@ function Directory() {
       {query.isError && <div role="alert"><p>Không thể tải danh sách nhân viên.</p><button onClick={() => { void query.refetch(); }}>Thử lại</button></div>}
       {query.data && <>
         {!query.data.items.length && <p>Không có nhân viên phù hợp.</p>}
-        <div className="table-scroll"><table><caption>{query.data.total} nhân viên</caption><thead><tr><th>Mã nhân viên</th><th>Họ và tên</th><th>Phòng ban</th><th>Chức danh</th><th>Trạng thái</th></tr></thead>
+        <div className="table-scroll" tabIndex={0} role="region" aria-label="Nhân viên, có thể cuộn ngang"><table><caption>{query.data.total} nhân viên</caption><thead><tr><th>Mã nhân viên</th><th>Họ và tên</th><th>Phòng ban</th><th>Chức danh</th><th>Trạng thái</th></tr></thead>
           <tbody>{query.data.items.map((row) => <tr key={row.id}><td>{row.employee_code}</td><td><Link href={`/employees/${row.id}`}>{row.display_name}</Link></td>
             <td>{row.department_name}</td><td>{row.position_title}</td><td><span className={row.employment_status === "ACTIVE" ? "badge active" : "badge"}>{row.employment_status === "ACTIVE" ? "Đang làm việc" : "Ngừng làm việc"}</span></td></tr>)}</tbody></table></div>
         <Pagination page={page} total={query.data.total} pending={query.isFetching} onPage={setPage} />

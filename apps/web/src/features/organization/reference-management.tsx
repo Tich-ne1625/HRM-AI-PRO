@@ -54,7 +54,7 @@ function ReferenceList({ kind }: { kind: ReferenceKind }) {
       {query.isError && <div role="alert"><p>Không thể tải danh sách.</p><button onClick={() => { void query.refetch(); }}>Thử lại</button></div>}
       {query.data && <>
         {!query.data.items.length && <p>Chưa có {label} phù hợp.</p>}
-        <div className="table-scroll"><table><caption>{query.data.total} {label}</caption><thead><tr><th>Mã</th><th>Tên</th><th>Trạng thái</th>{hr && <th>Thao tác</th>}</tr></thead>
+        <div className="table-scroll" tabIndex={0} role="region" aria-label="Danh mục tổ chức, có thể cuộn ngang"><table><caption>{query.data.total} {label}</caption><thead><tr><th>Mã</th><th>Tên</th><th>Trạng thái</th>{hr && <th>Thao tác</th>}</tr></thead>
           <tbody>{query.data.items.map((row) => <tr key={row.id}><td>{row.code}</td><td>{referenceLabel(row)}</td>
             <td>{row.is_active ? "Hoạt động" : "Ngừng hoạt động"}</td>{hr && <td className="row-actions">
               <button className="secondary" aria-label={`Chỉnh sửa ${row.code}`} disabled={mutation.isPending} onClick={() => setEditing(row)}>Chỉnh sửa</button>

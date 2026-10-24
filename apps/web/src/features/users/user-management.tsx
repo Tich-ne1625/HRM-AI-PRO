@@ -58,7 +58,7 @@ function AdminUsers() {
       {query.isError && <div role="alert"><p>Không thể tải tài khoản.</p>
         <button onClick={() => { void query.refetch(); }}>Thử lại</button></div>}
       {query.data && <>
-        <div className="table-scroll"><table><caption>Danh sách tài khoản · {query.data.total} tài khoản</caption>
+        <div className="table-scroll" tabIndex={0} role="region" aria-label="Tài khoản, có thể cuộn ngang"><table><caption>Danh sách tài khoản · {query.data.total} tài khoản</caption>
           <thead><tr><th>Email</th><th>Vai trò</th><th>Trạng thái</th><th>Thao tác</th></tr></thead>
           <tbody>{query.data.items.map((user) => <tr key={user.id}>
             <td>{user.email}</td><td><select aria-label={`Vai trò của ${user.email}`} value={user.role}

@@ -1,3 +1,4 @@
+from datetime import datetime
 from decimal import Decimal
 from uuid import UUID
 
@@ -18,17 +19,28 @@ class DepartmentMetric(BaseModel):
     average: Decimal | None
 
 
+class Activity(BaseModel):
+    id: UUID
+    action: str
+    occurred_at: datetime
+    employee_id: UUID | None = None
+    display_name: str | None = None
+    cycle_id: UUID | None = None
+
+
 class AdminDashboard(BaseModel):
     role: str
     pending_feedback: int
     active_accounts: int
     inactive_accounts: int
     account_roles: dict[str, int]
+    recent_activities: list[Activity] = Field(default_factory=list)
 
 
 class Dashboard(BaseModel):
     role: str
     pending_feedback: int
+    recent_activities: list[Activity] = Field(default_factory=list)
     active_employees: int | None = None
     cycles: list[CycleOption] = Field(default_factory=list)
     cycles_truncated: bool = False

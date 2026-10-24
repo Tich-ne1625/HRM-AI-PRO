@@ -68,7 +68,7 @@ def test_dashboard_demo_metrics_scope_and_no_side_effects(world, monkeypatch):
     assert (hr["kpis_entered"], hr["kpis_assigned"], hr["kpi_entry_percent"]) == (9, 10, "90.00")
     assert sum(hr["score_bands"].values()) == 2
     assert len(hr["departments"]) == 2
-    assert len(statements) <= 12  # authentication + fixed aggregates, independent of employee count
+    assert len(statements) <= 13  # authentication + fixed aggregates, independent of employee count
     manager = clients["manager"].get("/api/v1/dashboard").json()
     assert (manager["participants"], manager["sample_size"], manager["average"]) == (3, 1, "82.80")
     sales = clients["sales.manager"].get("/api/v1/dashboard").json()

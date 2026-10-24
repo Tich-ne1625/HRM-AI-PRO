@@ -464,6 +464,19 @@ def performance_smoke(
     print(
         "Performance HTTP smoke passed: exact scores, reuse, stale/recalculate, two revisions, optional acknowledgement, atomic finalization, evidence locks, closure and next activation."
     )
+    closed_dashboard = hr.request("/api/v1/dashboard?cycle_id=" + cycle["id"])
+    assert closed_dashboard["average"] == "87.00" and closed_dashboard["sample_size"] == 1
+    assert closed_dashboard["finalized"] == 1 and closed_dashboard["awaiting_completion"] == 0
+    assert len(closed_dashboard["recent_activities"]) == 3
+    for browser in (hr, manager, employee):
+        dashboard = browser.request("/api/v1/dashboard")
+        assert dashboard["selected_cycle"]["id"] == next_cycle["id"]
+        assert dashboard["average"] is None and dashboard["not_calculated"] == 1
+        assert browser.request("/api/v1/ai-reports")["total"] == 0
+    manager.request("/api/v1/ai-reports?audience=HR_PRIVATE", expected=403)
+    admin.request("/api/v1/ai-reports", expected=403)
+    assert "participants" not in admin.request("/api/v1/dashboard")
+    print("Phase 8 HTTP smoke passed: scoped dashboard, sanitized activity, saved AI list and role boundaries.")
 
 
 def feedback_smoke(

@@ -32,7 +32,7 @@ function Detail({id, cycle}: {id: string; cycle: string}) {
     {cycleQuery.isError && <ReviewError error={cycleQuery.error} />}
     <p>{participant.is_snapshot ? "Thông tin tổ chức tại lúc kích hoạt chu kỳ." : "Thông tin nháp chưa đóng băng."} Phiên bản dữ liệu đánh giá: {participant.evidence_version}.</p>
     {!data.items.length && <p>Chưa phân bổ KPI.</p>}
-    <div className="table-scroll"><table><caption>KPI được giao trong chu kỳ đang chọn</caption><thead><tr><th>KPI / hướng</th><th>Mục tiêu</th><th>Trọng số</th><th>Kết quả thực tế</th></tr></thead><tbody>{data.items.map((row) => <tr key={row.id}>
+    <div className="table-scroll" tabIndex={0} role="region" aria-label="KPI được giao, có thể cuộn ngang"><table><caption>KPI được giao trong chu kỳ đang chọn</caption><thead><tr><th>KPI / hướng</th><th>Mục tiêu</th><th>Trọng số</th><th>Kết quả thực tế</th></tr></thead><tbody>{data.items.map((row) => <tr key={row.id}>
       <td>{row.definition.code} · {row.definition.name}<br />{row.definition.direction === "HIGHER_IS_BETTER" ? "Càng cao càng tốt" : "Càng thấp càng tốt"}</td><td>{row.target} {row.definition.unit}</td><td>{row.weight}%</td><td>
         <p>{row.actual === null ? "Chưa nhập" : row.actual}</p>
         {participant.can_manage_kpis && !editing && (editingActual?.row.id === row.id

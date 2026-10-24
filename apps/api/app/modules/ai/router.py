@@ -8,6 +8,7 @@ from app.core.config import Settings
 from app.core.database import get_db_session
 from app.core.policies import AuthContext, require_roles
 from app.modules.ai.provider import Provider
+from app.modules.ai.reports import SavedReport, saved_reports
 from app.modules.ai.schemas import AnalysisState, AnalysisView, Audience, GenerateInput
 from app.modules.ai.service import AIService
 from app.modules.auth.router import require_csrf, require_same_origin
@@ -31,6 +32,20 @@ def service(request: Request, session: Database) -> AIService:
 
 
 Service = Annotated[AIService, Depends(service)]
+
+
+@router.get("/ai-reports", response_model=Page[SavedReport])
+def reports(
+    context: Reader,
+    session: Database,
+    response: Response,
+    audience: Audience = Audience.PUBLIC,
+    cycle_id: UUID | None = None,
+    page: Annotated[int, Query(ge=1)] = 1,
+    page_size: Annotated[int, Query(ge=1, le=100)] = 20,
+) -> Page[SavedReport]:
+    response.headers["Cache-Control"] = "no-store"
+    return saved_reports(session, context.user, audience, cycle_id, page, page_size)
 
 
 @router.get("/performance/{review_id}/ai-analysis", response_model=AnalysisState)

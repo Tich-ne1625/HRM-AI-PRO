@@ -13,7 +13,7 @@ export function WorkspaceHeader() {
     { href: "/dashboard", label: "Tổng quan", active: path === "/dashboard" },
     { href: "/account", label: "Cá nhân", active: path === "/account" || path.startsWith("/feedback") && !path.startsWith("/feedback-administration") },
     ...(domain ? [
-      { href: "/review-cycles", label: "Đánh giá hiệu suất", active: path.startsWith("/review-cycles") || path.startsWith("/kpis") || path.startsWith("/feedback-administration") || /^\/employees\/[^/]+\/(kpis|feedback|performance)/.test(path) },
+      { href: "/review-cycles", label: "Đánh giá hiệu suất", active: path.startsWith("/ai-reports") || path.startsWith("/review-cycles") || path.startsWith("/kpis") || path.startsWith("/feedback-administration") || /^\/employees\/[^/]+\/(kpis|feedback|performance)/.test(path) },
       { href: "/employees", label: "Tổ chức", active: /^\/(employees|departments|positions)(\/[^/]+)?$/.test(path) },
     ] : []),
     ...(user?.role === "ADMIN" ? [{ href: "/admin/users", label: "Quản trị hệ thống", active: path.startsWith("/admin") || path.startsWith("/settings") }] : []),
@@ -36,7 +36,7 @@ export function WorkspaceNavigation() {
   const groups = [
     { label: "Không gian làm việc", items: [{ href: "/dashboard", label: "Tổng quan" }] },
     { label: "Cá nhân", items: [{ href: "/account", label: "Tài khoản" }, ...(user ? [{ href: "/feedback", label: "Phản hồi của tôi" }] : [])] },
-    ...(domain ? [{ label: "Đánh giá", items: [{ href: "/review-cycles", label: "Chu kỳ đánh giá" }, { href: "/kpis", label: "Danh mục KPI" }, ...(user?.role === "HR" ? [{ href: "/feedback-administration", label: "Quản trị phản hồi" }] : [])] },
+    ...(domain ? [{ label: "Đánh giá", items: [{ href: "/review-cycles", label: "Chu kỳ đánh giá" }, { href: "/kpis", label: "Danh mục KPI" }, { href: "/ai-reports", label: "Tư vấn AI đã lưu" }, ...(user?.role === "HR" ? [{ href: "/feedback-administration", label: "Quản trị phản hồi" }] : [])] },
       { label: "Tổ chức", items: [{ href: "/employees", label: "Nhân viên" }, { href: "/departments", label: "Phòng ban" }, { href: "/positions", label: "Chức danh" }] }] : []),
     ...(user?.role === "ADMIN" ? [{ label: "Quản trị", items: [{ href: "/admin/users", label: "Quản lý tài khoản" }, { href: "/settings/scoring", label: "Cấu hình chấm điểm" }] }] : []),
     { label: "Hệ thống", items: [{ href: "/", label: "Trạng thái hệ thống" }] },
