@@ -101,6 +101,23 @@ def check(t, ca):
     assert response.getheader("Strict-Transport-Security") == "max-age=31536000"
     assert "'nonce-" in response.getheader("Content-Security-Policy", "")
     connection.close()
+    # Web /login readiness alone does not prove the rewritten API route is ready.
+    # Wait on a read-only, unauthenticated API response before testing any POST.
+    for _ in range(30):
+        c = LocalTLS("insighthr.test", 13443, context=context, timeout=15)
+        try:
+            c.request("GET", "/api/v1/auth/me")
+            ready = c.getresponse()
+            ready.read()
+            if ready.status == 401:
+                break
+        except (ssl.SSLError, OSError):
+            pass
+        finally:
+            c.close()
+        time.sleep(1)
+    else:
+        raise RuntimeError("Verified ingress is reachable but API proxy is not ready")
     # HTTP ingress + Next proxy enforce real byte counts before JSON parsing.
     results = []
     for chunked in [False, True]:
