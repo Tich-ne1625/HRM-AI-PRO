@@ -24,7 +24,7 @@ export function DashboardOverview() {
       <button type="button" className="secondary" disabled={query.isFetching} onClick={() => { void query.refetch(); }}>{query.isFetching ? "Đang tải…" : "Tải lại"}</button></div>
     {query.isPending && <p role="status">Đang tải tổng quan…</p>}
     {query.isError && <p role="alert">Không tải được tổng quan. Hãy thử tải lại hoặc kiểm tra phiên đăng nhập.</p>}
-    {data && <>
+    {data && !query.isError && <>
       <div className="dashboard-task"><div><strong>Phản hồi của tôi</strong><p>{data.pending_feedback} nhiệm vụ còn mở trong các chu kỳ đang hoạt động.</p></div><Link href="/feedback">Mở hộp việc →</Link></div>
       {admin ? <>
         <div className="metric-grid"><Metric label="Tài khoản hoạt động" value={data.active_accounts ?? 0} /><Metric label="Tài khoản đã khóa" value={data.inactive_accounts ?? 0} /></div>

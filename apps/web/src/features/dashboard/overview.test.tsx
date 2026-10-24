@@ -59,3 +59,12 @@ it("offers retry on a failed load and handles an unlinked account", async () => 
   await screen.findByText(/Chưa có người tham gia/);
   expect(screen.getByRole("link", { name: /Mở hộp việc/ })).toBeTruthy();
 });
+it("hides cached metrics and activities when a refresh is denied or fails", async () => {
+  const user = userEvent.setup(); mount(); await screen.findByText("84.90");
+  mocks.get.mockRejectedValue(new Error("authority changed"));
+  await user.click(screen.getByRole("button", { name: "Tải lại" }));
+  await screen.findByRole("alert");
+  expect(screen.queryByText("84.90")).toBeNull();
+  expect(screen.queryByText("Đã tính điểm đánh giá")).toBeNull();
+  expect(screen.queryByRole("link", { name: /Mở chu kỳ để/ })).toBeNull();
+});
