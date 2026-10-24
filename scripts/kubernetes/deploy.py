@@ -219,6 +219,8 @@ def deploy(t, mode, release, db_only=False):
             return
         job = migrate(t, release, lease)
         for obj in objects:
+            if obj["kind"] == "Ingress" and t.namespace == "insighthr-phase10-restore":
+                continue
             if obj["kind"] not in {"ConfigMap", "StatefulSet"} and not (
                 obj["kind"] == "Service" and obj["metadata"]["name"] == "postgres"
             ):

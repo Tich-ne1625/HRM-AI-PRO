@@ -1,0 +1,62 @@
+name: Phase 10 Kubernetes acceptance
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: phase10-kubernetes-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  cluster-acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Install pinned test tools
+        run: |
+          python -m pip install PyYAML==6.0.3 cryptography==50.0.2 websockets==16.0
+          curl -fsSL https://github.com/k3d-io/k3d/releases/download/v5.8.3/k3d-linux-amd64 -o "$RUNNER_TEMP/k3d"
+          echo "dbaa79a76ace7f4ca230a1ff41dc7d8a5036a8ad0309e9c54f9bf3836dbe853e  $RUNNER_TEMP/k3d" | sha256sum -c -
+          chmod +x "$RUNNER_TEMP/k3d"
+          echo "$RUNNER_TEMP" >> "$GITHUB_PATH"
+      - name: Create disposable cluster without modifying default kubeconfig
+        run: python scripts/kubernetes/cluster.py create
+      - name: Validate both profiles with the API server
+        run: python scripts/kubernetes/validate.py
+      - name: Build immutable release and deploy through migration Job
+        run: python scripts/kubernetes/deploy.py --release phase10-${{ github.sha }} --build
+      - name: Real browser forms and isolated offline AI
+        run: python scripts/kubernetes/acceptance.py --with-offline-provider
+      - name: Migration negative gates
+        run: python scripts/kubernetes/check_failures.py --release phase10-${{ github.sha }}
+      - name: Persistence outage restart and independent restore
+        run: python scripts/kubernetes/check_recovery.py --release phase10-${{ github.sha }}
+      - name: Verified TLS cookies and proxy boundaries
+        run: python scripts/kubernetes/check_http.py --release phase10-${{ github.sha }}
+      - name: Upload sanitized evidence only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase10-acceptance-${{ github.sha }}
+          path: |
+            .superpowers/sdd/phase-10/validation.json
+            .superpowers/sdd/phase-10/deployment.json
+            .superpowers/sdd/phase-10/failure-gates.json
+            .superpowers/sdd/phase-10/recovery.json
+            .superpowers/sdd/phase-10/restore.json
+            .superpowers/sdd/phase-10/tls-http.json
+            .superpowers/sdd/phase-10/browser/report.json
+            .superpowers/sdd/phase-10/browser/*.png
+            .superpowers/sdd/phase-10/browser/failure.txt
+          include-hidden-files: true
+          retention-days: 14
+      - name: Cleanup only the owned disposable cluster
+        if: always()
+        run: python scripts/kubernetes/cluster.py delete --confirm-delete insighthr-phase10
