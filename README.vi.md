@@ -43,6 +43,8 @@ Nhập mật khẩu khi được hỏi; không đặt mật khẩu hoặc API ke
 
 ## Dùng chức năng theo role
 
+Nếu chưa biết bắt đầu từ đâu, làm theo [hướng dẫn nghiệm thu từng bước](docs/nghiem-thu.vi.md), từ ADMIN → HR → Quản lý → Nhân viên → quay lại HR để chốt và đóng kỳ.
+
 | Role | Công việc chính |
 | --- | --- |
 | ADMIN | Tạo/khóa tài khoản, đổi role, cấu hình trọng số tính điểm |

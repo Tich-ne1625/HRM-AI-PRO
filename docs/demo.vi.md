@@ -1,5 +1,7 @@
 # Thực hành InsightHR bằng dữ liệu mẫu
 
+**Lần đầu sử dụng?** Đọc [hướng dẫn nghiệm thu từng bước theo thứ tự role](nghiem-thu.vi.md): có đường dẫn menu, dữ liệu nhập mẫu, kết quả cần thấy, xử lý lỗi và phiếu đánh dấu đạt/chưa đạt.
+
 Toàn bộ người, tài khoản, KPI và nhận xét trong bộ `[DEMO]` đều hư cấu. Bộ mẫu có **10 tài khoản, 8 nhân viên, 2 phòng ban, 2 chức danh, 2 KPI và 3 chu kỳ**. Không có đầu ra AI giả; chỉ HR chủ động xác nhận mới gọi Gemini.
 
 ## Nạp dữ liệu một lần
