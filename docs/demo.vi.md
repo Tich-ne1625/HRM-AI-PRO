@@ -27,6 +27,8 @@ Khi chạy API trực tiếp, kích hoạt virtual environment rồi chạy `pyt
 
 Các tài khoản demo dùng chung mật khẩu mà lệnh đã in. Đăng xuất trước khi đổi tài khoản; có thể dùng các profile trình duyệt khác nhau để so sánh quyền.
 
+Tại màn hình đăng nhập, chọn ô **Nhân sự / Quản lý / Nhân viên / Quản trị**. Nhóm có nhiều tài khoản hiện danh sách **Người dùng thử** theo tên và công việc để bạn chọn, không cần nhớ email. Nhập mật khẩu demo rồi bấm **Vào trải nghiệm**. Bấm **Dùng tài khoản riêng** nếu cần nhập email khác. Chọn vai trò chỉ chọn tài khoản để đăng nhập; quyền thực tế vẫn do hệ thống kiểm tra.
+
 | Email | Role | Việc nên thử |
 | --- | --- | --- |
 | `admin.demo@example.com` | ADMIN | Quản trị tài khoản, tạo user, đổi role/khóa tài khoản thử, xem cấu hình tính điểm cho kỳ tương lai |

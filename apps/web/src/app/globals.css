@@ -62,6 +62,23 @@ a {
 .auth-card { width: 100%; max-width: 40rem; padding: 2rem; background: white; border: 1px solid #e2e8f0;
   border-radius: 1rem; box-shadow: 0 8px 28px #0f172a05; color: #0f172a; margin: 0 0 1.5rem; }
 .auth-card.wide { max-width: none; }
+.login-card { max-width: 42rem; }
+.demo-role-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; margin-top: 1.5rem; }
+.auth-card .demo-role { display: grid; align-content: start; gap: .35rem; text-align: left; background: #fff; color: #334155; border: 1px solid #cbd5e1; padding: 1rem; min-width: 0; }
+.demo-role strong { font-size: .98rem; }
+.demo-role span { font-size: .8rem; font-weight: 400; line-height: 1.5; }
+.auth-card .demo-role[aria-pressed="true"] { background: #eef3ff; border-color: #2454d5; box-shadow: inset 0 0 0 1px #2454d5; color: #1e40af; }
+.auth-card .demo-role:hover { border-color: #2454d5; }
+.auth-card .demo-account-hint { font-size: .8rem; margin: 0; overflow-wrap: anywhere; }
+.demo-account-hint span { color: #334155; }
+.auth-card form .help-text { margin: 0; font-weight: 400; }
+.auth-card .login-mode-switch { display: block; margin: 0 auto 1.25rem; padding: .45rem; background: transparent; color: #1d4ed8; text-decoration: underline; text-underline-offset: .2em; }
+.login-footer { display: flex; justify-content: space-between; gap: .75rem; flex-wrap: wrap; border-top: 1px solid #e2e8f0; padding-top: 1rem; color: #64748b; font-size: .78rem; }
+@media (max-width: 420px) {
+  .auth-card.login-card { padding: 1.25rem; }
+  .auth-card .demo-role { padding: .75rem; }
+  .demo-role span { font-size: .75rem; }
+}
 .auth-card h1 { font-size: clamp(1.4rem, 3vw, 1.9rem); font-weight: 700; margin: .5rem 0 1rem; overflow-wrap: anywhere; }
 .auth-card h2 { font-size: 1.25rem; font-weight: 650; margin-bottom: 1rem; }
 .auth-card p { line-height: 1.7; color: #475569; margin-bottom: 1rem; }

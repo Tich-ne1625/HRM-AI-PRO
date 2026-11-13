@@ -12,6 +12,7 @@ docker compose --env-file .env up --build --wait
 ```
 
 3. Mở **http://localhost:3000/login** trên trình duyệt.
+   Màn hình mở sẵn **Nhân sự**. Chọn ô **Nhân sự / Quản lý / Nhân viên / Quản trị** để điền tài khoản demo; với Quản lý hoặc Nhân viên, chọn tên trong **Người dùng thử**. Nhập mật khẩu rồi bấm **Vào trải nghiệm**. Email ở bảng bên dưới giúp đối chiếu, bạn không cần tự nhớ hoặc gõ. Tài khoản ngoài bộ demo dùng nút **Dùng tài khoản riêng**.
 4. Chuẩn bị mật khẩu demo đã lưu khi nạp dữ liệu. Các email demo bên dưới dùng mật khẩu được tạo lúc nạp, trừ khi bạn đã đổi riêng.
 5. Chỉ khi chưa từng nạp demo, chạy:
 

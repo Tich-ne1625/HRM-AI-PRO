@@ -194,6 +194,7 @@ class Page:
     def login(self, role, password):
         self.command("Network.clearBrowserCookies")
         self.go("/login")
+        self.click("Dùng tài khoản riêng")
         self.fill("#email", f"{role}.phase9@example.com")
         self.fill("#password", password)
         self.write(
