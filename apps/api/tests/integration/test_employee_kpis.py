@@ -71,11 +71,11 @@ def test_complete_allocation_actuals_and_scope(world):
     assert result.status_code == 200
     assert result.json()["participant"]["evidence_version"] == 4
     assert next(r for r in result.json()["items"] if r["id"] == row["id"])["actual"] == "0.0000"
-    stale = world.client().patch(
+    stale = world.client("manager").patch(
         actual_path, json={"expected_evidence_version": 3, "actual": "7.0000"}
     )
     assert stale.json()["error"]["code"] == "stale_evidence_version"
-    cleared = world.client().patch(
+    cleared = world.client("manager").patch(
         actual_path, json={"expected_evidence_version": 4, "actual": None}
     )
     assert cleared.status_code == 200
@@ -84,9 +84,9 @@ def test_complete_allocation_actuals_and_scope(world):
 
 def test_replacement_retains_snapshot_and_actual_until_target_changes(world):
     _cycle, first, second, path = allocation_world(world)
-    saved = world.client().put(path, json=replace_body(first)).json()
+    saved = world.client("manager").put(path, json=replace_body(first)).json()
     row = saved["items"][0]
-    world.client().patch(
+    world.client("manager").patch(
         f"/api/v1/employee-kpis/{row['id']}",
         json={
             "expected_evidence_version": 3,
@@ -101,19 +101,19 @@ def test_replacement_retains_snapshot_and_actual_until_target_changes(world):
             "direction": "LOWER_IS_BETTER",
         },
     )
-    kept = world.client().put(path, json=replace_body(first, second, version=4)).json()
+    kept = world.client("manager").put(path, json=replace_body(first, second, version=4)).json()
     old = next(r for r in kept["items"] if r["definition_id"] == first["id"])
     assert old["id"] == row["id"] and old["actual"] == "50.0000"
     assert old["definition"]["name"] == "Sales"
     assert old["definition"]["direction"] == "HIGHER_IS_BETTER"
     body = replace_body(first, second, version=5)
     body["items"][0]["target"] = "200.0000"
-    changed = world.client().put(path, json=body)
+    changed = world.client("manager").put(path, json=body)
     assert changed.status_code == 200
     assert all(r["actual"] is None for r in changed.json()["items"])
     # Removing then assigning again takes the current definition snapshot.
-    world.client().put(path, json=replace_body(second, version=6))
-    readded = world.client().put(path, json=replace_body(first, second, version=7)).json()
+    world.client("manager").put(path, json=replace_body(second, version=6))
+    readded = world.client("manager").put(path, json=replace_body(first, second, version=7)).json()
     assert (
         next(r for r in readded["items"] if r["definition_id"] == first["id"])["definition"]["name"]
         == "Renamed definition"
@@ -122,20 +122,20 @@ def test_replacement_retains_snapshot_and_actual_until_target_changes(world):
 
 def test_retired_definition_can_be_kept_but_not_newly_assigned(world):
     _cycle, first, second, path = allocation_world(world)
-    saved = world.client().put(path, json=replace_body(first)).json()
+    saved = world.client("manager").put(path, json=replace_body(first)).json()
     world.client().patch(
         f"/api/v1/kpis/{first['id']}", json={"expected_version": 1, "is_active": False}
     )
     # Exact no-op retains version even for a retired definition.
     assert (
-        world.client()
+        world.client("manager")
         .put(path, json=replace_body(first, version=3))
         .json()["participant"]["evidence_version"]
         == 3
     )
     row = saved["items"][0]
     assert (
-        world.client()
+        world.client("manager")
         .patch(
             f"/api/v1/employee-kpis/{row['id']}",
             json={
@@ -146,8 +146,8 @@ def test_retired_definition_can_be_kept_but_not_newly_assigned(world):
         .status_code
         == 200
     )
-    world.client().put(path, json=replace_body(second, version=4))
-    failed = world.client().put(path, json=replace_body(first, version=5))
+    world.client("manager").put(path, json=replace_body(second, version=4))
+    failed = world.client("manager").put(path, json=replace_body(first, version=5))
     assert failed.status_code == 409 and failed.json()["error"]["code"] == "kpi_definition_inactive"
 
 
@@ -167,7 +167,7 @@ def test_invalid_allocations_never_store_partial_evidence(world, failure):
         body["items"][0]["target"] = "1.00001"
     else:
         body["items"][0]["definition_id"] = str(uuid4())
-    response = world.client().put(path, json=body)
+    response = world.client("manager").put(path, json=body)
     assert response.status_code == (404 if failure == "unknown" else 422)
     assert world.client().get(path).json()["items"] == []
     assert world.client().get(path).json()["participant"]["evidence_version"] == 2
@@ -178,7 +178,7 @@ def test_evidence_audit_failure_restores_rows_and_version(world, monkeypatch, mu
     from app.models import EmployeeKPI
 
     _cycle, first, second, path = allocation_world(world)
-    saved = world.client().put(path, json=replace_body(first)).json()
+    saved = world.client("manager").put(path, json=replace_body(first)).json()
     row = saved["items"][0]
 
     def fail(*args, **kwargs):
@@ -186,9 +186,9 @@ def test_evidence_audit_failure_restores_rows_and_version(world, monkeypatch, mu
 
     monkeypatch.setattr(AuditWriter, "record", fail)
     if mutation == "replace":
-        response = world.client().put(path, json=replace_body(second, version=3))
+        response = world.client("manager").put(path, json=replace_body(second, version=3))
     else:
-        response = world.client().patch(
+        response = world.client("manager").patch(
             f"/api/v1/employee-kpis/{row['id']}",
             json={
                 "expected_evidence_version": 3,
@@ -226,7 +226,7 @@ def test_uncapped_policy_rejects_new_lower_kpis(world):
         },
     )
     _cycle, _first, second, path = allocation_world(world)
-    result = world.client().put(path, json=replace_body(second))
+    result = world.client("manager").put(path, json=replace_body(second))
     assert result.status_code == 409 and result.json()["error"]["code"] == "kpi_policy_incompatible"
 
 
@@ -236,13 +236,13 @@ def test_finalized_and_closed_evidence_is_immutable(world):
     from app.models import CycleParticipant, ReviewCycle
 
     cycle, first, second, path = allocation_world(world)
-    saved = world.client().put(path, json=replace_body(first)).json()
+    saved = world.client("manager").put(path, json=replace_body(first)).json()
     with Session(world.engine) as session, session.begin():
         row = session.get(CycleParticipant, saved["participant"]["id"])
         row.finalized_at = datetime.now(UTC)
-    response = world.client().put(path, json=replace_body(second, version=3))
+    response = world.client("manager").put(path, json=replace_body(second, version=3))
     assert response.json()["error"]["code"] == "participant_finalized"
     with Session(world.engine) as session, session.begin():
         session.get(ReviewCycle, cycle["id"]).status = "CLOSED"
-    response = world.client().put(path, json=replace_body(second, version=3))
+    response = world.client("manager").put(path, json=replace_body(second, version=3))
     assert response.json()["error"]["code"] == "cycle_not_active"

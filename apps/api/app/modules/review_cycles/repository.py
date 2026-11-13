@@ -43,8 +43,6 @@ def can_write_kpis(
 ) -> bool:
     if cycle.status != CycleStatus.ACTIVE or participant.finalized_at is not None:
         return False
-    if user.role == UserRole.HR:
-        return True
     return bool(
         user.role == UserRole.MANAGER
         and actor_employee

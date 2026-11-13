@@ -28,7 +28,14 @@ Database = Annotated[Session, Depends(get_db_session)]
 Reader = Annotated[
     AuthContext, Depends(require_roles(UserRole.HR, UserRole.MANAGER, UserRole.EMPLOYEE))
 ]
-Calculator = Annotated[AuthContext, Depends(require_roles(UserRole.HR, UserRole.MANAGER))]
+Calculator = Annotated[
+    AuthContext,
+    Depends(
+        require_roles(
+            UserRole.MANAGER,
+        )
+    ),
+]
 HR = Annotated[AuthContext, Depends(require_roles(UserRole.HR))]
 
 

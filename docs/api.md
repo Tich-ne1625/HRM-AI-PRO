@@ -1,5 +1,21 @@
 # API contract
 
+## Notifications and responsibility split (2026-11-14)
+
+HR organizes, assigns feedback, monitors and finalizes/closes. Only the eligible current direct manager writes individual KPI allocations/actuals and calculates/recalculates; HR receives 403 for these writes and no edit controls. HR still manages KPI definitions and reads scoped evidence.
+
+All routes below require authentication and return no-store. Inbox ownership, current role and employee scope apply before count/page/read updates. An assigned reviewer may receive their own assignment notice without report access. Read mutations require exact Origin and family-bound CSRF.
+
+| Route under `/api/v1/notifications` | Behavior |
+| --- | --- |
+| GET `?page=1&page_size=20&unread=false` | `{items,total,unread_count,page,page_size}`; page size 1–50; newest first; item `{id,title,message,href,created_at,read_at}` |
+| GET `/tasks` | `{items,truncated}` from current evidence/own open assignments; actionable versus waiting work, no scoring/AI writes |
+| POST `/{id}/read` | 204, idempotent read timestamp; missing/outside scope 404 |
+| POST `/read-all` | 204; only currently visible recipient rows |
+| GET `/events` | Authenticated same-origin SSE; `change` asks client to refetch scoped data; heartbeat every 10s; expired/revoked/changed role emits `session` and closes |
+
+Notifications and transaction-bound PostgreSQL NOTIFY commit with business changes; rollback publishes neither. One reconnecting LISTEN connection per API process, bounded queues and at most five SSE connections per account per process. SSE sends no business payload. Browser reconnects with session refresh, catches up from durable inbox and falls back to 15s reads while disconnected. No new secrets, service or environment variables. See [audiences and workflow](notifications-contract.vi.md).
+
 ## Security boundaries and audit reads (Phase 9)
 
 All `/api/v1/` responses, including errors, use no-store. The API reads and bounds actual body bytes before domain processing (default 131072); excess returns 413 `request_too_large`, including chunked/forged-length ASGI requests. Same-origin/CSRF and SQL role/resource checks remain authoritative.
@@ -164,7 +180,7 @@ Implemented under `/api/v1`, all no-store. Read scope is HR/self/current direct 
 | --- | --- |
 | GET `/performance/{employee_id}?cycle_id=...` | Scoped report: NOT_CALCULATED/CURRENT/STALE/FINALIZED, readiness, frozen labels, capability flags; current_result=null when stale/not calculated; last_calculation explicitly historical |
 | GET `/performance/{employee_id}/readiness?cycle_id=...` | Public actionable issue codes/KPI IDs; HR additionally receives pending/blocked required assignment IDs |
-| POST `/performance/{employee_id}/calculate` | HR/current eligible direct manager, ACTIVE/unfinalized; `{cycle_id,expected_evidence_version}`. First 201, later 200. Same hash returns reused=true without a revision/audit |
+| POST `/performance/{employee_id}/calculate` | Current eligible direct manager only, ACTIVE/unfinalized; `{cycle_id,expected_evidence_version}`. First 201, later 200. Same hash returns reused=true without a revision/audit |
 | GET `/reviews/{id}/revisions` | Scoped history, page >=1, page_size 1–100; newest calculation_version first |
 | GET `/reviews/{id}/revisions/{calculation_version}` | Scoped immutable calculation detail with allowed feedback aggregates and at most caller's own submission in that revision |
 | GET `/reviews/{id}/finalization-context` | HR-only current evidence/calculation versions, readiness, open_optional_count |
@@ -189,9 +205,9 @@ All endpoints below are implemented under `/api/v1`, use the existing error enve
 | DELETE `/review-cycles/{id}/participants/{participant_id}` | HR, DRAFT with no evidence; JSON `{expected_version}`; returns `{version,count:1}` |
 | POST `/review-cycles/{id}/activate` | HR `{expected_version}`; validates eligibility, freezes policy/organization/relationships, increments versions and activates atomically |
 | GET/POST `/kpis`; PATCH `/kpis/{id}` | HR manages definitions; GET other domain roles only definitions assigned within live scope. PATCH expected_version + supported changes; retirement via is_active |
-| GET `/employees/{id}/kpi-options?cycle_id=...` | HR/eligible current direct manager only, ACTIVE/unfinalized participant; paginated active definitions available to assign |
-| GET/PUT `/employees/{id}/kpis?cycle_id=...` | GET scoped aggregate; PUT HR/current eligible direct manager `{expected_evidence_version,items:[{definition_id,target,weight}]}` atomically replaces complete allocation |
-| PATCH `/employee-kpis/{id}` | HR/current eligible direct manager `{expected_evidence_version,actual}`; actual null clears; target/weight/snapshot are forbidden |
+| GET `/employees/{id}/kpi-options?cycle_id=...` | Eligible current direct manager only, ACTIVE/unfinalized participant; paginated active definitions available to assign |
+| GET/PUT `/employees/{id}/kpis?cycle_id=...` | GET scoped aggregate; PUT current eligible direct manager only `{expected_evidence_version,items:[{definition_id,target,weight}]}` atomically replaces complete allocation |
+| PATCH `/employee-kpis/{id}` | Current eligible direct manager only `{expected_evidence_version,actual}`; actual null clears; target/weight/snapshot are forbidden |
 
 Allocation response is `{participant,cycle_status,items}`. The participant DTO exposes id/cycle_id/employee_id, employee_code/display_name, department_id/name, position_title, evidence_version, is_snapshot and can_manage_kpis. It never exposes the private user/manager/direct-report snapshot. Items expose id/definition_id, a definition snapshot (schema_version/version/code/name/description/unit/direction), target/actual/weight. No score fields are fabricated. Nonexistent and out-of-scope detail requests use the same 404 code for that resource type.
 

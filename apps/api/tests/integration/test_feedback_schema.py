@@ -13,7 +13,7 @@ from .test_feedback_workflows import create_assignment, feedback_world
 
 
 def test_feedback_migration_metadata_and_no_backfill(world):
-    assert ScriptDirectory.from_config(Config(str(ALEMBIC_INI))).get_heads() == ["20261024_0008"]
+    assert ScriptDirectory.from_config(Config(str(ALEMBIC_INI))).get_heads() == ["20261114_0009"]
     assert {"feedback", "feedback_assignments"} <= set(inspect(world.engine).get_table_names())
     command.check(Config(str(ALEMBIC_INI)))
     feedback_world(world)
@@ -89,9 +89,9 @@ def test_phase4_upgrade_downgrade_preserves_account_kpi_and_actual(world):
     from .test_employee_kpis import allocation_world, replace_body
 
     _, definition, _, path = allocation_world(world)
-    allocation = world.client().put(path, json=replace_body(definition)).json()
+    allocation = world.client("manager").put(path, json=replace_body(definition)).json()
     assert (
-        world.client()
+        world.client("manager")
         .patch(
             f"/api/v1/employee-kpis/{allocation['items'][0]['id']}",
             json={"expected_evidence_version": 3, "actual": "0.0000"},

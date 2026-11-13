@@ -1,6 +1,10 @@
 # Database design status
 
-## Current head: Phase 9 login reservations
+## Current head: notifications
+
+Current head is `20261114_0009`, parent `20261024_0008`. The new `notifications` table stores an audit event, recipient/current-at-delivery role, event kind, optional employee/cycle/assignment links, created_at and nullable read_at. Unique `(event_id,recipient_id)` prevents duplicate delivery; `(recipient_id,created_at,id)` indexes inbox ordering. No raw comments, AI outputs or credentials are copied. Existing accounts, password hashes, evidence and histories are untouched. Read state survives reload/restart. Downgrading to 0008 deletes the notification table/history only; back up before rollback. No historical business events are backfilled.
+
+## Phase 9 login reservations
 
 Revision `20261024_0008` (parent `20261022_0007`) adds only `auth_login_limits`: `bucket_key VARCHAR(64)` primary key constrained to lowercase hex, positive integer `attempts`, non-null timezone-aware `expires_at` with an expiry index. The key is a domain-separated HMAC of normalized email, never a raw email. Reservations use atomic PostgreSQL upsert and database statement time, committed before password work. Counts saturate at configured cap+1; an expired window resets on the next attempt.
 

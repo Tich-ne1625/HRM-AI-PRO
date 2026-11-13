@@ -198,9 +198,7 @@ class PerformanceService:
         request_id: str,
     ) -> tuple[PerformanceReport, bool]:
         with self.session.begin():
-            actor = authorize_domain_write(
-                self.session, context, csrf, (UserRole.HR, UserRole.MANAGER)
-            )
+            actor = authorize_domain_write(self.session, context, csrf, (UserRole.MANAGER,))
             participant, employee, cycle = self.lock_scope(employee_id, body.cycle_id, actor)
             self.writable(participant, cycle)
             if not can_write_kpis(

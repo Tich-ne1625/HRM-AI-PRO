@@ -1,0 +1,40 @@
+{
+  "real_sse": true,
+  "read_synced_between_tabs": true,
+  "read_persists_reload": true,
+  "manager_to_hr_handoff": true,
+  "notification_opens_detail_modal": true,
+  "hr_no_calculation_controls": true,
+  "finalized_kpi_locked": true,
+  "reconnected": true,
+  "widths": [
+    1280,
+    390
+  ],
+  "ai_called": false,
+  "date": "2026-11-14",
+  "environment": "isolated fictional data; API 18019/web 13019; AI disabled",
+  "backend": {
+    "unique_tests_verified_across_regression_and_targeted_runs": 860,
+    "ruff": "passed",
+    "mypy_source_files": 110
+  },
+  "frontend": {
+    "tests": 168,
+    "files": 24,
+    "lint": "passed",
+    "typecheck": "passed",
+    "production_build": "passed"
+  },
+  "no_user_domain_mutations_during_browser_test": true,
+  "user_stack": {
+    "schema_head": "20261114_0009",
+    "api_web_postgres": "healthy",
+    "backup_created": true,
+    "business_and_account_tables_unchanged": 15,
+    "prior_auth_history_verified": true,
+    "auth_difference": "normal session refresh",
+    "web_sse_unbuffered": true,
+    "existing_demo_password_preserved": true
+  }
+}

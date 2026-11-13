@@ -125,4 +125,7 @@ class AuditWriter:
         )
         session.add(record)
         session.flush()
+        from app.modules.notifications.delivery import deliver
+
+        deliver(session, record)
         return record

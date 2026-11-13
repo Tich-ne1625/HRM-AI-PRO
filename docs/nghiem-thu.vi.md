@@ -191,7 +191,7 @@ Làm trước khi đóng kỳ. Mỗi hàng là một bài độc lập; đăng x
 | Tính lần đầu | Quản lý kỹ thuật mở **Dũng → Kết quả**, bấm **Tính điểm hiệu suất** khi đủ điều kiện | Có kết quả và lần tính mới |
 | Tính lại | `sales.manager.demo@example.com` mở **Linh → Kết quả**, đọc tình trạng rồi **Tính lại điểm** | Hết **Cần tính lại**; lần cũ vẫn trong lịch sử |
 | Xem lịch sử | HR mở **An → Kết quả → Lịch sử tính điểm → Xem lần …** | Đọc được các lần tính, không ghi đè lịch sử. Bộ demo nguyên trạng/policy mặc định có 87.00 rồi 82.80; dữ liệu đã sửa có thể khác |
-| Phản hồi tùy chọn | `linh.demo@example.com` mở **Phản hồi của tôi**, gửi phân công `PEER` cho **An** nếu còn mở và An chưa chốt | Gửi thành công; kết quả An cần tính lại. Sau đó HR/quản lý kỹ thuật tính lại An trước khi chốt |
+| Phản hồi tùy chọn | `linh.demo@example.com` mở **Phản hồi của tôi**, gửi phân công `PEER` cho **An** nếu còn mở và An chưa chốt | Gửi thành công; kết quả An cần tính lại. Sau đó quản lý kỹ thuật tính lại An, HR kiểm tra/chốt |
 | Hồ sơ đã chốt | HR hoặc `ha.demo@example.com` xem kết quả Hà | Đọc được kết quả; không sửa bằng chứng đã khóa |
 | Phạm vi quản lý | Quản lý kỹ thuật xem danh sách kỳ, rồi quản lý kinh doanh xem cùng kỳ | Kỹ thuật thấy An/Bình/Dũng; kinh doanh thấy Hà/Linh trong phạm vi tương ứng, không truy cập chéo hồ sơ |
 | Thống kê nhóm nhỏ | Mở tổng hợp phản hồi An | Nhóm chưa đủ ba người gửi bị ẩn thống kê nhóm để bảo vệ riêng tư; không coi đó là mất dữ liệu |
@@ -232,7 +232,19 @@ Nếu một bài đã hoàn thành từ trước, ghi “đã có sẵn, kiểm 
 2. Xem **Thông tin bản nháp**, sửa tên/ngày nếu cần, lưu theo form. Mở **Thêm người tham gia bản nháp**, tìm và chọn nhân viên cần đánh giá, bấm **Thêm người đã chọn**.
 3. Kiểm tra đủ người, tài khoản hoạt động, cơ cấu và cấu hình chấm điểm trước khi kích hoạt.
 4. Chỉ sau khi kỳ ACTIVE cũ đã đóng, và bạn muốn bắt đầu một lượt mới, bấm **Kích hoạt chu kỳ → Xác nhận kích hoạt**. Danh sách tham gia và cấu hình bị đóng băng sau bước này.
-5. Với kỳ mới, HR/quản lý phân bổ KPI cho từng người, tổng trọng số 100%; HR giao phản hồi qua **Phân công phản hồi**, rồi lặp luồng nhập thực tế → gửi phản hồi → tính → chốt → đóng. Xem các trường bắt buộc trực tiếp trên form.
+5. Với kỳ mới, quản lý trực tiếp phân bổ KPI cho từng người, tổng trọng số 100%; HR giao phản hồi qua **Phân công phản hồi**, rồi lặp luồng quản lý nhập thực tế → người được giao gửi phản hồi → quản lý tính → HR chốt → HR đóng kỳ. Xem các trường bắt buộc trực tiếp trên form.
+
+### Kiểm tra thông báo và bàn giao công việc
+
+1. Mở hai trình duyệt hoặc hai cửa sổ riêng tư độc lập: HR ở một cửa sổ, người được giao phản hồi ở cửa sổ khác. Không dùng chung phiên đăng nhập cho hai role.
+2. Người nhận bấm chuông **Thông báo** trên header. HR giao một phiếu hợp lệ cho người đó. Tin mới xuất hiện trực tiếp, số chưa đọc tăng; không cần tải lại trang.
+3. Người nhận bấm tin: phiếu mở trong khung chi tiết; tin chuyển đã đọc. Bấm **× Đóng** để quay về trang ban đầu. Chưa gửi phiếu thì phiếu vẫn còn ở **Việc cần làm**.
+4. Mở thêm tab cùng tài khoản người nhận; đánh dấu một tin đã đọc ở tab đầu. Tab thứ hai tự cập nhật số chưa đọc. Tải lại vẫn giữ trạng thái đã đọc.
+5. Gửi phiếu đúng người được giao. HR/quản lý liên quan nhận tin cập nhật; công việc gửi phiếu không còn trong danh sách người gửi.
+6. Quản lý hoàn tất bằng chứng và tính điểm. HR nhận tin, mở **Việc cần làm → Kiểm tra và chốt kết quả**, kiểm tra rồi chốt. Nhân viên/quản lý nhận tin đã chốt.
+7. Kiểm tra HR không có nút chỉnh phân bổ/nhập thực tế/tính điểm; quản lý không có nút chốt. Tắt mạng tạm thời: sidebar báo kết nối lại; bật mạng để nhận các tin đã lưu trong lúc gián đoạn.
+
+Thông báo bắt đầu từ lần nâng cấp này; không tạo lại tin từ dữ liệu demo cũ. Dùng **Việc cần làm** để xem hồ sơ còn chờ hiện tại. Không cần nạp lại dữ liệu mẫu.
 
 Kỳ nháp không tự kế thừa đầy đủ bằng chứng từ kỳ đã đóng. Phần này là bài vận hành mới, không yêu cầu phải hoàn tất để nghiệm thu bộ demo.
 

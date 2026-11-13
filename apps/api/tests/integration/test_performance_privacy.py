@@ -77,7 +77,7 @@ def test_report_and_history_queries_are_bounded(world):
     report = calculate(world, cycle, participant, base).json()
     for value in ("50.0000", "60.0000", "70.0000"):
         assert (
-            world.client()
+            world.client("manager")
             .patch(
                 f"/api/v1/employee-kpis/{item['id']}",
                 json={

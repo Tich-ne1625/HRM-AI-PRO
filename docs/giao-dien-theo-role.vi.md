@@ -35,15 +35,24 @@ Các nút **Thêm nhân viên**, **Thêm mới phòng ban/chức danh**, **Thêm
 
 | Khu vực | HR | Quản lý trực tiếp | Nhân viên |
 | --- | --- | --- | --- |
-| KPI | Xem, phân bổ, nhập thực tế khi kỳ/hồ sơ cho phép | Xem, phân bổ, nhập thực tế cho cấp dưới khi được phép | Chỉ xem |
+| KPI | Chỉ xem để theo dõi; quản trị danh mục tại tab riêng | Xem, phân bổ, nhập thực tế cho cấp dưới khi được phép | Chỉ xem |
 | Phản hồi 360 | Xem tổng hợp, mở quản trị phân công | Xem tổng hợp được phép | Xem tổng hợp được phép |
-| Kết quả | Xem, tính, chốt theo điều kiện | Xem, tính theo điều kiện | Chỉ xem |
+| Kết quả | Xem, kiểm tra và chốt theo điều kiện | Xem, tính/tính lại theo điều kiện | Chỉ xem |
 | Tư vấn AI | Chọn phạm vi, tạo khi đủ điều kiện, đọc lịch sử | Chỉ đọc tư vấn chung trong phạm vi | Chỉ đọc tư vấn chung trong phạm vi |
 | Phiếu được giao | Chỉ gửi khi chính mình là người được giao | Như HR | Như HR |
 
 Hồ sơ đã chốt hoặc kỳ đã đóng không còn thao tác sửa bằng chứng. Một nút không xuất hiện vì thiếu quyền khác với nút đang tạm khóa trong khi lưu hoặc chờ xác nhận.
 
 Các liên kết chi tiết vẫn có địa chỉ để mở ở tab mới hoặc truy cập trực tiếp khi cần. Khi mở bằng cách bấm thông thường trong không gian làm việc, chúng dùng khung nổi để giữ ngữ cảnh của danh sách.
+
+## Sidebar thông báo
+
+Chuông **Thông báo** nằm trên header ở mọi role. Bấm để mở khung bên phải; đóng bằng **× Đóng** hoặc Escape. Có hai mục:
+
+- **Thông báo**: tin gửi riêng cho người liên quan; chấm chưa đọc và số trên chuông; lọc chưa đọc, đánh dấu một tin hoặc đọc tất cả. Bấm tin mở đúng chi tiết, giữ trang đang xem.
+- **Việc cần làm**: việc có thể thực hiện và việc đang chờ người khác. HR giao phiếu/kiểm tra/chốt; quản lý giao KPI/nhập thực tế/tính; người được giao gửi phiếu. Danh sách dựa trên dữ liệu hiện tại, không bị xóa khi đọc tin.
+
+Cập nhật trực tiếp khi có tương tác và khi đọc ở tab khác. Khi mất kết nối, trang tự thử lại và kiểm tra định kỳ. Quyền đọc vẫn do API kiểm tra; thông báo không chứa nhận xét gốc hoặc tư vấn nội bộ gửi cho role khác. Xem [quy tắc người nhận](notifications-contract.vi.md).
 
 ## Kiểm tra thay đổi giao diện
 

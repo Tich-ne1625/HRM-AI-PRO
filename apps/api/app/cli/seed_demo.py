@@ -196,9 +196,12 @@ class DemoBuilder:
             )
         return row.id
 
+    def manager_context(self, person: str) -> AuthContext:
+        return self.contexts["sales.manager" if person in ("ha", "linh") else "manager"]
+
     def allocate(self, cycle_id: UUID, person: str, *, partial: bool = False) -> list[UUID]:
         participant = self.participant(cycle_id, person)
-        context = self.contexts["hr"]
+        context = self.manager_context(person)
         service = AllocationService(self.session)
         allocation = service.replace(
             self.employees[person].id,
@@ -281,7 +284,7 @@ class DemoBuilder:
             CalculateInput(
                 cycle_id=cycle_id, expected_evidence_version=participant.evidence_version
             ),
-            self.contexts["hr"],
+            self.manager_context(person),
             csrf=self.csrf,
             request_id=DATASET,
         )
@@ -339,7 +342,7 @@ class DemoBuilder:
                             expected_evidence_version=participant.evidence_version,
                             actual="80",
                         ),
-                        self.contexts["hr"],
+                        self.manager_context(person),
                         csrf=self.csrf,
                         request_id=DATASET,
                     )

@@ -88,7 +88,7 @@ def test_saved_reports_reject_invalid_filters(world, query):
 def test_saved_report_history_stale_engine_and_live_scope(ai_world):
     world, provider, report, path, body, item = ai_world
     generated = generate(world, path, body)
-    changed = world.client().patch(
+    changed = world.client("manager").patch(
         f"/api/v1/employee-kpis/{item['id']}",
         json={"expected_evidence_version": report["evidence_version"], "actual": "50.0000"},
     )

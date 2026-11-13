@@ -24,7 +24,11 @@ class HTTPBoundary:
                 headers["X-Frame-Options"] = "DENY"
                 headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
                 if api:
-                    headers["Cache-Control"] = "no-store"
+                    headers["Cache-Control"] = (
+                        "no-store, no-transform"
+                        if headers.get("content-type", "").startswith("text/event-stream")
+                        else "no-store"
+                    )
                     headers["Content-Security-Policy"] = (
                         "default-src 'none'; frame-ancestors 'none'"
                     )

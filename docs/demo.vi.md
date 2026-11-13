@@ -32,13 +32,13 @@ Tại màn hình đăng nhập, chọn ô **Nhân sự / Quản lý / Nhân viê
 | Email | Role | Việc nên thử |
 | --- | --- | --- |
 | `admin.demo@example.com` | ADMIN | Quản trị tài khoản, tạo user, đổi role/khóa tài khoản thử, xem cấu hình tính điểm cho kỳ tương lai |
-| `hr.demo@example.com` | HR | Phòng ban/chức danh/nhân viên, kỳ đánh giá, KPI, phân công và nhận xét gốc, tính/chốt điểm, tạo tư vấn AI |
+| `hr.demo@example.com` | HR | Tổ chức nhân sự, kỳ đánh giá, danh mục KPI, phân công và nhận xét gốc, theo dõi/kiểm tra/chốt điểm, tạo tư vấn AI |
 | `manager.demo@example.com` | MANAGER | Nguyễn Lan, quản lý An/Bình/Dũng; nhập KPI, gửi đánh giá quản lý, tính điểm cho nhân viên trực tiếp |
 | `sales.manager.demo@example.com` | MANAGER | Trần Huy, quản lý Hà/Linh; thử phạm vi phòng ban khác và tính lại điểm của Linh |
 | `an.demo@example.com` | EMPLOYEE | Xem điểm hiện tại và lịch sử hai lần tính; đọc tư vấn chung sau khi HR tạo |
 | `binh.demo@example.com` | EMPLOYEE | Gửi tự đánh giá còn thiếu qua **Phản hồi của tôi** |
 | `chi.demo@example.com` | EMPLOYEE | Nhân viên trực tiếp của An; xem phản hồi đã gửi với quan hệ SUBORDINATE |
-| `dung.demo@example.com` | EMPLOYEE | Xem hồ sơ đã đủ bằng chứng, đang chờ quản lý/HR tính điểm |
+| `dung.demo@example.com` | EMPLOYEE | Xem hồ sơ đã đủ bằng chứng, đang chờ quản lý tính điểm |
 | `ha.demo@example.com` | EMPLOYEE | Xem kết quả đã chốt, kiểm tra bằng chứng không còn được sửa |
 | `linh.demo@example.com` | EMPLOYEE | Xem điểm cần tính lại; gửi phản hồi PEER còn mở cho An |
 
@@ -73,8 +73,8 @@ Chọn **Chu kỳ đánh giá → Thực hành đánh giá → người tham gia
 
 ## Luồng 3: tính mới, tính lại và xem hồ sơ đã chốt
 
-- **Dũng:** đã đủ KPI và phản hồi bắt buộc, chưa tính điểm. HR/quản lý kỹ thuật bấm tính để thấy luồng tạo kết quả lần đầu.
-- **Linh:** đã tính điểm rồi sửa KPI, trạng thái **Cần tính lại**. HR/quản lý kinh doanh tính lại, lịch sử cũ vẫn giữ.
+- **Dũng:** đã đủ KPI và phản hồi bắt buộc, chưa tính điểm. Quản lý kỹ thuật bấm tính, sau đó HR kiểm tra/chốt.
+- **Linh:** đã tính điểm rồi sửa KPI, trạng thái **Cần tính lại**. Quản lý kinh doanh tính lại, lịch sử cũ vẫn giữ; HR kiểm tra/chốt.
 - **Hà:** đã chốt trong kỳ ACTIVE. Xem kết quả hoặc tạo AI bằng HR; các thao tác sửa bằng chứng bị khóa.
 - Sau khi mọi người trong kỳ ACTIVE đều đã chốt, HR **Đóng chu kỳ**, rồi có thể kích hoạt kỳ nháp tiếp theo. Một hồ sơ chưa chốt vẫn chặn đóng kỳ.
 

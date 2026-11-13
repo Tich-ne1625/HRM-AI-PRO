@@ -20,6 +20,8 @@ from app.modules.health.router import router as health_router
 from app.modules.health.service import ReadinessService
 from app.modules.kpis.allocation_router import router as allocation_router
 from app.modules.kpis.router import router as kpis_router
+from app.modules.notifications.realtime import NotificationHub
+from app.modules.notifications.router import router as notifications_router
 from app.modules.organization.router import router as organization_router
 from app.modules.performance.router import router as performance_router
 from app.modules.review_cycles.router import router as cycles_router
@@ -29,8 +31,12 @@ from app.modules.users.router import router as users_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
-    yield
-    app.state.engine.dispose()
+    app.state.notification_hub.start()
+    try:
+        yield
+    finally:
+        await app.state.notification_hub.stop()
+        app.state.engine.dispose()
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -44,6 +50,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         application_settings.alembic_config_path,
     )
     app.state.ai_provider = GeminiProvider(application_settings)
+    app.state.notification_hub = NotificationHub(
+        application_settings.database_url.get_secret_value()
+    )
     register_error_handling(app)
     app.add_middleware(
         HTTPBoundary,
@@ -64,6 +73,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(ai_router)
     app.include_router(dashboard_router)
     app.include_router(audit_router)
+    app.include_router(notifications_router)
     return app
 
 

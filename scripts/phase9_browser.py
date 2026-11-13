@@ -309,6 +309,7 @@ def workflow(p, password):
     p.write("/api/v1/kpis", lambda: p.click("Thêm định nghĩa"), 201)
     kpi_path = f"/employees/{employees['employee']}/kpis?cycle_id={cycle}"
     report_path = f"/employees/{employees['employee']}/performance?cycle_id={cycle}"
+    p.login("manager", password)
     p.go(kpi_path)
     p.click("Chỉnh phân bổ KPI")
     p.click("Thêm P9")
@@ -321,6 +322,7 @@ def workflow(p, password):
     p.fill("input[id^=actual-]", "90")
     actual_id = p.get(allocation_path + f"?cycle_id={cycle}")["items"][0]["id"]
     p.write(f"/api/v1/employee-kpis/{actual_id}", lambda: p.click("Lưu thực tế P9"))
+    p.login("hr", password)
     assignments = []
     for relation in ("SELF", "MANAGER"):
         p.go(f"/feedback-administration?participant_id={participant}&cycle_id={cycle}")

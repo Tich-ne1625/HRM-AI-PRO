@@ -28,7 +28,7 @@ function Detail({id, cycle}: {id: string; cycle: string}) {
   if (query.isPending) return <p role="status">Đang tải KPI nhân viên…</p>;
   if (query.isError) return <ReviewError error={query.error} reload={() => {void query.refetch();}} />;
   const data = query.data, participant = data.participant;
-  const canManage = participant.can_manage_kpis && (user?.role === "HR" || user?.role === "MANAGER");
+  const canManage = participant.can_manage_kpis && user?.role === "MANAGER";
   return <><section className="auth-card wide"><Link href={`/review-cycles/${cycle}`}>← Người tham gia chu kỳ</Link><p className="eyebrow">{cycleQuery.data?.name ?? "Chu kỳ được chọn"} · {cycleStatus[data.cycle_status]}</p>
     <h1>KPI · {participant.display_name}</h1><p>{participant.employee_code} · {participant.department_name} · {participant.position_title}</p>
     {participant.is_snapshot && <EvaluationTabs employeeId={id} cycleId={cycle} active="kpis" />}

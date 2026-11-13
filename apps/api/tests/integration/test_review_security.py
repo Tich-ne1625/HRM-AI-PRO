@@ -12,7 +12,7 @@ def test_every_phase4_mutation_checks_origin_csrf_and_live_family(world, failure
     from app.models import AuditLog, AuthSession
 
     cycle, first, _second, path = allocation_world(world)
-    saved = world.client().put(path, json=replace_body(first)).json()
+    saved = world.client("manager").put(path, json=replace_body(first)).json()
     cycle_path = "/api/v1/review-cycles/" + cycle["id"]
     cases = [
         (
@@ -47,9 +47,9 @@ def test_every_phase4_mutation_checks_origin_csrf_and_live_family(world, failure
             "/api/v1/kpis/" + first["id"],
             {"expected_version": 1, "name": "Forbidden"},
         ),
-        ("hr", "PUT", path, replace_body(first, version=3)),
+        ("manager", "PUT", path, replace_body(first, version=3)),
         (
-            "hr",
+            "manager",
             "PATCH",
             "/api/v1/employee-kpis/" + saved["items"][0]["id"],
             {"expected_evidence_version": 3, "actual": "10.0000"},
@@ -85,9 +85,9 @@ def test_forged_evidence_fields_are_rejected_and_audits_do_not_copy_payloads(wor
     _cycle, first, _second, path = allocation_world(world)
     body = replace_body(first)
     for extra in ({"scope": "HR"}, {"snapshot": {}}, {"manager_id": world.employees["other"]}):
-        assert world.client().put(path, json={**body, **extra}).status_code == 422
-    saved = world.client().put(path, json=body).json()
-    world.client().patch(
+        assert world.client("manager").put(path, json={**body, **extra}).status_code == 422
+    saved = world.client("manager").put(path, json=body).json()
+    world.client("manager").patch(
         "/api/v1/employee-kpis/" + saved["items"][0]["id"],
         json={
             "expected_evidence_version": 3,

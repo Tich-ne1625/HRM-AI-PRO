@@ -359,7 +359,7 @@ def performance_smoke(
         base + "/calculate", method="POST", body=payload, expected=201
     )
     assert calculated["current_result"]["final_score"] == "24.00"
-    assert hr.request(base + "/calculate", method="POST", body=payload)["reused"]
+    assert manager.request(base + "/calculate", method="POST", body=payload)["reused"]
     admin.request(path, expected=403)
     optional.request(path, expected=404)
     manager.request(
@@ -373,7 +373,7 @@ def performance_smoke(
     stale = employee.request(path)
     assert stale["state"] == "STALE" and stale["current_result"] is None
     payload["expected_evidence_version"] += 1
-    report = hr.request(base + "/calculate", method="POST", body=payload)
+    report = manager.request(base + "/calculate", method="POST", body=payload)
     assert report["current_result"]["final_score"] == "87.00"
     review = "/api/v1/reviews/" + report["review_id"]
     assert employee.request(review + "/revisions")["total"] == 2

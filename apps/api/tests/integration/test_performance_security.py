@@ -29,7 +29,7 @@ def test_performance_mutations_require_origin_and_csrf(world, operation, protect
             f"/api/v1/review-cycles/{cycle['id']}/close",
             {"expected_version": cycle["version"]},
         )
-    client = world.client()
+    client = world.client("manager" if operation == "calculate" else "hr")
     if protection == "origin":
         client.headers["Origin"] = "https://untrusted.example"
     else:
@@ -209,7 +209,7 @@ def test_revision_uniqueness_foreign_keys_and_migration_roundtrip(world):
     with pytest.raises(IntegrityError), Session(world.engine) as session, session.begin():
         session.add(PerformanceReviewRevision(**values))
     config = Config(str(ALEMBIC_INI))
-    assert ScriptDirectory.from_config(config).get_heads() == ["20261024_0008"]
+    assert ScriptDirectory.from_config(config).get_heads() == ["20261114_0009"]
     command.check(config)
     command.downgrade(config, "20261020_0005")
     command.upgrade(config, "head")
@@ -234,7 +234,7 @@ def test_revision_database_error_rolls_back_header_and_audit(world, monkeypatch,
     cycle, participant, item, base = ready_world(world)
     if recalculate:
         calculate(world, cycle, participant, base)
-        world.client().patch(
+        world.client("manager").patch(
             f"/api/v1/employee-kpis/{item['id']}",
             json={
                 "expected_evidence_version": participant["evidence_version"],
@@ -288,7 +288,7 @@ def test_calculation_uses_frozen_policy_and_definition_after_live_edits(world):
         == 200
     )
     assert (
-        world.client()
+        world.client("manager")
         .patch(
             f"/api/v1/employee-kpis/{item['id']}",
             json={

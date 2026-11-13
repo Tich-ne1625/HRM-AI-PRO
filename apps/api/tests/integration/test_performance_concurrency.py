@@ -52,7 +52,7 @@ def test_finalize_competes_with_evidence_writer(world, monkeypatch, mutation):
         if mutation == "submit":
             return submit(world, assignment, "bob")
         if mutation == "allocation":
-            return world.client().put(
+            return world.client("manager").put(
                 f"/api/v1/employees/{world.employees['alice']}/kpis?cycle_id={cycle['id']}",
                 json={
                     "expected_evidence_version": participant["evidence_version"],
@@ -76,7 +76,7 @@ def test_finalize_competes_with_evidence_writer(world, monkeypatch, mutation):
                     "due_at": None,
                 },
             )
-        return world.client().patch(
+        return world.client("manager").patch(
             f"/api/v1/employee-kpis/{item['id']}",
             json={
                 "expected_evidence_version": participant["evidence_version"],
@@ -101,7 +101,7 @@ def test_calculate_competes_with_kpi_change_without_lost_version(world, monkeypa
     responses = race(
         monkeypatch,
         lambda: calculate(world, cycle, participant, base),
-        lambda: world.client().patch(
+        lambda: world.client("manager").patch(
             f"/api/v1/employee-kpis/{item['id']}",
             json={
                 "expected_evidence_version": participant["evidence_version"],
@@ -169,7 +169,7 @@ def test_report_read_has_one_snapshot_while_kpis_change(world, monkeypatch):
         future = pool.submit(lambda: world.client().get(base + f"?cycle_id={cycle['id']}"))
         assert entered.wait(10)
         try:
-            changed = world.client().patch(
+            changed = world.client("manager").patch(
                 f"/api/v1/employee-kpis/{item['id']}",
                 json={
                     "expected_evidence_version": participant["evidence_version"],

@@ -68,3 +68,19 @@ def test_error_responses_are_private_and_secret_safe():
         assert response.headers["cache-control"] == "no-store"
         assert response.headers["x-content-type-options"] == "nosniff"
         assert "SECRET_SENTINEL" not in response.text
+
+
+def test_sse_preserves_no_transform_so_web_proxy_does_not_buffer_events():
+    from starlette.responses import StreamingResponse
+
+    app = create_app(Settings(_env_file=None, database_url="postgresql+psycopg://x:x@localhost/x"))
+
+    @app.get("/api/v1/test-events")
+    def events():
+        return StreamingResponse(
+            iter(["event: change\ndata: {}\n\n"]), media_type="text/event-stream"
+        )
+
+    response = TestClient(app).get("/api/v1/test-events")
+    assert response.headers["cache-control"] == "no-store, no-transform"
+    assert response.text == "event: change\ndata: {}\n\n"

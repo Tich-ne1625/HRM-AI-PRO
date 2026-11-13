@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useRef, type ReactNode } from "react";
 
-export function WorkspaceDialog({ title, close, children, focusKey }: { title: string; close: () => void; children: ReactNode; focusKey?: string }) {
+export function WorkspaceDialog({ title, close, children, focusKey, variant }: { title: string; close: () => void; children: ReactNode; focusKey?: string; variant?: "sidebar" }) {
   const ref = useRef<HTMLDialogElement>(null);
   const titleId = useId();
   useEffect(() => {
@@ -26,7 +26,7 @@ export function WorkspaceDialog({ title, close, children, focusKey }: { title: s
     dialog?.querySelector<HTMLButtonElement>(".dialog-close")?.focus({ preventScroll: true });
     if (dialog) dialog.scrollTop = 0;
   }, [focusKey]);
-  return <dialog ref={ref} className="workspace-dialog" aria-labelledby={titleId} onCancel={(event) => { event.preventDefault(); close(); }} onKeyDown={(event) => {
+  return <dialog ref={ref} className={`workspace-dialog${variant === "sidebar" ? " notification-sidebar" : ""}`} aria-labelledby={titleId} onCancel={(event) => { event.preventDefault(); close(); }} onKeyDown={(event) => {
     if (event.key !== "Tab") return;
     const controls = Array.from(event.currentTarget.querySelectorAll<HTMLElement>('a[href], button:not(:disabled), input:not(:disabled):not([type="hidden"]), select:not(:disabled), textarea:not(:disabled), [tabindex]:not([tabindex="-1"])'))
       .filter((element) => element.tabIndex >= 0 && element.getClientRects().length > 0);

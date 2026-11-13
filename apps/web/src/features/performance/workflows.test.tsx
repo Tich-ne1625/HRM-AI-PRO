@@ -32,6 +32,13 @@ it("does not fetch reports for ADMIN", () => {
   mocks.role = "ADMIN"; mount(<PerformanceReport employeeId="e1" cycleId="c1" />);
   expect(screen.getByRole("alert")).toBeTruthy(); expect(mocks.api.report).not.toHaveBeenCalled();
 });
+it("keeps HR calculation controls hidden even if server capability is stale", async () => {
+  mount(<PerformanceReport employeeId="e1" cycleId="c1" />);
+  await screen.findByText("Điểm hiệu suất");
+  expect(screen.queryByRole("button", { name: "Tính lại điểm" })).toBeNull();
+  expect(screen.getByRole("button", { name: "Chốt kết quả" })).toBeTruthy();
+  expect(mocks.api.calculate).not.toHaveBeenCalled();
+});
 it("shows current totals and retains employee/cycle across functional tabs", async () => {
   mount(<PerformanceReport employeeId="e1" cycleId="c1" />);
   await screen.findByText("Điểm hiệu suất");
@@ -72,6 +79,7 @@ it("requires renewed acknowledgement when the confirmation context changes", asy
   expect(screen.getByRole("button", { name: "Xác nhận chốt kết quả" })).toHaveProperty("disabled", true);
 });
 it("stops repeat submission after conflict until explicit reload", async () => {
+  mocks.role = "MANAGER";
   mocks.api.calculate.mockRejectedValue(new ApiClientError(409, "stale_evidence_version", "stale"));
   const user = userEvent.setup(); mount(<PerformanceReport employeeId="e1" cycleId="c1" />);
   await user.click(await screen.findByRole("button", { name: "Tính lại điểm" }));

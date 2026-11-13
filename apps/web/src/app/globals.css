@@ -62,11 +62,35 @@ a {
 .auth-card { width: 100%; max-width: 40rem; padding: 2rem; background: white; border: 1px solid #e2e8f0;
   border-radius: 1rem; box-shadow: 0 8px 28px #0f172a05; color: #0f172a; margin: 0 0 1.5rem; }
 .auth-card.wide { max-width: none; }
+.workspace .notification-trigger { display: inline-flex; align-items: center; gap: .45rem; padding: .6rem .7rem; border: 1px solid #dbe3ef; border-radius: .65rem; background: white; color: #334155; cursor: pointer; white-space: nowrap; font-size: .8rem; }
+.notification-count { min-width: 1.3rem; padding: .1rem .3rem; border-radius: 1rem; background: #dc2626; color: white; font-size: .7rem; font-weight: 700; text-align: center; }
+.workspace-dialog.notification-sidebar { width: min(28rem, 100%); height: 100dvh; max-height: 100dvh; margin: 0 0 0 auto; border-radius: 1rem 0 0 1rem; }
+.notification-sidebar .workspace-dialog-header { padding: 1rem; }
+.notification-sidebar .workspace-dialog-content { padding: 1rem; }
+.notification-connection { font-size: .75rem; color: #64748b; margin: 0 0 .8rem; }
+.notification-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: .4rem; padding: .3rem; background: #eaf0fa; border-radius: .65rem; margin-bottom: 1rem; }
+.workspace .notification-tabs button { padding: .65rem .3rem; border-radius: .5rem; color: #475569; background: transparent; cursor: pointer; font-size: .85rem; font-weight: 600; }
+.workspace .notification-tabs button[aria-pressed="true"] { color: #1d4ed8; background: white; box-shadow: 0 1px 4px #14213d14; }
+.notification-tools { display: flex; justify-content: space-between; align-items: center; gap: .5rem; margin-bottom: .8rem; font-size: .8rem; }
+.notification-tools label { display: flex; align-items: center; gap: .4rem; }
+.workspace .notification-tools button, .workspace .notification-read { padding: .4rem .2rem; color: #1d4ed8; background: transparent; cursor: pointer; font-size: .78rem; }
+.notification-list { display: grid; gap: .6rem; list-style: none; margin: 0; padding: 0; }
+.notification-list li { border: 1px solid #dbe3ef; border-radius: .7rem; background: white; overflow: hidden; }
+.notification-list li.is-unread { background: #eff5ff; border-color: #c8d9fc; }
+.workspace .notification-item { display: grid; gap: .4rem; padding: .9rem; width: 100%; text-align: left; cursor: pointer; background: transparent; color: #334155; }
+.notification-item-title, .notification-item strong { display: flex; align-items: baseline; gap: .45rem; font-size: .88rem; font-weight: 650; line-height: 1.5; }
+.notification-item > span:not(.notification-item-title) { font-size: .8rem; line-height: 1.6; }
+.notification-item small { color: #64748b; font-size: .7rem; }
+.notification-read { margin: 0 .9rem .5rem; }
+.unread-dot { width: .45rem; height: .45rem; border-radius: 50%; background: #2563eb; flex-shrink: 0; }
+.notification-empty { padding: 2rem .5rem; text-align: center; color: #64748b; font-size: .85rem; line-height: 1.7; }
+.notification-empty h3 { color: #334155; font-weight: 600; margin-bottom: .5rem; }
+@media (max-width: 600px) { .notification-trigger > span:not(.notification-count) { display: none; } .notification-sidebar .workspace-dialog-header h2 { font-size: .95rem; } }
 .workspace-dialog { margin: auto; width: min(74rem, calc(100% - 3rem)); max-height: calc(100dvh - 3rem); padding: 0; border: 1px solid #cbd5e1; border-radius: 1rem; background: #f8fafc; color: #14213d; box-shadow: 0 24px 80px #0f172a40; overflow: auto; overscroll-behavior: contain; }
 .workspace-dialog::backdrop { background: #0f172a80; backdrop-filter: blur(3px); }
 .workspace-dialog-header { position: sticky; top: 0; z-index: 10; display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1rem 1.5rem; background: #fff; border-bottom: 1px solid #e2e8f0; }
 .workspace-dialog-header h2 { font-size: 1.1rem; font-weight: 700; margin: .25rem 0 0; }
-.dialog-close { display: flex; align-items: center; gap: .5rem; padding: .5rem .8rem; border: 1px solid #cbd5e1; border-radius: .5rem; background: #f8fafc; color: #334155; cursor: pointer; flex-shrink: 0; }
+.workspace .dialog-close { display: flex; align-items: center; gap: .5rem; padding: .5rem .8rem; border: 1px solid #cbd5e1; border-radius: .5rem; background: #f8fafc; color: #334155; cursor: pointer; flex-shrink: 0; }
 .dialog-close > span:first-child { font-size: 1.6rem; line-height: 1; }
 .workspace-dialog-content { padding: 1.25rem; min-width: 0; }
 .workspace-dialog-content .auth-card { max-width: none; margin-bottom: 1rem; box-shadow: none; }
@@ -263,3 +287,5 @@ details[open] > summary { margin-bottom: 1rem; }
   .workspace-main .row-actions { gap: .5rem; }
   .workspace-main .section-heading { align-items: flex-start; }
 }
+
+.workspace .notification-item:hover { background: #eaf0fa; }

@@ -72,7 +72,7 @@ def test_concurrent_full_allocations_have_one_winner(world, monkeypatch):
     _cycle, first, second, path = allocation_world(world)
     responses = race(
         monkeypatch,
-        lambda: world.client().put(path, json=replace_body(first)),
+        lambda: world.client("manager").put(path, json=replace_body(first)),
         lambda: world.client("manager").put(path, json=replace_body(second)),
     )
     assert sorted(r.status_code for r in responses) == [200, 409]
@@ -83,11 +83,11 @@ def test_put_and_actual_share_the_participant_version(world, monkeypatch):
     from .test_employee_kpis import allocation_world, replace_body
 
     _cycle, first, second, path = allocation_world(world)
-    saved = world.client().put(path, json=replace_body(first)).json()
+    saved = world.client("manager").put(path, json=replace_body(first)).json()
     row = saved["items"][0]
     responses = race(
         monkeypatch,
-        lambda: world.client().put(path, json=replace_body(first, second, version=3)),
+        lambda: world.client("manager").put(path, json=replace_body(first, second, version=3)),
         lambda: world.client("manager").patch(
             f"/api/v1/employee-kpis/{row['id']}",
             json={
@@ -104,10 +104,10 @@ def test_actuals_on_two_rows_cannot_bypass_participant_version(world, monkeypatc
     from .test_employee_kpis import allocation_world, replace_body
 
     _cycle, first, second, path = allocation_world(world)
-    rows = world.client().put(path, json=replace_body(first, second)).json()["items"]
+    rows = world.client("manager").put(path, json=replace_body(first, second)).json()["items"]
 
     def update(row):
-        return world.client().patch(
+        return world.client("manager").patch(
             f"/api/v1/employee-kpis/{row['id']}",
             json={
                 "expected_evidence_version": 3,
@@ -128,7 +128,7 @@ def test_allocations_for_different_participants_do_not_deadlock(world, monkeypat
     other = path.replace(world.employees["alice"], world.employees["bob"])
     responses = race(
         monkeypatch,
-        lambda: world.client().put(path, json=replace_body(first)),
+        lambda: world.client("manager").put(path, json=replace_body(first)),
         lambda: world.client("other").put(other, json=replace_body(second)),
     )
     assert [r.status_code for r in responses] == [200, 200]

@@ -260,7 +260,8 @@ def test_real_accounts_organization_linkage_scopes_and_transfer(auth_engine, mon
         assert calculated.status_code == 201, calculated.text
         performance = calculated.json()
         assert performance["current_result"]["final_score"] == "76.50"
-        assert hr.post(performance_path + "/calculate", json=payload).json()["reused"]
+        assert hr.post(performance_path + "/calculate", json=payload).status_code == 403
+        assert manager.post(performance_path + "/calculate", json=payload).json()["reused"]
         changed = manager.patch(
             "/api/v1/employee-kpis/" + assigned.json()["items"][0]["id"],
             json={
@@ -274,7 +275,7 @@ def test_real_accounts_organization_linkage_scopes_and_transfer(auth_engine, mon
             == "STALE"
         )
         payload["expected_evidence_version"] += 1
-        performance = hr.post(performance_path + "/calculate", json=payload).json()
+        performance = manager.post(performance_path + "/calculate", json=payload).json()
         assert performance["current_result"]["final_score"] == "87.00"
         review_path = f"/api/v1/reviews/{performance['review_id']}"
         assert employee.get(review_path + "/revisions").json()["total"] == 2

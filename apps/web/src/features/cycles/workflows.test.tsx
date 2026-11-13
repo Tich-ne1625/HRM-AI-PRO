@@ -69,6 +69,13 @@ it("does not fetch domain data or show HR forms to ADMIN", () => {
 it("shows managers a read-only cycle directory", async () => {
   mocks.role = "MANAGER"; mount(<CycleDirectory />); await screen.findByRole("link", {name: "Quý IV"}); expect(screen.queryByLabelText("Tên chu kỳ")).toBeNull();
 });
+it("shows HR allocated KPI without manager write controls", async () => {
+  mount(<EmployeeKpis id="alice" cycle="cycle" />);
+  await screen.findByRole("heading", { name: "KPI · An" });
+  expect(screen.queryByRole("button", { name: "Chỉnh phân bổ KPI" })).toBeNull();
+  expect(screen.queryByRole("button", { name: "Nhập thực tế SALES" })).toBeNull();
+  expect(mocks.api.replace).not.toHaveBeenCalled();
+});
 it("requires explicit activation confirmation and shows actionable failures", async () => {
   mocks.api.activate.mockRejectedValue(new ApiClientError(409, "activation_requirements_not_met", "Requirements", [{employee_id: "alice", code: "self_account_required"}]));
   const user = userEvent.setup(); mount(<CycleDetail id="cycle" />);
@@ -114,12 +121,14 @@ it("requires confirmation before a target change clears existing actuals", async
   await user.click(screen.getByRole("button", {name: "Xác nhận lưu và xóa thực tế liên quan"})); await waitFor(() => expect(onSave).toHaveBeenCalledTimes(1));
 });
 it("retains allocation edits after a stale conflict and never retries automatically", async () => {
+  mocks.role = "MANAGER";
   mocks.api.replace.mockRejectedValue(new ApiClientError(409, "stale_evidence_version", "Stale")); const user = userEvent.setup(); mount(<EmployeeKpis id="alice" cycle="cycle" />);
   await user.click(await screen.findByRole("button", {name: "Chỉnh phân bổ KPI"}));
   const input = screen.getByLabelText("Mục tiêu SALES · Doanh số (VND)"); await user.clear(input); await user.type(input, "150.0000");
   await user.click(screen.getByRole("button", {name: "Lưu toàn bộ phân bổ"})); await screen.findByRole("alert"); expect((input as HTMLInputElement).value).toBe("150.0000"); expect(mocks.api.replace).toHaveBeenCalledTimes(1);
 });
 it("distinguishes zero actual from missing and saves with the displayed evidence version", async () => {
+  mocks.role = "MANAGER";
   const user = userEvent.setup(); mount(<EmployeeKpis id="alice" cycle="cycle" />);
   expect(await screen.findByText("Chưa nhập")).toBeTruthy(); await user.click(screen.getByRole("button", {name: "Nhập thực tế SALES"}));
   await user.type(screen.getByLabelText("Thực tế SALES"), "0.0000"); await user.click(screen.getByRole("button", {name: "Lưu thực tế SALES"}));
@@ -130,6 +139,7 @@ it("renders employee KPI read-only and does not fetch allocation options", async
   await screen.findByText("Chưa nhập"); expect(screen.queryByRole("button", {name: "Chỉnh phân bổ KPI"})).toBeNull(); expect(mocks.api.options).not.toHaveBeenCalled();
 });
 it("does not silently adopt a background evidence version while actual input is open", async () => {
+  mocks.role = "MANAGER";
   const user = userEvent.setup(), cache = mount(<EmployeeKpis id="alice" cycle="cycle" />);
   await user.click(await screen.findByRole("button", {name: "Nhập thực tế SALES"}));
   await user.type(screen.getByLabelText("Thực tế SALES"), "25.0000");

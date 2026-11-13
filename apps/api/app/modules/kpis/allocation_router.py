@@ -18,7 +18,14 @@ router = APIRouter(prefix="/api/v1", tags=["employee-kpis"])
 Reader = Annotated[
     AuthContext, Depends(require_roles(UserRole.HR, UserRole.MANAGER, UserRole.EMPLOYEE))
 ]
-Writer = Annotated[AuthContext, Depends(require_roles(UserRole.HR, UserRole.MANAGER))]
+Writer = Annotated[
+    AuthContext,
+    Depends(
+        require_roles(
+            UserRole.MANAGER,
+        )
+    ),
+]
 Database = Annotated[Session, Depends(get_db_session)]
 
 

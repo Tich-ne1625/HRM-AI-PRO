@@ -25,7 +25,7 @@ tables={}
 with engine.connect() as c:
     head=c.exec_driver_sql('SELECT version_num FROM alembic_version').scalar_one()
     for t in Base.metadata.sorted_tables:
-        if t.name=='auth_login_limits': continue
+        if t.name in ('auth_login_limits','notifications'): continue
         rows=sorted(json.dumps(dict(r),sort_keys=True,default=str,separators=(',',':')) for r in c.execute(select(t)).mappings())
         tables[t.name]={'count':len(rows),'sha256':hashlib.sha256('\\n'.join(rows).encode()).hexdigest()}
 print(json.dumps({'head':head,'tables':tables},sort_keys=True))
@@ -49,7 +49,7 @@ def snapshot():
 
 def main():
     before = snapshot()
-    assert before["head"] == "20261024_0008"
+    assert before["head"] == "20261114_0009"
     assert before["tables"]["performance_review_revisions"]["count"] >= 2
     assert before["tables"]["ai_analyses"]["count"] == 3
     run(["exec", "-T", "api", "alembic", "downgrade", "20261022_0007"])
@@ -71,7 +71,7 @@ def main():
     report = {
         "status": "passed",
         "head": before["head"],
-        "roundtrip_0007_0008": True,
+        "roundtrip_0007_0009": True,
         "postgres_only_restart_read_before_migration": True,
         "scope": "all columns of all pre-Phase-9 ORM tables; auth_login_limits excluded",
         "tables": before["tables"],

@@ -110,9 +110,7 @@ class AllocationService:
         request_id: str,
     ) -> AllocationView:
         with self.session.begin():
-            user = authorize_domain_write(
-                self.session, context, csrf, (UserRole.HR, UserRole.MANAGER)
-            )
+            user = authorize_domain_write(self.session, context, csrf, (UserRole.MANAGER,))
             self.repository.get(cycle_id, user, lock=True)
             participant, employee, cycle = self.repository.participant_for_employee(
                 employee_id,
@@ -223,9 +221,7 @@ class AllocationService:
         request_id: str,
     ) -> AllocationView:
         with self.session.begin():
-            user = authorize_domain_write(
-                self.session, context, csrf, (UserRole.HR, UserRole.MANAGER)
-            )
+            user = authorize_domain_write(self.session, context, csrf, (UserRole.MANAGER,))
             # First resolve only scoped IDs; lock cycle then participant, as for PUT.
             from app.modules.review_cycles.repository import participant_scope
 

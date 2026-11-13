@@ -7,6 +7,7 @@ from app.modules.auth.models import AuthSession
 from app.modules.employees.models import Employee, EmploymentStatus
 from app.modules.feedback.models import AssignmentStatus, Feedback, FeedbackAssignment, Relationship
 from app.modules.kpis.models import EmployeeKPI, KPIDefinition, KPIDirection
+from app.modules.notifications.models import Notification
 from app.modules.organization.models import Department, Position
 from app.modules.performance.models import PerformanceReview, PerformanceReviewRevision
 from app.modules.review_cycles.models import CycleParticipant, CycleStatus, ReviewCycle
@@ -30,6 +31,7 @@ __all__ = [
     "KPIDefinition",
     "KPIDirection",
     "LoginLimit",
+    "Notification",
     "PerformanceReview",
     "PerformanceReviewRevision",
     "Position",

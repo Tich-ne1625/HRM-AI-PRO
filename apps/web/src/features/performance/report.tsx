@@ -36,18 +36,19 @@ function ReportContent({ employeeId, cycleId }: { employeeId: string; cycleId: s
   if (query.isPending) return <p role="status">Đang tải báo cáo hiệu suất…</p>;
   if (query.isError) return <ReviewError error={query.error} reload={() => { void refresh(); }} />;
   const row = query.data;
+  const stateLabel = row.state === "CURRENT" && user?.role === "HR" ? "Chờ HR kiểm tra" : row.state === "CURRENT" && user?.role === "MANAGER" ? "Chờ HR chốt" : states[row.state];
   return <>
     <section className="auth-card wide">
       <div className="section-heading"><div><p className="eyebrow">BÁO CÁO HIỆU SUẤT</p><h1>{row.display_name}</h1><p>{row.employee_code} · {row.cycle_name}</p></div><Link href={`/review-cycles/${cycleId}`}>← Về chu kỳ</Link></div>
       <EvaluationTabs employeeId={employeeId} cycleId={cycleId} active="performance" />
-      <div className="section-heading"><span className={`badge ${row.state === "FINALIZED" ? "active" : ""}`}>{states[row.state]}</span><button type="button" className="secondary" disabled={query.isFetching || calculate.isPending} onClick={() => { calculate.reset(); void refresh(); }}>Làm mới dữ liệu</button></div>
+      <div className="section-heading"><span className={`badge ${row.state === "FINALIZED" ? "active" : ""}`}>{stateLabel}</span><button type="button" className="secondary" disabled={query.isFetching || calculate.isPending} onClick={() => { calculate.reset(); void refresh(); }}>Làm mới dữ liệu</button></div>
       {row.state === "STALE" && <p className="state-notice" role="status">KPI hoặc phản hồi đã thay đổi. Điểm cũ nằm trong lịch sử; cần tính lại trước khi chốt.</p>}
-      {row.state === "NOT_CALCULATED" && <p>Hoàn tất KPI và phản hồi bắt buộc, sau đó HR hoặc quản lý trực tiếp tính điểm.</p>}
+      {row.state === "NOT_CALCULATED" && <p>Quản lý trực tiếp hoàn tất KPI và tính điểm sau khi đủ phản hồi bắt buộc. HR theo dõi phần còn thiếu và kiểm tra để chốt.</p>}
       {!row.readiness.ready && <div className="state-notice"><h2>Việc cần hoàn thành</h2><ul>{[...new Set(row.readiness.issues.map((issue) => issue.code))].map((code) => <li key={code}>{issueLabels[code] ?? "Kiểm tra lại dữ liệu đánh giá."}</li>)}</ul><div className="row-actions"><Link href={`/employees/${employeeId}/kpis?cycle_id=${cycleId}`}>Kiểm tra KPI</Link>{user?.role === "HR" && <Link href={`/feedback-administration?participant_id=${row.participant_id}&cycle_id=${cycleId}`}>Kiểm tra phân công phản hồi</Link>}</div></div>}
       {row.current_result && <ScoreMetrics row={row.current_result} />}
       {row.finalized_at && <p role="status">Đã chốt lúc {new Date(row.finalized_at).toLocaleString("vi-VN")}.</p>}
       <div className="row-actions">
-        {row.can_calculate && (user?.role === "HR" || user?.role === "MANAGER") && <button disabled={calculate.isPending || confirm || calculate.isError} onClick={() => calculate.mutate()}>{calculate.isPending ? "Đang tính…" : row.state === "NOT_CALCULATED" ? "Tính điểm hiệu suất" : "Tính lại điểm"}</button>}
+        {row.can_calculate && user?.role === "MANAGER" && <button disabled={calculate.isPending || confirm || calculate.isError} onClick={() => calculate.mutate()}>{calculate.isPending ? "Đang tính…" : row.state === "NOT_CALCULATED" ? "Tính điểm hiệu suất" : "Tính lại điểm"}</button>}
         {row.can_finalize && user?.role === "HR" && <button className="secondary" disabled={calculate.isPending} onClick={() => setConfirm(true)}>Chốt kết quả</button>}
         {user?.role === "HR" && <Link className="action-link" href={`/feedback-administration?participant_id=${row.participant_id}&cycle_id=${cycleId}`}>Phân công phản hồi</Link>}
       </div>

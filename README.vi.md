@@ -50,13 +50,15 @@ Nếu chưa biết bắt đầu từ đâu, làm theo [hướng dẫn nghiệm t
 | Role | Công việc chính |
 | --- | --- |
 | ADMIN | Tạo/khóa tài khoản, đổi role, cấu hình trọng số tính điểm |
-| HR | Hồ sơ/tổ chức, chu kỳ/KPI, giao phản hồi, chốt kết quả, đóng kỳ, yêu cầu AI |
+| HR | Hồ sơ/tổ chức, chu kỳ, danh mục KPI, giao phản hồi, theo dõi, chốt kết quả, đóng kỳ, yêu cầu AI |
 | Quản lý | Theo dõi nhân viên trực tiếp, nhập kết quả KPI/tính điểm khi có quyền, gửi phản hồi được giao |
 | Nhân viên | Xem KPI/kết quả của mình, gửi phản hồi được giao, đọc tư vấn chung đã lưu |
 
 **Tab trên** chọn nhóm chức năng; **menu trái cố định theo role**. Trên điện thoại, bấm **Mở menu**. Hồ sơ và form tạo mới mở trong **khung nổi có nút × Đóng**, giữ danh sách bên dưới. Trong một chu kỳ, bấm **Mở đánh giá** để dùng ba tab KPI / Phản hồi / Kết quả. Xem [bản đồ menu và thao tác theo role](docs/giao-dien-theo-role.vi.md).
 
-Luồng đánh giá: **HR lập kỳ/giao KPI → nhập thực tế → reviewer gửi phản hồi → quản lý/HR tính điểm → HR chốt từng người và đóng kỳ**. Nếu sửa KPI/phản hồi, kết quả chuyển “Cần tính lại”. Từ chu kỳ, chọn nhân viên rồi dùng các tab **KPI / Phản hồi 360 / Kết quả hiệu suất** để làm việc cùng ngữ cảnh.
+Luồng đánh giá: **HR lập kỳ và giao phản hồi → quản lý trực tiếp giao KPI, nhập thực tế → reviewer gửi phản hồi → quản lý tính điểm → HR kiểm tra, chốt từng người và đóng kỳ**. HR chỉ xem phân bổ/thực tế, không nhập thay hoặc tính thay quản lý. Nếu sửa KPI/phản hồi, kết quả chuyển “Cần tính lại”. Từ chu kỳ, chọn nhân viên rồi dùng các tab **KPI / Phản hồi 360 / Kết quả hiệu suất** để làm việc cùng ngữ cảnh.
+
+Bấm chuông **Thông báo** trên header để mở sidebar bên phải. **Thông báo** cho biết thay đổi mới, có dấu chưa đọc/đã đọc; **Việc cần làm** chỉ rõ việc của bạn và việc đang chờ phối hợp. Cập nhật trực tiếp giữa các tab; bấm một tin mở đúng khung chi tiết, đóng bằng **×**. Đọc tin không hoàn thành công việc. Dữ liệu cũ không được phát lại thành tin mới, nhưng việc còn chờ vẫn hiện. Xem [cách nhận thông báo và phân chia trách nhiệm](docs/notifications-contract.vi.md).
 
 ## Dùng AI khi cần
 

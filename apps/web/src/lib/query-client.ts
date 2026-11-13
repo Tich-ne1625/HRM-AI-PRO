@@ -9,6 +9,7 @@ export function createQueryClient() {
       onSettled: () => Promise.all([
         client.invalidateQueries({ queryKey: ["dashboard"] }),
         client.invalidateQueries({ queryKey: ["ai", "reports"] }),
+        client.invalidateQueries({ queryKey: ["notifications"] }),
       ]).then(() => undefined),
     }),
   });

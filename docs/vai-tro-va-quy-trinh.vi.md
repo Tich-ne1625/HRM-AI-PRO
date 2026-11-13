@@ -15,10 +15,10 @@ Luồng phối hợp chính:
 ```mermaid
 flowchart TD
     A["ADMIN: tạo tài khoản, cấp role và cấu hình chấm điểm"] --> B["HR: liên kết hồ sơ, xác định quản lý, lập và kích hoạt kỳ"]
-    B --> C["HR / Quản lý: phân bổ KPI, mục tiêu và nhập thực tế"]
+    B --> C["Quản lý trực tiếp: phân bổ KPI, mục tiêu và nhập thực tế"]
     B --> D["HR: giao phiếu phản hồi cho đúng người"]
     D --> E["Người được giao: mở Phản hồi của tôi và gửi đánh giá"]
-    C --> F["HR / Quản lý: kiểm tra đủ dữ liệu và bấm Tính điểm"]
+    C --> F["Quản lý trực tiếp: kiểm tra đủ dữ liệu và bấm Tính điểm"]
     E --> F
     F --> G["HR: kiểm tra và chốt kết quả từng nhân viên"]
     G --> H["HR: đóng kỳ khi tất cả người tham gia đã chốt"]
@@ -66,10 +66,10 @@ Ví dụ: ADMIN tạo tài khoản cho Bình với role EMPLOYEE; HR mới là n
 | Chuẩn bị tổ chức | Tạo/sửa phòng ban, chức danh, hồ sơ; liên kết tài khoản và quản lý | **Tổ chức → Phòng ban / Chức danh / Nhân viên** | Có phạm vi quản lý đúng và nhân viên đủ điều kiện tham gia |
 | Chuẩn bị kỳ | Tạo bản nháp, đặt tên/ngày, thêm người tham gia | **Đánh giá hiệu suất → Chu kỳ đánh giá** | Danh sách người sẽ được đánh giá |
 | Bắt đầu kỳ | Kiểm tra người tham gia và cấu hình rồi kích hoạt | **Kích hoạt chu kỳ → Xác nhận kích hoạt** | Kỳ ACTIVE; thông tin tổ chức và cấu hình được đóng băng cho lịch sử |
-| Chuẩn bị KPI | Quản lý danh mục KPI; HR hoặc quản lý phân bổ cho từng người | **Danh mục KPI**; dòng nhân viên trong kỳ → **Quản lý KPI** | Nhân viên nhìn thấy chỉ tiêu; HR/quản lý có nơi nhập thực tế |
+| Chuẩn bị KPI | Quản lý danh mục KPI; theo dõi phân bổ do quản lý trực tiếp thực hiện | **Danh mục KPI**; dòng nhân viên trong kỳ → **Quản lý KPI** | Quản lý chọn KPI từ danh mục để giao cho cấp dưới; HR chỉ xem |
 | Thu thập phản hồi | Giao SELF/MANAGER bắt buộc; thêm PEER/SUBORDINATE nếu phù hợp; đặt hạn | Dòng nhân viên → **Phân công phản hồi**, hoặc **Quản trị phản hồi** | Phiếu hiện trong **Phản hồi của tôi** của người được giao |
 | Theo dõi thiếu dữ liệu | Xem KPI chưa nhập, phân công bắt buộc chưa gửi; gia hạn khi cần | **Kết quả → Việc cần hoàn thành**; quản trị phân công | Xác định đúng người cần làm tiếp |
-| Tổng hợp | Tính điểm nếu đủ dữ liệu; kiểm tra chi tiết và lịch sử | **Kết quả → Tính điểm hiệu suất / Tính lại điểm** | Có kết quả lưu để đối chiếu |
+| Tổng hợp | Chờ quản lý tính điểm; kiểm tra chi tiết và lịch sử đã lưu | **Kết quả → Chi tiết / Lịch sử tính điểm** | HR xác định kết quả đủ điều kiện chốt |
 | Xác nhận từng người | Kiểm tra kết quả hiện tại, xem phân công còn mở rồi xác nhận | **Chốt kết quả** | Hồ sơ người đó bị khóa sửa bằng chứng trong kỳ |
 | Kết thúc đợt | Khi mọi người đã chốt, đóng cả kỳ | Trang kỳ → **Đóng chu kỳ** | Kỳ CLOSED, giữ lại để tra cứu |
 | Tư vấn | Chọn phạm vi dữ liệu và xác nhận gọi Gemini | Báo cáo → **Tư vấn AI → Tư vấn chung / Nội bộ HR** | Tư vấn được lưu; quyền đọc phụ thuộc phạm vi |
@@ -119,10 +119,10 @@ Hệ thống hiện phối hợp bằng **các bản ghi dùng chung theo quyề
 | --- | --- | --- | --- |
 | ADMIN → người dùng | Tài khoản và quyền | Đăng nhập, menu theo role | Đăng nhập được, đúng chức năng |
 | HR → quản lý/nhân viên | Kỳ và danh sách tham gia | **Chu kỳ đánh giá** | Kỳ hoạt động, có đúng người trong phạm vi |
-| HR/quản lý → nhân viên | KPI, mục tiêu và thực tế | **KPI và kết quả thực tế** | Đọc được các số đã lưu |
+| Quản lý trực tiếp → nhân viên | KPI, mục tiêu và thực tế | **KPI và kết quả thực tế** | Đọc được các số đã lưu |
 | HR → người đánh giá | Phân công: đánh giá ai, quan hệ gì, bắt buộc không, hạn nào | **Phản hồi của tôi** | Có phiếu chờ đúng tên/kỳ |
 | Người đánh giá → HR/hồ sơ được đánh giá | Rating và nhận xét đã gửi | HR: quản trị phân công; báo cáo: tổng hợp được phép | Phiếu **Đã gửi**, điều kiện tính điểm được cập nhật |
-| HR/quản lý → HR/nhân viên trong phạm vi | Kết quả tính và lịch sử | **Kết quả hiệu suất** | Có điểm, số lần tính, dữ liệu hiện tại |
+| Quản lý trực tiếp → HR/nhân viên trong phạm vi | Kết quả tính và lịch sử | **Kết quả hiệu suất** | Có điểm, số lần tính, dữ liệu hiện tại |
 | HR → hồ sơ nhân viên | Xác nhận chốt | **Kết quả hiệu suất** và KPI/phản hồi | **Đã chốt**, không sửa bằng chứng |
 | HR → người đọc được phép | Tư vấn AI chung đã lưu | Báo cáo hoặc **Tư vấn AI đã lưu** | Đọc lại được sau tải trang |
 | HR → toàn bộ kỳ | Xác nhận hoàn tất | **Chu kỳ đánh giá** | Kỳ **Đã đóng**, đọc lại được lịch sử |
@@ -137,11 +137,11 @@ Ví dụ dưới đây minh họa luồng và công thức, không khẳng đị
 | --- | --- | --- | --- |
 | 1 | ADMIN | Cấp tài khoản HR, Nguyễn Lan và Bình với role phù hợp | Mỗi người đăng nhập được |
 | 2 | HR | Liên kết tài khoản Bình vào hồ sơ; đặt Nguyễn Lan là quản lý; thêm Bình vào kỳ rồi kích hoạt | Nguyễn Lan có Bình trong phạm vi; Bình thấy kỳ của mình |
-| 3 | HR/Nguyễn Lan | Giao một KPI “Xử lý yêu cầu hỗ trợ”, mục tiêu 100 yêu cầu, trọng số KPI này 100% | Bình thấy rõ chỉ tiêu cần đạt |
+| 3 | Nguyễn Lan (quản lý) | Giao một KPI “Xử lý yêu cầu hỗ trợ”, mục tiêu 100 yêu cầu, trọng số KPI này 100% | Bình thấy rõ chỉ tiêu cần đạt |
 | 4 | HR | Giao SELF cho Bình và MANAGER cho Nguyễn Lan | Mỗi người thấy một phiếu trong **Phản hồi của tôi** |
 | 5 | Nguyễn Lan | Ghi thực tế Bình hoàn thành 90 yêu cầu | Hồ sơ KPI lưu thực tế 90 |
 | 6 | Bình và Nguyễn Lan | Mỗi người gửi phiếu rating 4/5 và nhận xét | HR thấy hai phiếu đã gửi; dữ liệu đủ nếu không còn yêu cầu khác |
-| 7 | Nguyễn Lan hoặc HR | Bấm **Tính điểm hiệu suất** | Hệ thống lưu điểm và chi tiết lần tính |
+| 7 | Nguyễn Lan (quản lý) | Bấm **Tính điểm hiệu suất** | Hệ thống lưu điểm và chi tiết lần tính |
 | 8 | HR | Kiểm tra; có thể tạo AI chung; xác nhận **Chốt kết quả** | Bình đọc kết quả, AI chung nếu đã tạo; bằng chứng bị khóa |
 | 9 | HR | Chốt xong tất cả người tham gia rồi **Đóng chu kỳ** | Cả kỳ được giữ để tra cứu |
 
@@ -153,7 +153,7 @@ Nếu cấu hình đã đóng băng là KPI 70% + phản hồi 30%, KPI càng ca
 Điểm cuối      = 90 × 70% + 80 × 30% = 87.00
 ```
 
-**Ai tạo ra điểm 87?** Hệ thống tính theo công thức sau thao tác của HR/quản lý. Quản lý cung cấp thực tế; người được giao cung cấp rating; HR xác nhận kết quả. Gemini chỉ đưa tư vấn từ dữ liệu được phép, không quyết định hoặc thay đổi điểm.
+**Ai tạo ra điểm 87?** Hệ thống tính theo công thức sau thao tác tính của quản lý trực tiếp. Quản lý cung cấp thực tế; người được giao cung cấp rating; HR xác nhận kết quả. Gemini chỉ đưa tư vấn từ dữ liệu được phép, không quyết định hoặc thay đổi điểm.
 
 Mọi phản hồi đã gửi được tính ngang nhau, gồm cả phản hồi tùy chọn; chưa có trọng số riêng cho SELF/MANAGER/PEER. Việc thu thập nhiều góc nhìn không đồng nghĩa quản lý tự đặt điểm tổng bằng tay.
 
@@ -163,11 +163,11 @@ Mọi phản hồi đã gửi được tính ngang nhau, gồm cả phản hồi
 | --- | --- | --- |
 | Kỳ **Bản nháp** — DRAFT | HR | Chuẩn bị danh sách; kiểm tra trước khi kích hoạt |
 | Kỳ **Đang hoạt động** — ACTIVE | HR, quản lý, người được giao phản hồi | Thu thập KPI và phản hồi theo nhiệm vụ |
-| **Chưa nhập** thực tế KPI | HR/quản lý có quyền | Nhập số thực tế |
+| **Chưa nhập** thực tế KPI | Quản lý trực tiếp có quyền | Nhập số thực tế |
 | Phiếu còn chờ gửi | Người được ghi trong phân công | Mở **Phản hồi của tôi** để gửi; quá hạn thì nhờ HR gia hạn |
-| **Chưa tính điểm** | HR/quản lý | Xử lý khối **Việc cần hoàn thành**, rồi bấm tính |
+| **Chưa tính điểm** | Quản lý trực tiếp | Xử lý khối **Việc cần hoàn thành**, rồi bấm tính |
 | Kết quả hiện tại/hợp lệ | HR | Kiểm tra, tạo AI nếu cần, rồi chốt |
-| **Cần tính lại** — STALE | HR/quản lý | Kiểm tra bằng chứng mới rồi bấm **Tính lại điểm** |
+| **Cần tính lại** — STALE | Quản lý trực tiếp | Kiểm tra bằng chứng mới rồi bấm **Tính lại điểm** |
 | **Đã chốt** — FINALIZED | HR | Chuyển sang xử lý người khác; không sửa hồ sơ đã chốt |
 | Tất cả đã chốt nhưng kỳ còn ACTIVE | HR | Đóng kỳ |
 | Kỳ **Đã đóng** — CLOSED | Người có quyền đọc | Tra cứu kết quả/lịch sử; HR vẫn có thể yêu cầu AI trên kết quả đủ điều kiện |
@@ -182,7 +182,7 @@ Mọi phản hồi đã gửi được tính ngang nhau, gồm cả phản hồi
 | Tạo/khóa tài khoản hoặc đổi role | ADMIN → **Quản trị hệ thống → Quản lý tài khoản** |
 | Đặt nhân viên thuộc phòng nào, ai quản lý | HR → **Tổ chức → Nhân viên** |
 | Chọn ai được đánh giá trong đợt này | HR → **Đánh giá hiệu suất → Chu kỳ đánh giá** → bản nháp |
-| Giao hoặc nhập thực tế KPI | HR/quản lý → kỳ đang hoạt động → dòng nhân viên → **Quản lý KPI** |
+| Giao hoặc nhập thực tế KPI | Quản lý trực tiếp → kỳ đang hoạt động → dòng nhân viên → **Quản lý KPI** |
 | Giao ai phải đánh giá ai | HR → dòng nhân viên trong kỳ → **Phân công phản hồi** |
 | Viết phiếu đã được giao cho bản thân | **Cá nhân → Phản hồi của tôi** |
 | Xem điểm/bằng chứng đang thiếu/chốt | Kỳ → dòng nhân viên → **Kết quả** |
@@ -191,3 +191,10 @@ Mọi phản hồi đã gửi được tính ngang nhau, gồm cả phản hồi
 | Đọc tư vấn đã có | **Tư vấn AI đã lưu** hoặc báo cáo liên quan, theo quyền |
 
 Để hiểu nhanh trên bộ demo, bắt đầu với **HR xem Bình → Nguyễn Lan nhập KPI → Bình gửi SELF → Nguyễn Lan gửi MANAGER và tính điểm → HR kiểm tra/chốt → Bình xem lại**. ADMIN chủ yếu chuẩn bị quyền trước đó. Các thao tác từng nút nằm trong [hướng dẫn nghiệm thu](nghiem-thu.vi.md).
+
+
+## 12. Bàn giao qua thông báo
+
+HR tổ chức và chốt; quản lý cung cấp bằng chứng và tính điểm. Hệ thống gửi tin cho người liên quan qua chuông **Thông báo** trên header. Ví dụ: HR giao SELF → Bình có tin và việc gửi phiếu; Bình gửi → HR/quản lý có tin cập nhật; quản lý tính điểm → HR có việc kiểm tra/chốt; HR chốt → Bình/quản lý nhận tin kết quả đã chốt.
+
+Sidebar bên phải có **Thông báo** (mới/chưa đọc/đã đọc) và **Việc cần làm** (việc của mình hoặc đang chờ phối hợp). Tin được cập nhật trực tiếp, trạng thái đọc đồng bộ giữa các tab. Bấm tin mở khung chi tiết đúng hồ sơ; đóng bằng ×. Đọc tin không thay thế thao tác gửi phiếu, tính hay chốt. Quy tắc người nhận và dữ liệu riêng tư nằm trong [tài liệu thông báo](notifications-contract.vi.md).

@@ -145,7 +145,7 @@ def test_provider_runs_without_database_locks_and_stale_output_is_discarded(ai_w
     def mutate():
         assert world.engine.pool.checkedout() == 0
         # A real competing domain write must finish during the provider call.
-        changed = world.client().patch(
+        changed = world.client("manager").patch(
             f"/api/v1/employee-kpis/{item['id']}",
             json={
                 "expected_evidence_version": body["expected_evidence_version"],

@@ -63,7 +63,7 @@ def test_manager_cannot_edit_self_or_indirect_report(world):
     assert world.client("manager").put(indirect_path, json=replace_body(first)).status_code == 404
 
 
-def test_inactive_employment_disables_manager_write_but_hr_can_complete_history(world):
+def test_inactive_employment_disables_manager_write_and_hr_cannot_override(world):
     from app.models import Employee, EmploymentStatus
 
     _cycle, first, _second, path = allocation_world(world)
@@ -72,4 +72,4 @@ def test_inactive_employment_disables_manager_write_but_hr_can_complete_history(
             Employee, world.employees["alice"]
         ).employment_status = EmploymentStatus.INACTIVE
     assert world.client("manager").put(path, json=replace_body(first)).status_code == 403
-    assert world.client().put(path, json=replace_body(first)).status_code == 200
+    assert world.client("hr").put(path, json=replace_body(first)).status_code == 403

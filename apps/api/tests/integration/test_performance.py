@@ -16,9 +16,9 @@ def ready_world(world, *, optional=False):
     cycle, participant = feedback_world(world)
     first = world.client().post("/api/v1/kpis", json=definition()).json()
     kpis = f"/api/v1/employees/{world.employees['alice']}/kpis?cycle_id={cycle['id']}"
-    allocation = world.client().put(kpis, json=replace_body(first)).json()
+    allocation = world.client("manager").put(kpis, json=replace_body(first)).json()
     item = allocation["items"][0]
-    actual = world.client().patch(
+    actual = world.client("manager").patch(
         f"/api/v1/employee-kpis/{item['id']}",
         json={"expected_evidence_version": 3, "actual": "90.0000"},
     )
@@ -38,7 +38,7 @@ def ready_world(world, *, optional=False):
     return cycle, participant, item, base
 
 
-def calculate(world, cycle, participant, base, role="hr"):
+def calculate(world, cycle, participant, base, role="manager"):
     return world.client(role).post(
         base + "/calculate",
         json={
@@ -81,7 +81,7 @@ def test_calculation_reuse_stale_revision_and_safe_projection(world):
         "Helpful",
     ):
         assert forbidden not in str(public)
-    changed = world.client().patch(
+    changed = world.client("manager").patch(
         f"/api/v1/employee-kpis/{item['id']}",
         json={"expected_evidence_version": participant["evidence_version"], "actual": "50.0000"},
     )
@@ -140,7 +140,7 @@ def test_finalize_optional_ack_close_and_new_cycle(world):
         == "review_already_finalized"
     )
     assert (
-        world.client()
+        world.client("manager")
         .patch(
             f"/api/v1/employee-kpis/{item['id']}",
             json={
@@ -233,7 +233,7 @@ def test_performance_audit_failure_rolls_back_atomically(world, monkeypatch, ope
     if operation != "calculate":
         report = calculate(world, cycle, participant, base).json()
     if operation == "recalculate":
-        world.client().patch(
+        world.client("manager").patch(
             f"/api/v1/employee-kpis/{item['id']}",
             json={
                 "expected_evidence_version": participant["evidence_version"],
