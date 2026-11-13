@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import Link from "next/link";
+import Link from "../workspace/detail-link";
 import { useState } from "react";
 import { useAuth } from "../auth/auth-provider";
 import { organizationApi } from "../organization/api";
@@ -29,27 +29,27 @@ function Detail({ id }: { id: string }) {
   return <>
     <section className="auth-card wide"><Link href="/review-cycles">← Danh sách chu kỳ</Link><p className="eyebrow">{cycleStatus[row.status]}</p><h1>{row.name}</h1>
       <p>{row.start_date} – {row.end_date} · Phiên bản {row.version} · {row.participant_count} người tham gia trong phạm vi</p>
-      <h2>{row.policy_is_preview ? "Cấu hình dự kiến khi kích hoạt" : "Cấu hình đã đóng băng"}</h2>
+      {user?.role === "HR" && <><h2>{row.policy_is_preview ? "Cấu hình dự kiến khi kích hoạt" : "Cấu hình đã đóng băng"}</h2>
       <p>KPI: {row.policy.kpi_weight}% · Phản hồi: {row.policy.feedback_weight}% · Giới hạn điểm KPI: {row.policy.kpi_cap ?? "Không giới hạn"}</p>
-      {row.policy_is_preview && <p>Cấu hình và tổ chức có thể thay đổi trước khi kích hoạt. Nhân viên và người quản lý cần có tài khoản đang hoạt động.</p>}
+      {row.policy_is_preview && <p>Cấu hình và tổ chức có thể thay đổi trước khi kích hoạt. Nhân viên và người quản lý cần có tài khoản đang hoạt động.</p>}</>}
       {row.status === "ACTIVE" && user?.role === "HR" && <CloseCycle cycle={row} />}
-      {row.can_activate && <button disabled={activate.isPending} onClick={() => setConfirmation(row.version)}>Kích hoạt chu kỳ</button>}
+      {user?.role === "HR" && row.can_activate && <button disabled={activate.isPending} onClick={() => setConfirmation(row.version)}>Kích hoạt chu kỳ</button>}
       {confirmation !== null && <section className="confirmation" role="group" aria-label="Xác nhận kích hoạt">
         <p>Kích hoạt sẽ đóng băng danh sách, phòng ban, chức danh, quan hệ quản lý và cấu hình chấm điểm. Sau đó không sửa danh sách tham gia.</p>
         <button disabled={activate.isPending} onClick={() => activate.mutate(confirmation)}>Xác nhận kích hoạt</button><button className="secondary" onClick={() => setConfirmation(null)}>Hủy</button>
       </section>}
       {activate.isError && <ReviewError error={activate.error} reload={() => {setConfirmation(null); void refresh();}} />}
     </section>
-    {row.can_edit && <section className="auth-card"><h2>Thông tin bản nháp</h2><CycleForm key={generation} initial={row} pending={edit.isPending} onSave={(v) => edit.mutate(v)} />
+    {user?.role === "HR" && row.can_edit && <section className="auth-card"><h2>Thông tin bản nháp</h2><CycleForm key={generation} initial={row} pending={edit.isPending} onSave={(v) => edit.mutate(v)} />
       {edit.isError && <ReviewError error={edit.error} reload={() => {void cycle.refetch().then(() => setGeneration((v) => v + 1));}} />}</section>}
-    {row.can_edit && <Enrollment cycle={row} />}
+    {user?.role === "HR" && row.can_edit && <Enrollment cycle={row} />}
     <section className="auth-card wide"><h2>Người tham gia</h2>
       <form className="filters" onSubmit={(e) => {e.preventDefault(); setQ(String(new FormData(e.currentTarget).get("q") ?? "")); setPage(1);}}><label htmlFor="participant-search">Tìm người tham gia</label><input id="participant-search" name="q" maxLength={100} /><button>Tìm</button></form>
       {participants.isPending && <p role="status">Đang tải người tham gia…</p>}{participants.isError && <ReviewError error={participants.error} />}
       {!participants.isError && participants.data && <><div className="table-scroll" tabIndex={0} role="region" aria-label="Người tham gia chu kỳ, có thể cuộn ngang"><table><caption>{participants.data.total} người tham gia trong phạm vi</caption><thead><tr><th>Nhân viên</th><th>Phòng ban</th><th>Chức danh</th><th>Thao tác</th></tr></thead><tbody>
-        {participants.data.items.map((p) => <tr key={p.id}><td>{p.employee_code} · {p.display_name}</td><td>{p.department_name}</td><td>{p.position_title}</td><td>{row.can_edit
+        {participants.data.items.map((p) => <tr key={p.id}><td>{p.employee_code} · {p.display_name}</td><td>{p.department_name}</td><td>{p.position_title}</td><td>{user?.role === "HR" && row.can_edit
           ? <button className="secondary" disabled={remove.isPending} onClick={() => remove.mutate(p.id)}>Bỏ {p.employee_code} khỏi nháp</button>
-          : <div className="row-actions"><Link href={`/employees/${p.employee_id}/performance?cycle_id=${id}`}>Kết quả</Link><Link href={`/employees/${p.employee_id}/kpis?cycle_id=${id}`}>{p.can_manage_kpis ? "Quản lý KPI" : "Xem KPI"}</Link><Link href={`/employees/${p.employee_id}/feedback?cycle_id=${id}`}>Tổng hợp phản hồi</Link>{user?.role === "HR" && <Link href={`/feedback-administration?participant_id=${p.id}&cycle_id=${id}`}>Phân công phản hồi</Link>}</div>}</td></tr>)}</tbody></table></div>
+          : <div className="row-actions"><Link className="action-link" href={`/employees/${p.employee_id}/performance?cycle_id=${id}`}>Mở đánh giá</Link></div>}</td></tr>)}</tbody></table></div>
         {!participants.data.items.length && <p>Chưa có người tham gia phù hợp.</p>}
         <Pagination page={page} total={participants.data.total} pending={participants.isFetching} onPage={setPage} /></>}
       {remove.isError && <ReviewError error={remove.error} reload={() => {void refresh();}} />}

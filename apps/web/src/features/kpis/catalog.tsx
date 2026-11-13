@@ -9,6 +9,7 @@ import { useAuth } from "../auth/auth-provider";
 import { reviewApi, type Definition } from "../cycles/api";
 import { ReviewAccess, ReviewError } from "../cycles/shared";
 import { Pagination } from "../organization/shared";
+import { WorkspaceDialog } from "../workspace/dialog";
 
 const schema = z.object({
   code: z.string().trim().toUpperCase().regex(/^[A-Z0-9][A-Z0-9_-]{1,31}$/, "Mã gồm 2–32 ký tự chữ, số, gạch ngang hoặc gạch dưới."),
@@ -21,13 +22,14 @@ export function KpiCatalog() {return <ReviewAccess><Catalog /></ReviewAccess>;}
 function Catalog() {
   const {user} = useAuth(), cache = useQueryClient();
   const hr = user?.role === "HR";
+  const [creating, setCreating] = useState(false);
   const [page, setPage] = useState(1), [q, setQ] = useState(""), [status, setStatus] = useState("");
   const [editing, setEditing] = useState<Definition | null>(null), [retiring, setRetiring] = useState<Definition | null>(null), [generation, setGeneration] = useState(0);
   const query = useQuery({queryKey: ["reviews", "definitions", page, q, status], queryFn: () => reviewApi.definitions({page, q, ...(status ? {is_active: status === "true"} : {})})});
   const save = useMutation({mutationFn: ({row, values}: {row: Definition | null; values: Partial<Values> & {is_active?: boolean}}) => reviewApi.saveDefinition(row?.id ?? null, {...values, ...(row ? {expected_version: row.version} : {})}), onSuccess: () => {
-    setEditing(null); setRetiring(null); setGeneration((v) => v + 1); void cache.invalidateQueries({queryKey: ["reviews"]});
+    setEditing(null); setCreating(false); setRetiring(null); setGeneration((v) => v + 1); void cache.invalidateQueries({queryKey: ["reviews"]});
   }});
-  return <><section className="auth-card wide"><p className="eyebrow">KPI</p><h1>Danh mục KPI</h1>
+  return <><section className="auth-card wide"><p className="eyebrow">KPI</p><div className="section-heading"><h1>Danh mục KPI</h1>{hr && <button onClick={() => { save.reset(); setEditing(null); setCreating(true); }}>Thêm định nghĩa KPI</button>}</div>
     <p>Định nghĩa mô tả chỉ tiêu. KPI đã gán giữ bản sao tại lúc gán; sửa danh mục không thay đổi lịch sử.</p>
     {!hr && <p>Chỉ hiển thị định nghĩa đã gán trong phạm vi của bạn.</p>}
     <form className="filters" onSubmit={(e) => {e.preventDefault(); const data = new FormData(e.currentTarget); setQ(String(data.get("q") ?? "")); setStatus(String(data.get("status") ?? "")); setPage(1);}}>
@@ -41,9 +43,9 @@ function Catalog() {
         <button className="secondary" disabled={save.isPending} onClick={() => row.is_active ? setRetiring(row) : save.mutate({row, values: {is_active: true}})}>{row.is_active ? "Ngừng sử dụng" : "Kích hoạt lại"} {row.code}</button></td>}</tr>)}</tbody></table></div>
       {!query.data.items.length && <p>Chưa có KPI phù hợp.</p>}<Pagination page={page} total={query.data.total} pending={query.isFetching} onPage={setPage} /></>}
     {retiring && <section className="confirmation" role="group" aria-label="Xác nhận ngừng KPI"><p>Ngừng sử dụng {retiring.code}? KPI đã gán vẫn được giữ, không thể gán mới.</p><button disabled={save.isPending} onClick={() => save.mutate({row: retiring, values: {is_active: false}})}>Xác nhận ngừng KPI</button><button className="secondary" onClick={() => setRetiring(null)}>Hủy</button></section>}
-    {save.isError && <ReviewError error={save.error} reload={() => {void query.refetch().then((result) => {if (editing) setEditing(result.data?.items.find((row) => row.id === editing.id) ?? null); setGeneration((v) => v + 1); save.reset();});}} />}
+    {save.isError && !creating && !editing && <ReviewError error={save.error} />}
   </section>
-  {hr && <details className="auth-card editor-disclosure" open={editing ? true : undefined}><summary>{editing ? "Sửa định nghĩa KPI" : "Thêm định nghĩa KPI"}</summary><DefinitionForm key={`${editing?.id ?? "new"}:${generation}`} initial={editing} pending={save.isPending} onSave={(values) => save.mutate({row: editing, values})} />{editing && <button className="secondary" onClick={() => setEditing(null)}>Hủy chỉnh sửa</button>}</details>}</>;
+  {hr && (creating || editing) && <WorkspaceDialog title={editing ? "Sửa định nghĩa KPI" : "Thêm định nghĩa KPI"} close={() => { setEditing(null); setCreating(false); save.reset(); }}><section className="auth-card"><DefinitionForm key={`${editing?.id ?? "new"}:${generation}`} initial={editing} pending={save.isPending} onSave={(values) => save.mutate({row: editing, values})} />{save.isError && <ReviewError error={save.error} reload={() => { void query.refetch().then((result) => { if (editing) setEditing(result.data?.items.find((row) => row.id === editing.id) ?? null); setGeneration((v) => v + 1); save.reset(); }); }} />}</section></WorkspaceDialog>}</>;
 }
 function DefinitionForm({initial, pending, onSave}: {initial: Definition | null; pending: boolean; onSave: (v: Values) => void}) {
   const form = useForm<Values>({resolver: zodResolver(schema), defaultValues: initial ?? {code: "", name: "", unit: "", description: "", direction: "HIGHER_IS_BETTER"}});

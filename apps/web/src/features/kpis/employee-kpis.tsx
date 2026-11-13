@@ -9,12 +9,14 @@ import { z } from "zod";
 import { reviewApi, type Allocation, type AllocationInput, type AllocationLine, type Definition } from "../cycles/api";
 import { cycleStatus, decimalUnits, ReviewAccess, ReviewError } from "../cycles/shared";
 import { Pagination } from "../organization/shared";
+import { useAuth } from "../auth/auth-provider";
 import { EvaluationTabs } from "../performance/context-tabs";
 
 export function EmployeeKpis({id, cycle}: {id: string; cycle: string}) {
   return <ReviewAccess>{cycle ? <Detail id={id} cycle={cycle} /> : <section className="auth-card"><p>Hãy chọn chu kỳ và người tham gia để xem KPI.</p><Link href="/review-cycles">Chọn chu kỳ đánh giá</Link></section>}</ReviewAccess>;
 }
 function Detail({id, cycle}: {id: string; cycle: string}) {
+  const { user } = useAuth();
   const cache = useQueryClient();
   const [editing, setEditing] = useState(false), [generation, setGeneration] = useState(0);
   const [editingActual, setEditingActual] = useState<{row: AllocationLine; version: number} | null>(null);
@@ -26,6 +28,7 @@ function Detail({id, cycle}: {id: string; cycle: string}) {
   if (query.isPending) return <p role="status">Đang tải KPI nhân viên…</p>;
   if (query.isError) return <ReviewError error={query.error} reload={() => {void query.refetch();}} />;
   const data = query.data, participant = data.participant;
+  const canManage = participant.can_manage_kpis && (user?.role === "HR" || user?.role === "MANAGER");
   return <><section className="auth-card wide"><Link href={`/review-cycles/${cycle}`}>← Người tham gia chu kỳ</Link><p className="eyebrow">{cycleQuery.data?.name ?? "Chu kỳ được chọn"} · {cycleStatus[data.cycle_status]}</p>
     <h1>KPI · {participant.display_name}</h1><p>{participant.employee_code} · {participant.department_name} · {participant.position_title}</p>
     {participant.is_snapshot && <EvaluationTabs employeeId={id} cycleId={cycle} active="kpis" />}
@@ -35,14 +38,14 @@ function Detail({id, cycle}: {id: string; cycle: string}) {
     <div className="table-scroll" tabIndex={0} role="region" aria-label="KPI được giao, có thể cuộn ngang"><table><caption>KPI được giao trong chu kỳ đang chọn</caption><thead><tr><th>KPI / hướng</th><th>Mục tiêu</th><th>Trọng số</th><th>Kết quả thực tế</th></tr></thead><tbody>{data.items.map((row) => <tr key={row.id}>
       <td>{row.definition.code} · {row.definition.name}<br />{row.definition.direction === "HIGHER_IS_BETTER" ? "Càng cao càng tốt" : "Càng thấp càng tốt"}</td><td>{row.target} {row.definition.unit}</td><td>{row.weight}%</td><td>
         <p>{row.actual === null ? "Chưa nhập" : row.actual}</p>
-        {participant.can_manage_kpis && !editing && (editingActual?.row.id === row.id
+        {canManage && !editing && (editingActual?.row.id === row.id
           ? <><ActualForm key={row.id} row={editingActual.row} pending={actual.isPending} onSave={(value) => actual.mutate({row: row.id, version: editingActual.version, value})} /><button className="secondary" disabled={actual.isPending} onClick={() => {setEditingActual(null); actual.reset();}}>Hủy nhập thực tế</button></>
           : <button className="secondary" disabled={editingActual !== null || actual.isPending} onClick={() => {setEditingActual({row, version: participant.evidence_version}); actual.reset();}}>Nhập thực tế {row.definition.code}</button>)}
       </td></tr>)}</tbody></table></div>
     {actual.isError && <ReviewError error={actual.error} reload={() => {setEditingActual(null); actual.reset(); void refresh();}} />}
-    {participant.can_manage_kpis && <button className="secondary" disabled={editingActual !== null || actual.isPending || replace.isPending} onClick={() => {setEditing(!editing); replace.reset(); setGeneration((v) => v + 1);}}>{editing ? "Hủy chỉnh phân bổ" : "Chỉnh phân bổ KPI"}</button>}
+    {canManage && <button className="secondary" disabled={editingActual !== null || actual.isPending || replace.isPending} onClick={() => {setEditing(!editing); replace.reset(); setGeneration((v) => v + 1);}}>{editing ? "Hủy chỉnh phân bổ" : "Chỉnh phân bổ KPI"}</button>}
   </section>
-  {editing && participant.can_manage_kpis && <section className="auth-card wide"><h2>Phân bổ trọn bộ KPI</h2>
+  {editing && canManage && <section className="auth-card wide"><h2>Phân bổ trọn bộ KPI</h2>
     <AllocationEditor key={generation} initial={data} employee={id} cycle={cycle} pending={replace.isPending} onSave={(version, items) => replace.mutate({version, items})} />
     {replace.isError && <ReviewError error={replace.error} reload={() => {void query.refetch().then(() => {setGeneration((v) => v + 1); replace.reset();});}} />}
   </section>}</>;

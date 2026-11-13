@@ -6,7 +6,7 @@ import { beforeEach, expect, it, vi } from "vitest";
 import { DashboardOverview } from "./overview";
 
 const mocks = vi.hoisted(() => ({ role: "HR", get: vi.fn() }));
-vi.mock("../auth/auth-provider", () => ({ useAuth: () => ({ user: { id: "u1", role: mocks.role } }) }));
+vi.mock("../auth/auth-provider", () => ({ useAuth: () => ({ user: { id: "u1", role: mocks.role, employee_id: "e1" } }) }));
 vi.mock("./api", () => ({ dashboardApi: { get: mocks.get } }));
 const overview = { role: "HR", pending_feedback: 2, active_employees: 8,
   cycles: [{ id: "c1", name: "Hiện tại", status: "ACTIVE" }, { id: "c2", name: "Lịch sử", status: "CLOSED" }],
@@ -67,4 +67,15 @@ it("hides cached metrics and activities when a refresh is denied or fails", asyn
   expect(screen.queryByText("84.90")).toBeNull();
   expect(screen.queryByText("Đã tính điểm đánh giá")).toBeNull();
   expect(screen.queryByRole("link", { name: /Mở chu kỳ để/ })).toBeNull();
+});
+
+it("shows employees their own result without department statistics or team distribution", async () => {
+  mocks.role = "EMPLOYEE";
+  mount();
+  await screen.findByText("Điểm của tôi");
+  expect(screen.queryByText("Kết quả theo phòng ban")).toBeNull();
+  expect(screen.queryByText("Phân bố điểm hợp lệ")).toBeNull();
+  expect(screen.queryByText("Tiến độ đánh giá")).toBeNull();
+  expect(screen.queryByText("Nhân viên đang làm việc")).toBeNull();
+  expect(screen.getByRole("link", { name: "Xem đánh giá của tôi" }).getAttribute("href")).toBe("/employees/e1/performance?cycle_id=c1");
 });

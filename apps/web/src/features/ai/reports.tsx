@@ -1,13 +1,14 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import Link from "next/link";
+import Link from "../workspace/detail-link";
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../auth/auth-provider";
 import { reviewApi } from "../cycles/api";
 import { Pagination } from "../organization/shared";
 import { aiApi, type Audience, type SavedReport } from "./api";
 import { AnalysisContent } from "./section";
+import { WorkspaceDialog } from "../workspace/dialog";
 
 export function SavedAIReports() {
   const { user } = useAuth();
@@ -53,10 +54,10 @@ function SavedDetail({ row, userId, close }: { row: SavedReport; userId: string;
   const heading = useRef<HTMLHeadingElement | null>(null);
   useEffect(() => { heading.current?.focus({ preventScroll: true }); heading.current?.scrollIntoView?.({ block: "start" }); }, []);
   const query = useQuery({ queryKey: ["ai", "saved-detail", userId, row.audience, row.review_id, row.id], queryFn: () => aiApi.detail(row.review_id, row.id) });
-  return <section className="ai-saved-detail" aria-labelledby="saved-ai-title"><div className="section-heading"><h2 ref={heading} tabIndex={-1} id="saved-ai-title">Tư vấn {row.generation_version} · {row.display_name}</h2><button type="button" className="secondary" onClick={close}>Đóng nội dung tư vấn</button></div>
+  return <WorkspaceDialog title="Nội dung tư vấn" close={close}><section className="auth-card ai-saved-detail" aria-labelledby="saved-ai-title"><div className="section-heading"><h2 ref={heading} tabIndex={-1} id="saved-ai-title">Tư vấn {row.generation_version} · {row.display_name}</h2></div>
     <p>{row.cycle_name} · {row.audience === "PUBLIC" ? "Tư vấn chung" : "Nội bộ HR"} · Nội dung tham khảo, không thay đổi điểm số.</p>
     {!row.matches_current_calculation && <p className="state-notice">Bản lịch sử không khớp kết quả hiện tại; chỉ dùng để đối chiếu.</p>}
     {query.isPending && <p role="status">Đang tải nội dung…</p>}{query.isError && <><p role="alert">Không tải được tư vấn hoặc quyền truy cập đã thay đổi.</p><button type="button" className="secondary" onClick={() => { void query.refetch(); }}>Thử tải lại nội dung</button></>}
     {!query.isError && query.data && <AnalysisContent row={query.data} />}
-  </section>;
+  </section></WorkspaceDialog>;
 }

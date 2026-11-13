@@ -1,5 +1,7 @@
 # Hướng dẫn nghiệm thu InsightHR cho người mới
 
+**Giao diện hiện tại:** xem [bản đồ menu theo role và khung chi tiết](giao-dien-theo-role.vi.md). Tại danh sách người tham gia, bấm **Mở đánh giá** để vào khung chung có ba tab KPI / Phản hồi / Kết quả. Các bước “mở Kết quả”, “Quản lý KPI” bên dưới được thực hiện bằng tab tương ứng trong khung này; HR mở phân công từ **Phân công phản hồi** trong phần kết quả hoặc **Quản trị phân công** trong tab phản hồi. Đóng bằng **× Đóng** hoặc **Escape** để trở lại danh sách giữ nguyên bộ lọc.
+
 **Chưa rõ từng role làm gì và phối hợp với nhau ra sao?** Đọc trước [Vai trò và quy trình vận hành](vai-tro-va-quy-trinh.vi.md), có sơ đồ bàn giao, bảng quyền, màn hình tương ứng và ví dụ tính điểm Bình từ đầu đến cuối.
 
 Mục tiêu: tự vận hành một lượt đánh giá, biết ai làm việc gì và nhận ra kết quả đúng/sai. Dùng dữ liệu hư cấu `[DEMO]`, không cần biết lập trình. Đây là bài thực hành có thay đổi dữ liệu; gửi phản hồi, chốt kết quả và đóng kỳ không có nút hoàn tác.

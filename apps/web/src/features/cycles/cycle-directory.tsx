@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import Link from "next/link";
+import Link from "../workspace/detail-link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -10,6 +10,7 @@ import { useAuth } from "../auth/auth-provider";
 import { Pagination } from "../organization/shared";
 import { reviewApi, type Cycle } from "./api";
 import { cycleStatus, ReviewAccess, ReviewError } from "./shared";
+import { WorkspaceDialog } from "../workspace/dialog";
 
 const cycleSchema = z.object({ name: z.string().trim().min(1, "Nhập tên chu kỳ.").max(200),
   start_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Chọn ngày bắt đầu."),
@@ -35,13 +36,14 @@ function Directory() {
   const cache = useQueryClient();
   const [page, setPage] = useState(1), [q, setQ] = useState(""), [status, setStatus] = useState("");
   const [generation, setGeneration] = useState(0);
+  const [creating, setCreating] = useState(false);
   const query = useQuery({ queryKey: ["reviews", "cycles", page, q, status], queryFn: () => reviewApi.cycles({page, q, status}) });
   const create = useMutation({ mutationFn: (values: CycleValues) => reviewApi.saveCycle(null, values), onSuccess: () => {
-    setGeneration((v) => v + 1); void cache.invalidateQueries({queryKey: ["reviews"]});
+    setGeneration((v) => v + 1); setCreating(false); void cache.invalidateQueries({queryKey: ["reviews"]});
   } });
   return <>
-    <section className="auth-card wide"><p className="eyebrow">ĐÁNH GIÁ NHÂN SỰ</p><h1>Chu kỳ đánh giá</h1>
-      <p>Mỗi lần chỉ có một chu kỳ đang đánh giá. HR chốt kết quả từng nhân viên trước khi đóng kỳ và kích hoạt chu kỳ tiếp theo.</p>
+    <section className="auth-card wide"><p className="eyebrow">ĐÁNH GIÁ NHÂN SỰ</p><div className="section-heading"><h1>Chu kỳ đánh giá</h1>{user?.role === "HR" && <button onClick={() => { create.reset(); setCreating(true); }}>Tạo chu kỳ mới</button>}</div>
+      <p>{user?.role === "HR" ? "Tạo và theo dõi đợt đánh giá. Mở một chu kỳ để quản lý người tham gia và hoàn tất kết quả." : "Chọn chu kỳ để mở KPI, phản hồi và kết quả trong phạm vi của bạn."}</p>
       <form className="filters" onSubmit={(e) => { e.preventDefault(); const data = new FormData(e.currentTarget); setQ(String(data.get("q") ?? "")); setStatus(String(data.get("status") ?? "")); setPage(1); }}>
         <div><label htmlFor="cycles-search">Tìm chu kỳ</label><input id="cycles-search" name="q" maxLength={100} /></div>
         <div><label htmlFor="cycles-status">Trạng thái chu kỳ</label><select id="cycles-status" name="status"><option value="">Tất cả</option>{Object.entries(cycleStatus).map(([key, value]) => <option key={key} value={key}>{value}</option>)}</select></div><button>Lọc</button>
@@ -52,6 +54,6 @@ function Directory() {
         {!query.data.items.length && <p>Chưa có chu kỳ phù hợp trong phạm vi của bạn.</p>}
         <Pagination page={page} total={query.data.total} pending={query.isFetching} onPage={setPage} /></>}
     </section>
-    {user?.role === "HR" && <details className="auth-card editor-disclosure"><summary>Tạo chu kỳ mới</summary><CycleForm key={generation} pending={create.isPending} onSave={(v) => create.mutate(v)} />{create.isError && <ReviewError error={create.error} />}</details>}
+    {creating && user?.role === "HR" && <WorkspaceDialog title="Tạo chu kỳ mới" close={() => setCreating(false)}><section className="auth-card"><CycleForm key={generation} pending={create.isPending} onSave={(v) => create.mutate(v)} />{create.isError && <ReviewError error={create.error} />}</section></WorkspaceDialog>}
   </>;
 }

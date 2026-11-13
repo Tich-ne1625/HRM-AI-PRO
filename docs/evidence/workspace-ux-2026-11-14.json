@@ -1,0 +1,55 @@
+{
+  "roles": [
+    {
+      "role": "HR",
+      "fixed_menu": true,
+      "scoped_menu": true,
+      "single_dialog_tabs": true,
+      "preserved_list_filter": true,
+      "focus_trap": true,
+      "escape_close": true
+    },
+    {
+      "role": "MANAGER",
+      "fixed_menu": true,
+      "scoped_menu": true,
+      "single_dialog_tabs": true,
+      "preserved_list_filter": true,
+      "focus_trap": true,
+      "escape_close": true
+    },
+    {
+      "role": "EMPLOYEE",
+      "fixed_menu": true,
+      "scoped_menu": true,
+      "single_dialog_tabs": true,
+      "preserved_list_filter": true,
+      "focus_trap": true,
+      "escape_close": true
+    },
+    {
+      "role": "ADMIN",
+      "fixed_menu": true,
+      "scoped_menu": true
+    }
+  ],
+  "runtime_exceptions": [],
+  "domain_writes": 0,
+  "ai_calls": 0,
+  "date": "2026-11-14",
+  "scope": "Local Docker Compose UI acceptance",
+  "web_test_files": 23,
+  "web_tests_passed": 162,
+  "lint": "passed",
+  "typecheck": "passed",
+  "production_build": "passed",
+  "viewport_widths": [
+    1280,
+    390
+  ],
+  "notes": [
+    "Authentication used existing local demo accounts.",
+    "No domain mutations or live AI calls.",
+    "Direct detail URLs remain available; ordinary workspace links open an in-place dialog."
+  ]
+}

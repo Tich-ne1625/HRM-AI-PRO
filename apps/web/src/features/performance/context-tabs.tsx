@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "../workspace/detail-link";
 
 export function EvaluationTabs({ employeeId, cycleId, active }: { employeeId: string; cycleId: string; active: "kpis" | "feedback" | "performance" }) {
   return <nav className="context-tabs" aria-label="Đánh giá trong cùng chu kỳ">{[

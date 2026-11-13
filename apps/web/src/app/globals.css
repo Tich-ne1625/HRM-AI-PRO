@@ -62,6 +62,23 @@ a {
 .auth-card { width: 100%; max-width: 40rem; padding: 2rem; background: white; border: 1px solid #e2e8f0;
   border-radius: 1rem; box-shadow: 0 8px 28px #0f172a05; color: #0f172a; margin: 0 0 1.5rem; }
 .auth-card.wide { max-width: none; }
+.workspace-dialog { margin: auto; width: min(74rem, calc(100% - 3rem)); max-height: calc(100dvh - 3rem); padding: 0; border: 1px solid #cbd5e1; border-radius: 1rem; background: #f8fafc; color: #14213d; box-shadow: 0 24px 80px #0f172a40; overflow: auto; overscroll-behavior: contain; }
+.workspace-dialog::backdrop { background: #0f172a80; backdrop-filter: blur(3px); }
+.workspace-dialog-header { position: sticky; top: 0; z-index: 10; display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1rem 1.5rem; background: #fff; border-bottom: 1px solid #e2e8f0; }
+.workspace-dialog-header h2 { font-size: 1.1rem; font-weight: 700; margin: .25rem 0 0; }
+.dialog-close { display: flex; align-items: center; gap: .5rem; padding: .5rem .8rem; border: 1px solid #cbd5e1; border-radius: .5rem; background: #f8fafc; color: #334155; cursor: pointer; flex-shrink: 0; }
+.dialog-close > span:first-child { font-size: 1.6rem; line-height: 1; }
+.workspace-dialog-content { padding: 1.25rem; min-width: 0; }
+.workspace-dialog-content .auth-card { max-width: none; margin-bottom: 1rem; box-shadow: none; }
+.workspace-dialog-content .auth-card:last-child { margin-bottom: 0; }
+.workspace-dialog-content .context-tabs { position: sticky; top: 0; background: white; }
+.auth-card a.action-link, .workspace-dialog a.action-link { display: inline-flex; align-items: center; padding: .5rem .8rem; border: 1px solid #cbd5e1; border-radius: .5rem; background: #f8fafc; font-size: .85rem; font-weight: 600; text-decoration: none; white-space: nowrap; }
+@media (max-width: 600px) {
+  .workspace-dialog { width: calc(100% - 1rem); max-height: calc(100dvh - 1rem); border-radius: .75rem; }
+  .workspace-dialog-header { padding: .8rem 1rem; }
+  .workspace-dialog-content { padding: .65rem; }
+  .workspace-dialog-content .auth-card { padding: 1rem; }
+}
 .login-card { max-width: 42rem; }
 .demo-role-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; margin-top: 1.5rem; }
 .auth-card .demo-role { display: grid; align-content: start; gap: .35rem; text-align: left; background: #fff; color: #334155; border: 1px solid #cbd5e1; padding: 1rem; min-width: 0; }

@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "../workspace/detail-link";
 import type { Activity } from "./api";
 
 const labels: Record<string, string> = { "user.created": "Đã tạo tài khoản", "user.role_changed": "Đã cập nhật vai trò tài khoản", "user.status_changed": "Đã cập nhật trạng thái tài khoản", "performance.calculated": "Đã tính điểm đánh giá", "performance.finalized": "Đã chốt kết quả đánh giá" };

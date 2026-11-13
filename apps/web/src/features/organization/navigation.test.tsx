@@ -38,18 +38,39 @@ it("shows ADMIN system tabs without HR workspace shortcuts", () => {
   expect(screen.getByRole("link", { name: "Quản trị hệ thống" })).toBeTruthy();
   expect(screen.queryByRole("link", { name: "Đánh giá hiệu suất" })).toBeNull();
 });
-it("keeps employee evaluation pages in the cycle workflow on the left", () => {
+it("marks evaluation without removing the other fixed HR sections", () => {
   state.path = "/employees/e1/performance"; render(<WorkspaceNavigation />);
   expect(screen.getByRole("link", { name: "Chu kỳ đánh giá" }).getAttribute("aria-current")).toBe("page");
-  expect(screen.queryByRole("link", { name: "Nhân viên" })).toBeNull();
+  expect(screen.getByRole("link", { name: "Nhân viên" })).toBeTruthy();
 });
 
-it("keeps the sidebar focused on the selected organization group", () => {
+it("keeps the same HR menu when switching to organization", () => {
   state.path = "/employees"; render(<><WorkspaceHeader /><WorkspaceNavigation /></>);
   expect(screen.getByRole("link", { name: "Nhân viên" }).getAttribute("aria-current")).toBe("page");
   expect(screen.getByRole("link", { name: "Phòng ban" })).toBeTruthy();
-  expect(screen.queryByRole("link", { name: "Danh mục KPI" })).toBeNull();
+  expect(screen.getByRole("link", { name: "Danh mục KPI" })).toBeTruthy();
   expect(screen.getByRole("link", { name: "Đánh giá hiệu suất" })).toBeTruthy();
+});
+
+it.each(["MANAGER", "EMPLOYEE"])("hides HR catalogs and administration from %s", (role) => {
+  state.role = role;
+  render(<WorkspaceNavigation />);
+  for (const label of ["Phòng ban", "Chức danh", "Danh mục KPI", "Quản trị phản hồi", "Quản lý tài khoản", "Cấu hình chấm điểm"]) {
+    expect(screen.queryByRole("link", { name: label })).toBeNull();
+  }
+  expect(screen.getByRole("link", { name: "Chu kỳ đánh giá" })).toBeTruthy();
+  expect(screen.queryByRole("link", { name: "Nhân viên trực tiếp" }) !== null).toBe(role === "MANAGER");
+});
+
+it("keeps identical sidebar destinations across every HR top-level tab", () => {
+  const view = render(<WorkspaceNavigation />);
+  const hrefs = () => screen.getAllByRole("link").map((link) => link.getAttribute("href"));
+  const original = hrefs();
+  for (const path of ["/employees", "/account", "/dashboard", "/kpis", "/feedback", "/ai-reports"]) {
+    state.path = path;
+    view.rerender(<WorkspaceNavigation />);
+    expect(hrefs()).toEqual(original);
+  }
 });
 it("keeps saved AI advice in evaluation navigation and hides it from ADMIN", () => {
   state.path = "/ai-reports";

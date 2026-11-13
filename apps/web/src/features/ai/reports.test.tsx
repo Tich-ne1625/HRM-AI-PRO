@@ -30,7 +30,7 @@ it("reads metadata first and opens saved content only after explicit selection",
   await user.click(screen.getByRole("button", { name: "Xem tư vấn 1 · An" }));
   await screen.findByText("Tư vấn đã lưu");
   expect(mocks.detail).toHaveBeenCalledWith("r1", "a1");
-  await user.click(screen.getByRole("button", { name: "Đóng nội dung tư vấn" }));
+  await user.click(screen.getByRole("button", { name: "Đóng Nội dung tư vấn" }));
   expect(screen.queryByText("Tư vấn đã lưu")).toBeNull();
   expect(mocks.generate).not.toHaveBeenCalled();
 });

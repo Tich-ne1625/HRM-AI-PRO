@@ -243,6 +243,7 @@ def workflow(p, password):
     p.login("hr", password)
     for kind, label in (("departments", "phòng ban"), ("positions", "chức danh")):
         p.go("/" + kind)
+        p.click("Thêm mới " + label)
         p.fill("#reference-code", "P9")
         p.fill("#reference-name", "Phase 9 Fictional " + kind)
         p.write("/api/v1/" + kind, lambda label=label: p.click("Thêm " + label), 201)
@@ -262,6 +263,7 @@ def workflow(p, password):
         row = p.write("/api/v1/employees", lambda: p.click("Lưu hồ sơ"), 201)
         employees[role] = row["id"]
     p.go("/review-cycles")
+    p.click("Tạo chu kỳ mới")
     p.fill("#cycle-name", "Phase 9 actual UI workflow")
     p.fill("#cycle-start", "2026-01-01")
     p.fill("#cycle-end", "2026-12-31")
@@ -297,6 +299,7 @@ def workflow(p, password):
     assert p.get(f"/api/v1/review-cycles/{cycle}")["status"] == "ACTIVE"
     p.shot("hr-close-denied-before-finalize")
     p.go("/kpis")
+    p.click("Thêm định nghĩa KPI")
     for selector, value in (
         ("#def-code", "P9"),
         ("#def-name", "Fictional deliveries"),

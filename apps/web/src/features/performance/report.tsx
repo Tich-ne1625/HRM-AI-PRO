@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import Link from "next/link";
+import Link from "../workspace/detail-link";
 import { useState } from "react";
 import { AISection } from "../ai/section";
 import { useAuth } from "../auth/auth-provider";
@@ -47,11 +47,12 @@ function ReportContent({ employeeId, cycleId }: { employeeId: string; cycleId: s
       {row.current_result && <ScoreMetrics row={row.current_result} />}
       {row.finalized_at && <p role="status">Đã chốt lúc {new Date(row.finalized_at).toLocaleString("vi-VN")}.</p>}
       <div className="row-actions">
-        {row.can_calculate && <button disabled={calculate.isPending || confirm || calculate.isError} onClick={() => calculate.mutate()}>{calculate.isPending ? "Đang tính…" : row.state === "NOT_CALCULATED" ? "Tính điểm hiệu suất" : "Tính lại điểm"}</button>}
-        {row.can_finalize && <button className="secondary" disabled={calculate.isPending} onClick={() => setConfirm(true)}>Chốt kết quả</button>}
+        {row.can_calculate && (user?.role === "HR" || user?.role === "MANAGER") && <button disabled={calculate.isPending || confirm || calculate.isError} onClick={() => calculate.mutate()}>{calculate.isPending ? "Đang tính…" : row.state === "NOT_CALCULATED" ? "Tính điểm hiệu suất" : "Tính lại điểm"}</button>}
+        {row.can_finalize && user?.role === "HR" && <button className="secondary" disabled={calculate.isPending} onClick={() => setConfirm(true)}>Chốt kết quả</button>}
+        {user?.role === "HR" && <Link className="action-link" href={`/feedback-administration?participant_id=${row.participant_id}&cycle_id=${cycleId}`}>Phân công phản hồi</Link>}
       </div>
       {calculate.isError && <ReviewError error={calculate.error} reload={() => { calculate.reset(); void refresh(); }} />}
-      {confirm && row.can_finalize && row.review_id && <FinalizeReview key={`${row.review_id}-${row.evidence_version}-${row.current_result?.calculation_version}`} report={row} onDone={refresh} onCancel={() => setConfirm(false)} />}
+      {confirm && user?.role === "HR" && row.can_finalize && row.review_id && <FinalizeReview key={`${row.review_id}-${row.evidence_version}-${row.current_result?.calculation_version}`} report={row} onDone={refresh} onCancel={() => setConfirm(false)} />}
     </section>
     <AISection report={row} />
     {row.current_result && <CalculationDetail row={row.current_result} />}

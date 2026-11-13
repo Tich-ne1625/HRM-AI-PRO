@@ -54,7 +54,7 @@ Nếu chưa biết bắt đầu từ đâu, làm theo [hướng dẫn nghiệm t
 | Quản lý | Theo dõi nhân viên trực tiếp, nhập kết quả KPI/tính điểm khi có quyền, gửi phản hồi được giao |
 | Nhân viên | Xem KPI/kết quả của mình, gửi phản hồi được giao, đọc tư vấn chung đã lưu |
 
-**Tab trên** chọn nhóm chức năng; **menu trái** hiện các việc của nhóm đang mở. Trên điện thoại, bấm **Mở menu**. Form tạo mới và chi tiết tính điểm được thu gọn, bấm tiêu đề để mở khi cần.
+**Tab trên** chọn nhóm chức năng; **menu trái cố định theo role**. Trên điện thoại, bấm **Mở menu**. Hồ sơ và form tạo mới mở trong **khung nổi có nút × Đóng**, giữ danh sách bên dưới. Trong một chu kỳ, bấm **Mở đánh giá** để dùng ba tab KPI / Phản hồi / Kết quả. Xem [bản đồ menu và thao tác theo role](docs/giao-dien-theo-role.vi.md).
 
 Luồng đánh giá: **HR lập kỳ/giao KPI → nhập thực tế → reviewer gửi phản hồi → quản lý/HR tính điểm → HR chốt từng người và đóng kỳ**. Nếu sửa KPI/phản hồi, kết quả chuyển “Cần tính lại”. Từ chu kỳ, chọn nhân viên rồi dùng các tab **KPI / Phản hồi 360 / Kết quả hiệu suất** để làm việc cùng ngữ cảnh.
 

@@ -8,6 +8,7 @@ import { z } from "zod";
 import { useAuth } from "../auth/auth-provider";
 import { organizationApi, referenceLabel, type Reference, type ReferenceInput, type ReferenceKind } from "./api";
 import { OrganizationAccess, organizationError, Pagination } from "./shared";
+import { WorkspaceDialog } from "../workspace/dialog";
 
 const schema = z.object({
   code: z.string().trim().toUpperCase().regex(/^[A-Z0-9][A-Z0-9_-]{1,31}$/, "Mã gồm 2–32 ký tự: chữ, số, gạch ngang hoặc gạch dưới."),
@@ -27,6 +28,7 @@ function ReferenceList({ kind }: { kind: ReferenceKind }) {
   const [q, setQ] = useState("");
   const [active, setActive] = useState("");
   const [editing, setEditing] = useState<Reference | null>(null);
+  const [creating, setCreating] = useState(false);
   const [editorVersion, setEditorVersion] = useState(0);
   const [confirm, setConfirm] = useState<{ row: Reference; input: ReferenceInput } | null>(null);
   const cache = useQueryClient();
@@ -34,7 +36,7 @@ function ReferenceList({ kind }: { kind: ReferenceKind }) {
     page, page_size: 20, q, is_active: active === "" ? undefined : active === "true",
   }) });
   const mutation = useMutation({ mutationFn: ({ id, input }: { id: string | null; input: ReferenceInput }) => organizationApi.saveReference(kind, id, input),
-    onSuccess: () => { setEditing(null); setConfirm(null); setEditorVersion((value) => value + 1); void cache.invalidateQueries({ queryKey: ["organization"] }); },
+    onSuccess: () => { setEditing(null); setCreating(false); setConfirm(null); setEditorVersion((value) => value + 1); void cache.invalidateQueries({ queryKey: ["organization"] }); },
   });
   function save(values: Values) {
     const input = { code: values.code, [kind === "departments" ? "name" : "title"]: values.label, is_active: values.is_active };
@@ -42,7 +44,7 @@ function ReferenceList({ kind }: { kind: ReferenceKind }) {
     else mutation.mutate({ id: editing?.id ?? null, input });
   }
   return <>
-    <section className="auth-card wide"><p className="eyebrow">TỔ CHỨC</p><h1>Danh sách {label}</h1>
+    <section className="auth-card wide"><p className="eyebrow">TỔ CHỨC</p><div className="section-heading"><h1>Danh sách {label}</h1>{hr && <button onClick={() => { setEditing(null); setCreating(true); mutation.reset(); }}>Thêm mới {label}</button>}</div>
       {!hr && <p>Chỉ hiển thị dữ liệu thuộc phạm vi hồ sơ của bạn.</p>}
       <form className="filters" onSubmit={(event) => {
         event.preventDefault(); const data = new FormData(event.currentTarget);
@@ -68,12 +70,12 @@ function ReferenceList({ kind }: { kind: ReferenceKind }) {
         <p>Ngừng hoạt động {confirm.row.code}? Hồ sơ hiện hữu được giữ nguyên liên kết; không thể gán mới cho đến khi kích hoạt lại.</p>
         <button disabled={mutation.isPending} onClick={() => mutation.mutate({ id: confirm.row.id, input: confirm.input })}>Xác nhận ngừng hoạt động</button>
         <button className="secondary" onClick={() => setConfirm(null)}>Hủy</button></section>}
-      {mutation.isError && <p role="alert">{organizationError(mutation.error)}</p>}
+      {mutation.isError && !creating && !editing && <p role="alert">{organizationError(mutation.error)}</p>}
     </section>
-    {hr && <details className="auth-card editor-disclosure" open={editing ? true : undefined}><summary>{editing ? "Chỉnh sửa" : "Thêm mới"} {label}</summary>
+    {hr && (creating || editing) && <WorkspaceDialog title={`${editing ? "Chỉnh sửa" : "Thêm mới"} ${label}`} close={() => { setCreating(false); setEditing(null); mutation.reset(); }}><section className="auth-card">
       <ReferenceEditor key={editing?.id ?? `new-${editorVersion}`} kind={kind} initial={editing} pending={mutation.isPending} onSave={save} />
-      {editing && <button className="secondary" onClick={() => setEditing(null)}>Hủy chỉnh sửa</button>}
-    </details>}
+      {mutation.isError && <p role="alert">{organizationError(mutation.error)}</p>}
+    </section></WorkspaceDialog>}
   </>;
 }
 

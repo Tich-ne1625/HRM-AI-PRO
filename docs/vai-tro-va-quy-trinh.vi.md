@@ -1,5 +1,7 @@
 # Ai làm gì trong InsightHR? Vai trò, nhiệm vụ và cách phối hợp
 
+Xem [bản đồ giao diện theo role](giao-dien-theo-role.vi.md) để biết chính xác từng nhóm menu có gì. Hồ sơ đánh giá mở trong khung nổi, dùng ba tab nội bộ và nút **× Đóng** để quay về danh sách.
+
 Tài liệu này giải thích **cách hệ thống vận hành**. Khi đã hiểu, dùng [bài nghiệm thu từng bước](nghiem-thu.vi.md) để thao tác trên dữ liệu demo.
 
 ## 1. Dự án giải quyết việc gì?

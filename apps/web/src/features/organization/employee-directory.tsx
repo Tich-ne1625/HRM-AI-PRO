@@ -1,12 +1,13 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import Link from "next/link";
+import Link from "../workspace/detail-link";
 import { useState } from "react";
 import { useAuth } from "../auth/auth-provider";
 import { organizationApi } from "./api";
 import { EmployeeForm, ReferencePicker } from "./employee-form";
 import { OrganizationAccess, Pagination } from "./shared";
+import { WorkspaceDialog } from "../workspace/dialog";
 
 export function EmployeeDirectory() {
   return <OrganizationAccess><Directory /></OrganizationAccess>;
@@ -43,6 +44,6 @@ function Directory() {
         <Pagination page={page} total={query.data.total} pending={query.isFetching} onPage={setPage} />
       </>}
     </section>
-    {creating && user?.role === "HR" && <EmployeeForm onSaved={() => setCreating(false)} />}
+    {creating && user?.role === "HR" && <WorkspaceDialog title="Thêm nhân viên" close={() => setCreating(false)}><EmployeeForm onSaved={() => setCreating(false)} /></WorkspaceDialog>}
   </>;
 }

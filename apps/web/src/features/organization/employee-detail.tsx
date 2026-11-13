@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import Link from "next/link";
+import Link from "../workspace/detail-link";
 import { useState } from "react";
 import { useAuth } from "../auth/auth-provider";
 import { organizationApi } from "./api";
