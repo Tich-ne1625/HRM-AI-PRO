@@ -43,6 +43,8 @@ Nhập mật khẩu khi được hỏi; không đặt mật khẩu hoặc API ke
 
 ## Dùng chức năng theo role
 
+Đọc [ai làm gì và tương tác với nhau qua đâu](docs/vai-tro-va-quy-trinh.vi.md) để hiểu vai trò, dữ liệu bàn giao và luồng đánh giá từ đầu đến cuối.
+
 Nếu chưa biết bắt đầu từ đâu, làm theo [hướng dẫn nghiệm thu từng bước](docs/nghiem-thu.vi.md), từ ADMIN → HR → Quản lý → Nhân viên → quay lại HR để chốt và đóng kỳ.
 
 | Role | Công việc chính |

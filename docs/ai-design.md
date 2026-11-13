@@ -1,6 +1,6 @@
 # AI design status
 
-Phases 1–6 are implemented; Gemini integration remains absent. No model name, API key, prompt, provider SDK, background call, or placeholder analysis is present in the running applications. The [Phase 7 contract](phase-7-contract.md) and [eight-task implementation plan](superpowers/plans/2026-10-22-phase-7-gemini.md) were prepared on 2026-10-22; this is a plan, not runtime acceptance.
+Phases 1–10 are implemented. Optional Gemini generation, saved advice and separate PUBLIC/HR_PRIVATE audiences are available. HR explicitly requests generation; model/key are configured by the operator. See the [Phase 7 contract](phase-7-contract.md), [implementation plan and acceptance](superpowers/plans/2026-10-22-phase-7-gemini.md), and [Phase 10 delivery report](phase-10-report.vi.md). For a plain-language explanation of who creates and reads advice, see the [Vietnamese role and workflow guide](vai-tro-va-quy-trinh.vi.md).
 
 The implemented boundary:
 

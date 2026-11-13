@@ -1,5 +1,7 @@
 # Hướng dẫn nghiệm thu InsightHR cho người mới
 
+**Chưa rõ từng role làm gì và phối hợp với nhau ra sao?** Đọc trước [Vai trò và quy trình vận hành](vai-tro-va-quy-trinh.vi.md), có sơ đồ bàn giao, bảng quyền, màn hình tương ứng và ví dụ tính điểm Bình từ đầu đến cuối.
+
 Mục tiêu: tự vận hành một lượt đánh giá, biết ai làm việc gì và nhận ra kết quả đúng/sai. Dùng dữ liệu hư cấu `[DEMO]`, không cần biết lập trình. Đây là bài thực hành có thay đổi dữ liệu; gửi phản hồi, chốt kết quả và đóng kỳ không có nút hoàn tác.
 
 ## 1. Chuẩn bị trước khi bắt đầu
