@@ -4,6 +4,7 @@ from app.modules.ai.models import AIAnalysis, AnalysisStatus
 from app.modules.audit.models import AuditLog
 from app.modules.auth.limiter import LoginLimit
 from app.modules.auth.models import AuthSession
+from app.modules.collaboration.models import ChatMessage, InternalPost, PostComment
 from app.modules.employees.models import Employee, EmploymentStatus
 from app.modules.feedback.models import AssignmentStatus, Feedback, FeedbackAssignment, Relationship
 from app.modules.kpis.models import EmployeeKPI, KPIDefinition, KPIDirection
@@ -20,6 +21,7 @@ __all__ = [
     "AssignmentStatus",
     "AuditLog",
     "AuthSession",
+    "ChatMessage",
     "CycleParticipant",
     "CycleStatus",
     "Department",
@@ -28,6 +30,7 @@ __all__ = [
     "EmploymentStatus",
     "Feedback",
     "FeedbackAssignment",
+    "InternalPost",
     "KPIDefinition",
     "KPIDirection",
     "LoginLimit",
@@ -35,6 +38,7 @@ __all__ = [
     "PerformanceReview",
     "PerformanceReviewRevision",
     "Position",
+    "PostComment",
     "Relationship",
     "ReviewCycle",
     "SystemConfig",

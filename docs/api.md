@@ -272,3 +272,21 @@ POST body: `{client_request_id:UUID,expected_calculation_version:int,expected_ev
 Responses expose only attempt UUID/audience/generation and calculation/evidence versions/status/model/prompt version/times/sampled flag/advisory/output/error code. No requester, hashes, fence, prompt or raw source comments. Output has exactly summary, strengths, improvement_areas, feedback_themes, recommended_actions and caveats. PUBLIC never uses private comments as input; HR_PRIVATE is a separate generation and cannot be reused publicly.
 
 Errors include ai_not_configured (503), provider_timeout (504), provider_invalid_output/provider_blocked (502), provider_quota/provider_configuration/provider_unavailable (503), generation_cooldown (429), generation_in_progress/generation_expired/analysis_stale/stale_analysis_version/stale_calculation_version/stale_evidence_version/review_stale/idempotency_conflict (409), and normal authorization/validation errors. Provider exception bodies and credentials are never returned. See [the full contract](phase-7-contract.md).
+# Internal collaboration
+
+Authenticated `/api/v1/collaboration` endpoints:
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| GET | `/people?search=&page=&post_id=&department_id=` | Public contact directory; optional audience filter, 30/page |
+| GET | `/posts?page=&audience=all/company/department` | Current audience-scoped feed, 20/page; publishing permissions and department options |
+| POST | `/posts` | `{id,title,body,department_id,mentions}`; HR/ADMIN company/active department, others own active department |
+| GET | `/posts/{id}?page=` | Scoped post and comments, 20/page |
+| POST | `/posts/{id}/comments` | `{id,body,mentions}`; mentions limited to post audience |
+| GET | `/conversations?page=` | Own recent conversations, 20/page and unread message count |
+| GET | `/chat/{peer_id}?before=` | Own pair only, latest 30 or older cursor page |
+| POST | `/chat/{peer_id}` | `{id,body,mentions}`; active recipient, mention only that recipient |
+| POST | `/chat/{peer_id}/read` | `{through_id}`; mark incoming messages through visible cursor and corresponding notices read |
+| GET | `/messages/{id}` | Resolve notification deep link, sender/recipient only |
+
+All writes require same-origin and family-bound CSRF; all content is plain text. Client UUID replay returns existing matching content without duplicate notices; changed content under that UUID is a 409. Feed, comments and chat send share commit-only notification signaling. The SSE endpoint remains `/api/v1/notifications/events`; no second subscription is created for chat. HR/ADMIN have no bypass for other people's private messages. See [Vietnamese usage and permissions](bang-tin-va-chat.vi.md).

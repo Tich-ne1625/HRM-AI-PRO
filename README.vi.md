@@ -2,6 +2,8 @@
 
 Hệ thống quản lý hiệu suất nhân viên: hồ sơ, KPI, phản hồi 360, tính điểm và tư vấn AI theo quyền. [English](README.md).
 
+**Trao đổi nội bộ:** [Hướng dẫn bảng tin, chat cửa sổ nhỏ và @nhắc](docs/bang-tin-va-chat.vi.md). Vào **Tổng quan → Bảng tin nội bộ** để xem tin công ty/phòng ban; nút **Chat nội bộ** ở góc phải dưới dùng để nhắn riêng.
+
 ## Chạy và xem ngay
 
 1. Mở **Docker Desktop**.

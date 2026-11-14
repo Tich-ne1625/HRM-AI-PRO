@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useAuth } from "../auth/auth-provider";
 import { navigationGroups, navigationPath } from "../workspace/navigation-model";
 import { NotificationCenter } from "../notifications/notification-center";
+import { ChatWidget } from "../collaboration/chat-widget";
 
 export function WorkspaceHeader() {
   const { user } = useAuth();
@@ -18,6 +19,7 @@ export function WorkspaceHeader() {
       aria-current={group.items.some((item) => path === item.href || path.startsWith(`${item.href}/`)) ? "location" : undefined}>{group.label}</Link>)}</nav>
     {user && <Link href="/account" className="workspace-profile"><span className="profile-dot" aria-hidden="true">{user.role.slice(0, 1)}</span><span>{roles[user.role]}<small>Tài khoản của bạn</small></span></Link>}
     {user?.id && <NotificationCenter key={`${user.id}:${user.role}`} />}
+    {user?.id && <ChatWidget key={`chat:${user.id}:${user.role}`} />}
   </header>;
 }
 

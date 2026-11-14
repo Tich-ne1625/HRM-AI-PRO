@@ -8,6 +8,8 @@ from sqlalchemy.sql.elements import ColumnElement
 from app.core.domain_writes import CsrfCheck, authorize_domain_write
 from app.core.errors import ApiError
 from app.core.policies import AuthContext
+from app.modules.collaboration.models import ChatMessage, InternalPost
+from app.modules.collaboration.service import post_scope
 from app.modules.employees.models import Employee
 from app.modules.employees.repository import employee_scope
 from app.modules.feedback.models import AssignmentStatus, FeedbackAssignment
@@ -38,6 +40,16 @@ TITLES = {
 
 
 def visible(user: User) -> ColumnElement[bool]:
+    post_notice = (
+        select(InternalPost.id)
+        .where(InternalPost.id == Notification.post_id, post_scope(user))
+        .exists()
+    )
+    message_notice = (
+        select(ChatMessage.id)
+        .where(ChatMessage.id == Notification.message_id, ChatMessage.recipient_id == user.id)
+        .exists()
+    )
     subject = (
         select(Employee.id)
         .where(Employee.id == Notification.employee_id, employee_scope(user))
@@ -54,11 +66,32 @@ def visible(user: User) -> ColumnElement[bool]:
     return and_(
         Notification.recipient_id == user.id,
         Notification.recipient_role == user.role.value,
-        or_(own_assignment, and_(Notification.assignment_id.is_(None), subject)),
+        or_(
+            post_notice,
+            message_notice,
+            own_assignment,
+            and_(Notification.assignment_id.is_(None), subject),
+        ),
     )
 
 
 def present(row: Notification, user: User, subject: str = "", cycle: str = "") -> NotificationView:
+    if row.post_id or row.message_id:
+        title = {
+            "collaboration.post": "Bảng tin có bài viết mới",
+            "collaboration.comment": "Có trao đổi hoặc @nhắc bạn trong bài viết",
+            "collaboration.mention": "Bạn được @nhắc trong tin nhắn",
+            "collaboration.message": "Bạn có tin nhắn mới",
+        }.get(row.kind, "Trao đổi mới")
+        href = f"/news?post={row.post_id}" if row.post_id else f"/news?message={row.message_id}"
+        return NotificationView(
+            id=row.id,
+            title=title,
+            message="Mở để xem nội dung trong phạm vi của bạn.",
+            href=href,
+            created_at=row.created_at,
+            read_at=row.read_at,
+        )
     href = f"/employees/{row.employee_id}/performance?cycle_id={row.cycle_id}"
     message = "Mở hồ sơ để xem cập nhật trong phạm vi của bạn."
     if row.assignment_id:

@@ -13,6 +13,7 @@ from app.modules.ai.provider import GeminiProvider
 from app.modules.ai.router import router as ai_router
 from app.modules.audit.router import router as audit_router
 from app.modules.auth.router import router as auth_router
+from app.modules.collaboration.router import router as collaboration_router
 from app.modules.dashboard.router import router as dashboard_router
 from app.modules.employees.router import router as employees_router
 from app.modules.feedback.router import router as feedback_router
@@ -74,6 +75,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(dashboard_router)
     app.include_router(audit_router)
     app.include_router(notifications_router)
+    app.include_router(collaboration_router)
     return app
 
 

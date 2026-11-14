@@ -219,3 +219,6 @@ Rebuild an existing Compose stack with `docker compose --env-file .env up --buil
 6. Employees read their own allocation; managers read self/current direct reports and cannot edit their own KPIs. Transfer changes live access while preserving historical snapshots. A 409 conflict retains input until explicit reload; reload fresh data and re-enter changes, without an automatic version retry.
 
 All business decimals are JSON strings. Feedback, calculation, finalization, AI, dashboards and demo seed remain outside Phase 4. See the [Vietnamese walkthrough](README.vi.md) and [contract](docs/phase-4-contract.md).
+# Internal communication
+
+All roles can open `/news` for company and department updates, with comments and explicit @mentions. A compact direct-chat window is available throughout the workspace, including unread counts and read receipts. Company announcements require HR/ADMIN; other staff post in their current department. Direct messages remain private to the two participants. See the [Vietnamese walkthrough](docs/bang-tin-va-chat.vi.md).

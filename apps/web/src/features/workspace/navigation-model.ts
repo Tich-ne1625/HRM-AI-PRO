@@ -4,6 +4,7 @@ export type NavigationGroup = { label: string; href: string; items: { href: stri
 
 export function navigationGroups(role: UserRole): NavigationGroup[] {
   const groups: NavigationGroup[] = [{ label: "Tổng quan", href: "/dashboard", items: [{ href: "/dashboard", label: "Tổng quan" }] }];
+  groups[0]!.items.push({ href: "/news", label: "Bảng tin nội bộ" });
   if (role !== "ADMIN") groups.push({ label: "Đánh giá hiệu suất", href: "/review-cycles", items: [
     { href: "/review-cycles", label: "Chu kỳ đánh giá" },
     ...(role === "HR" ? [{ href: "/feedback-administration", label: "Phân công phản hồi" }, { href: "/kpis", label: "Danh mục KPI" }] : []),
@@ -30,5 +31,5 @@ export function workspaceRouteAllowed(role: UserRole, path: string): boolean {
   if (/^\/(departments|positions|kpis|feedback-administration)(\/|$)/.test(path)) return role === "HR";
   if (path === "/employees") return role === "HR" || role === "MANAGER";
   if (/^\/(employees|review-cycles|ai-reports)(\/|$)/.test(path)) return role !== "ADMIN";
-  return path === "/dashboard" || path === "/account" || /^\/feedback(\/|$)/.test(path);
+  return path === "/news" || path === "/dashboard" || path === "/account" || /^\/feedback(\/|$)/.test(path);
 }

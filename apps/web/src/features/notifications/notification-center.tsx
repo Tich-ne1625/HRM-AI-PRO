@@ -45,7 +45,7 @@ export function NotificationCenter() {
     };
     const changed = () => {
       if (disposed) return;
-      for (const domain of ["notifications", "dashboard", "organization", "reviews", "feedback", "performance", "ai"]) void cache.invalidateQueries({ queryKey: [domain] });
+      for (const domain of ["notifications", "dashboard", "organization", "reviews", "feedback", "performance", "ai", "collaboration"]) void cache.invalidateQueries({ queryKey: [domain] });
     };
     const connect = () => {
       source = new EventSource("/api/v1/notifications/events", { withCredentials: true });

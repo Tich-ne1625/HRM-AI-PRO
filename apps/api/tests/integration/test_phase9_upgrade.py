@@ -19,7 +19,14 @@ def test_new_limiter_migration_roundtrip_preserves_all_previous_records(ai_world
         with world.engine.connect() as conn:
             tables = sorted(
                 set(inspect(conn).get_table_names())
-                - {"alembic_version", "auth_login_limits", "notifications"}
+                - {
+                    "alembic_version",
+                    "auth_login_limits",
+                    "notifications",
+                    "internal_posts",
+                    "post_comments",
+                    "chat_messages",
+                }
             )
             for table in tables:
                 rows = [dict(r) for r in conn.execute(text(f'SELECT * FROM "{table}"')).mappings()]
@@ -34,4 +41,4 @@ def test_new_limiter_migration_roundtrip_preserves_all_previous_records(ai_world
     assert fingerprint() == before
     with world.engine.connect() as conn:
         assert conn.scalar(text("SELECT count(*) FROM auth_login_limits")) == 0
-        assert conn.scalar(text("SELECT version_num FROM alembic_version")) == "20261114_0009"
+        assert conn.scalar(text("SELECT version_num FROM alembic_version")) == "20261114_0010"

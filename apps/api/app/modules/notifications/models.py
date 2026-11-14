@@ -27,5 +27,11 @@ class Notification(Base):
     assignment_id: Mapped[UUID | None] = mapped_column(
         ForeignKey("feedback_assignments.id", ondelete="RESTRICT")
     )
+    post_id: Mapped[UUID | None] = mapped_column(
+        ForeignKey("internal_posts.id", ondelete="RESTRICT")
+    )
+    message_id: Mapped[UUID | None] = mapped_column(
+        ForeignKey("chat_messages.id", ondelete="RESTRICT")
+    )
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     read_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))

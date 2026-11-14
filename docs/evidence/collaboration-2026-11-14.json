@@ -1,0 +1,75 @@
+{
+  "date": "2026-11-14",
+  "feature": "company_department_feed_and_direct_chat",
+  "migration": "20261114_0010",
+  "backend": {
+    "current_collected_cases": 912,
+    "initial_broad_run": {
+      "passed": 507,
+      "failed": 3,
+      "resolved_failures": "Legacy migration assertions expected head 0009 or fingerprinted empty extension tables; updated for head 0010."
+    },
+    "focused_final_run": {
+      "passed": 70,
+      "includes_collaboration_cases": 29,
+      "includes_all_failed_migration_cases": true
+    },
+    "remaining_suite": {
+      "passed": 397,
+      "deselected": 515
+    },
+    "all_current_cases_covered_after_fixes": true,
+    "ruff": "passed",
+    "mypy": "passed: 115 source files"
+  },
+  "frontend": {
+    "passed": 184,
+    "files": 26,
+    "new_cases": 8,
+    "typecheck": "passed",
+    "eslint": "passed",
+    "production_build": "passed"
+  },
+  "browser": {
+    "company_post_from_form": true,
+    "mentions_saved_and_visible": true,
+    "feed_and_notice_realtime_between_accounts": true,
+    "comment_from_form": true,
+    "chat_message_from_form": true,
+    "unread_until_conversation_opened": true,
+    "sender_receives_read_receipt": true,
+    "modal_close_preserves_page": true,
+    "viewport_widths": [
+      1280,
+      390
+    ],
+    "ai_calls": 0,
+    "disposable_data_only": true
+  },
+  "production_readonly_probe": {
+    "production_news_visible": true,
+    "production_chat_visible": true,
+    "existing_password_unchanged": true,
+    "close_preserves_page": true,
+    "widths": [
+      1280,
+      390
+    ],
+    "domain_writes": 0,
+    "ai_calls": 0
+  },
+  "preservation": {
+    "head": "20261114_0010",
+    "business_account_and_notification_tables_unchanged": 15,
+    "prior_audit_history_verified": true,
+    "login_and_refresh_activity_during_upgrade": true,
+    "no_data_reset": true
+  },
+  "limitations": [
+    "Direct 1-to-1 chat; no group chat or attachments",
+    "Explicit mention picker; plain typed names do not trigger mentions",
+    "Unsaved chat draft is not retained when closing the window"
+  ],
+  "secrets_and_user_content_in_evidence": false,
+  "live_ai_calls": 0
+}
