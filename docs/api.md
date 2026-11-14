@@ -1,5 +1,13 @@
 # API contract
 
+## HR bulk feedback assignment (2026-11-14)
+
+`POST /api/v1/feedback-assignments/bulk` is HR-only, exact-Origin/CSRF protected and no-store. Body: `{participant_id,reviewer_ids,relationship,required,due_at,expected_evidence_version}`. `reviewer_ids` contains 1–100 distinct UUIDs; only PEER/SUBORDINATE are allowed. SELF/MANAGER retain their existing single-recipient workflow. Success 201: `{assignment_ids,created_count,evidence_version}`.
+
+The server follows existing guard/admin/user UUID/cycle/participant/assignment lock order, revalidates current accounts and historical relationship rules, deadline, ACTIVE/unfinalized state, expected version, duplicate assignments (including cancelled history), and total active assignment capacity 100. All rows commit together, evidence_version advances once, and each new assignment has its own audit event/recipient notification. Failure rolls back assignments/audits/notices/signals. No skip-on-conflict, implicit reopening or version refresh/retry; a replay with the old version returns 409. Recipient conflict details contain only selected reviewer IDs for HR to identify affected names.
+
+`GET /feedback-reviewer-options` accepts optional `department_id` (current reviewer department) and `available_only=true` (active accounts with no prior assignment for this participant). Both apply before count/offset/limit. Page size remains bounded at 100; select-all reads the full bounded filtered result and sends explicit reviewer IDs for confirmation. Existing default behavior preserves assignment status for single-recipient editors. `GET /feedback-context` adds `active_assignment_count` so the UI shows remaining capacity. No migration/environment/AI changes. See [HR instructions](phan-cong-phan-hoi.vi.md).
+
 ## Notifications and responsibility split (2026-11-14)
 
 HR organizes, assigns feedback, monitors and finalizes/closes. Only the eligible current direct manager writes individual KPI allocations/actuals and calculates/recalculates; HR receives 403 for these writes and no edit controls. HR still manages KPI definitions and reads scoped evidence.

@@ -49,7 +49,7 @@ function Detail({ id }: { id: string }) {
       {!participants.isError && participants.data && <><div className="table-scroll" tabIndex={0} role="region" aria-label="Người tham gia chu kỳ, có thể cuộn ngang"><table><caption>{participants.data.total} người tham gia trong phạm vi</caption><thead><tr><th>Nhân viên</th><th>Phòng ban</th><th>Chức danh</th><th>Thao tác</th></tr></thead><tbody>
         {participants.data.items.map((p) => <tr key={p.id}><td>{p.employee_code} · {p.display_name}</td><td>{p.department_name}</td><td>{p.position_title}</td><td>{user?.role === "HR" && row.can_edit
           ? <button className="secondary" disabled={remove.isPending} onClick={() => remove.mutate(p.id)}>Bỏ {p.employee_code} khỏi nháp</button>
-          : <div className="row-actions"><Link className="action-link" href={`/employees/${p.employee_id}/performance?cycle_id=${id}`}>Mở đánh giá</Link></div>}</td></tr>)}</tbody></table></div>
+          : <div className="row-actions">{user?.role === "HR" && row.status === "ACTIVE" && <Link className="action-link" href={`/feedback-administration?participant_id=${p.id}&cycle_id=${id}`}>Phân công phản hồi</Link>}<Link className="action-link" href={`/employees/${p.employee_id}/performance?cycle_id=${id}`}>Mở đánh giá</Link></div>}</td></tr>)}</tbody></table></div>
         {!participants.data.items.length && <p>Chưa có người tham gia phù hợp.</p>}
         <Pagination page={page} total={participants.data.total} pending={participants.isFetching} onPage={setPage} /></>}
       {remove.isError && <ReviewError error={remove.error} reload={() => {void refresh();}} />}

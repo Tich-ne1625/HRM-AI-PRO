@@ -58,6 +58,8 @@ Nếu chưa biết bắt đầu từ đâu, làm theo [hướng dẫn nghiệm t
 
 Luồng đánh giá: **HR lập kỳ và giao phản hồi → quản lý trực tiếp giao KPI, nhập thực tế → reviewer gửi phản hồi → quản lý tính điểm → HR kiểm tra, chốt từng người và đóng kỳ**. HR chỉ xem phân bổ/thực tế, không nhập thay hoặc tính thay quản lý. Nếu sửa KPI/phản hồi, kết quả chuyển “Cần tính lại”. Từ chu kỳ, chọn nhân viên rồi dùng các tab **KPI / Phản hồi 360 / Kết quả hiệu suất** để làm việc cùng ngữ cảnh.
 
+**HR giao phản hồi:** mở **Phân công phản hồi** từ menu hoặc thẻ trên Tổng quan → chọn kỳ/người được đánh giá → chọn quan hệ. Đồng nghiệp/cấp dưới có thể chọn nhiều người, lọc phòng ban và **Chọn toàn bộ kết quả lọc** → xem lại → xác nhận một lần. Mỗi người nhận phiếu/thông báo riêng. Xem [hướng dẫn từng bước](docs/phan-cong-phan-hoi.vi.md).
+
 Bấm chuông **Thông báo** trên header để mở sidebar bên phải. **Thông báo** cho biết thay đổi mới, có dấu chưa đọc/đã đọc; **Việc cần làm** chỉ rõ việc của bạn và việc đang chờ phối hợp. Cập nhật trực tiếp giữa các tab; bấm một tin mở đúng khung chi tiết, đóng bằng **×**. Đọc tin không hoàn thành công việc. Dữ liệu cũ không được phát lại thành tin mới, nhưng việc còn chờ vẫn hiện. Xem [cách nhận thông báo và phân chia trách nhiệm](docs/notifications-contract.vi.md).
 
 ## Dùng AI khi cần

@@ -7,7 +7,7 @@ Menu trái được giữ cố định theo tài khoản đang đăng nhập. Đ
 | Nhóm | ADMIN | HR | Quản lý | Nhân viên |
 | --- | --- | --- | --- | --- |
 | Tổng quan | Thống kê tài khoản | Tổng quan đánh giá toàn phạm vi HR | Tổng quan nhóm trực tiếp | Tổng quan kết quả bản thân |
-| Đánh giá hiệu suất | Không hiển thị | Chu kỳ đánh giá; Quản trị phản hồi; Danh mục KPI; Tư vấn AI đã lưu | Chu kỳ đánh giá; Tư vấn AI đã lưu | Chu kỳ đánh giá; Tư vấn AI đã lưu |
+| Đánh giá hiệu suất | Không hiển thị | Chu kỳ đánh giá; Phân công phản hồi; Danh mục KPI; Tư vấn AI đã lưu | Chu kỳ đánh giá; Tư vấn AI đã lưu | Chu kỳ đánh giá; Tư vấn AI đã lưu |
 | Tổ chức / Nhóm của tôi | Không hiển thị | Nhân viên; Phòng ban; Chức danh | Nhân viên trực tiếp | Không hiển thị danh mục tổ chức |
 | Quản trị hệ thống | Quản lý tài khoản; Cấu hình chấm điểm | Không hiển thị | Không hiển thị | Không hiển thị |
 | Cá nhân | Phản hồi của tôi; Tài khoản | Phản hồi của tôi; Tài khoản | Phản hồi của tôi; Tài khoản | Phản hồi của tôi; Tài khoản |
@@ -22,7 +22,7 @@ Danh mục phòng ban/chức danh/KPI phục vụ quản trị được đưa v�
 2. Tại **Người tham gia**, mỗi người có một thao tác **Mở đánh giá**.
 3. Hồ sơ mở trong cùng khung với ba tab cố định: **KPI & kết quả thực tế / Phản hồi 360 / Kết quả hiệu suất**.
 4. Chuyển giữa ba tab giữ nguyên nhân viên và chu kỳ. Các nút bên trong chỉ xuất hiện khi role, phạm vi và trạng thái hồ sơ cho phép.
-5. HR có **Phân công phản hồi** trong phần kết quả hoặc **Quản trị phân công** trong tab phản hồi. Quản lý và nhân viên không thấy các thao tác quản trị này.
+5. HR có **Phân công phản hồi** trong phần kết quả hoặc **Phân công phản hồi** trong tab phản hồi. Quản lý và nhân viên không thấy các thao tác quản trị này.
 6. Bấm **× Đóng** ở góc trên hoặc nhấn **Escape** để đóng toàn bộ khung. Danh sách bên dưới giữ bộ lọc, trang và trạng thái đang xem.
 
 Nút **Về chu kỳ** bên trong hồ sơ mở danh sách người tham gia của kỳ trong cùng khung. Nút **Đóng** luôn kết thúc khung chi tiết và trở về trang phía dưới; không cần bấm Back qua các tab vừa xem.
@@ -57,3 +57,6 @@ Cập nhật trực tiếp khi có tương tác và khi đọc ở tab khác. Kh
 ## Kiểm tra thay đổi giao diện
 
 Ngày 14/11/2026: **162 test web / 23 file** đạt; lint, typecheck và production build đạt. Kiểm tra Edge thực tế qua bốn role xác nhận menu cố định, phần quản trị đúng role, một khung cho các tab đánh giá, giữ bộ lọc khi đóng và thao tác bàn phím Tab/Escape. Đã kiểm tra bố cục ở 1280/390 px, mở/đóng các form tạo mới HR và phiếu phản hồi. Không ghi dữ liệu nghiệp vụ hoặc gọi AI trong lượt kiểm tra trình duyệt này. [Kết quả kiểm tra](evidence/workspace-ux-2026-11-14.json).
+
+
+Hướng dẫn HR giao nhiều người cùng lúc, lọc phòng ban và xác nhận một lần: [Phân công phản hồi](phan-cong-phan-hoi.vi.md).

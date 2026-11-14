@@ -1,6 +1,6 @@
 # Hướng dẫn nghiệm thu InsightHR cho người mới
 
-**Giao diện hiện tại:** xem [bản đồ menu theo role và khung chi tiết](giao-dien-theo-role.vi.md). Tại danh sách người tham gia, bấm **Mở đánh giá** để vào khung chung có ba tab KPI / Phản hồi / Kết quả. Các bước “mở Kết quả”, “Quản lý KPI” bên dưới được thực hiện bằng tab tương ứng trong khung này; HR mở phân công từ **Phân công phản hồi** trong phần kết quả hoặc **Quản trị phân công** trong tab phản hồi. Đóng bằng **× Đóng** hoặc **Escape** để trở lại danh sách giữ nguyên bộ lọc.
+**Giao diện hiện tại:** xem [bản đồ menu theo role và khung chi tiết](giao-dien-theo-role.vi.md). Tại danh sách người tham gia, bấm **Mở đánh giá** để vào khung chung có ba tab KPI / Phản hồi / Kết quả. Các bước “mở Kết quả”, “Quản lý KPI” bên dưới được thực hiện bằng tab tương ứng trong khung này; HR mở phân công từ **Phân công phản hồi** trong phần kết quả hoặc **Phân công phản hồi** trong tab phản hồi. Đóng bằng **× Đóng** hoặc **Escape** để trở lại danh sách giữ nguyên bộ lọc.
 
 **Chưa rõ từng role làm gì và phối hợp với nhau ra sao?** Đọc trước [Vai trò và quy trình vận hành](vai-tro-va-quy-trinh.vi.md), có sơ đồ bàn giao, bảng quyền, màn hình tương ứng và ví dụ tính điểm Bình từ đầu đến cuối.
 
@@ -291,3 +291,6 @@ Ngày thực hiện: … / … / … · Người thực hiện: … · Chu kỳ:
 Khi báo lỗi, gửi: **mã NT → role/email thử → tên kỳ/nhân viên → bước vừa làm → mong đợi → thực tế → ảnh thông báo**. Che thông tin cá nhân, không gửi API key, cookie hoặc mật khẩu. Ví dụ: “NT05, quản lý kỹ thuật, kỳ thực hành/Bình, sau Tính điểm: mong có điểm; thực tế báo thiếu phản hồi bắt buộc”.
 
 Hoàn thành NT01–NT05, NT08–NT12 là đã thử luồng nghiệp vụ chính. NT06–NT07 xác nhận phần AI khi chủ động bật và gọi; NT13–NT14 mở rộng quản trị/kỳ mới. Mục nào chưa đạt thì ghi lại, xử lý rồi nghiệm thu lại đúng phần đó; không cần xóa và làm lại toàn bộ dữ liệu.
+
+
+Hướng dẫn HR giao nhiều người cùng lúc, lọc phòng ban và xác nhận một lần: [Phân công phản hồi](phan-cong-phan-hoi.vi.md).

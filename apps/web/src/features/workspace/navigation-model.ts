@@ -6,7 +6,7 @@ export function navigationGroups(role: UserRole): NavigationGroup[] {
   const groups: NavigationGroup[] = [{ label: "Tổng quan", href: "/dashboard", items: [{ href: "/dashboard", label: "Tổng quan" }] }];
   if (role !== "ADMIN") groups.push({ label: "Đánh giá hiệu suất", href: "/review-cycles", items: [
     { href: "/review-cycles", label: "Chu kỳ đánh giá" },
-    ...(role === "HR" ? [{ href: "/feedback-administration", label: "Quản trị phản hồi" }, { href: "/kpis", label: "Danh mục KPI" }] : []),
+    ...(role === "HR" ? [{ href: "/feedback-administration", label: "Phân công phản hồi" }, { href: "/kpis", label: "Danh mục KPI" }] : []),
     { href: "/ai-reports", label: "Tư vấn AI đã lưu" },
   ] });
   if (role === "HR" || role === "MANAGER") groups.push({ label: role === "HR" ? "Tổ chức" : "Nhóm của tôi", href: "/employees", items: [

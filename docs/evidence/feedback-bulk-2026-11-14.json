@@ -1,0 +1,54 @@
+{
+  "hr_workspace_visible": true,
+  "participant_without_prior_peer_assignment_selectable": true,
+  "filtered_department_reviewer_count": 3,
+  "single_atomic_ui_request": true,
+  "one_evidence_increment": true,
+  "recipient_realtime_notice": true,
+  "recipient_can_open_and_submit": true,
+  "subordinate_filter_preserves_relationship": true,
+  "widths": [
+    1280,
+    390
+  ],
+  "ai_calls": 0,
+  "user_data_untouched": true,
+  "date": "2026-11-14",
+  "schema_head": "20261114_0009",
+  "migration_required": false,
+  "environment": "isolated fictional API 18029 / web 13029; AI disabled",
+  "assignment_modal_preserves_workspace": true,
+  "backend_quality": {
+    "ruff": "passed",
+    "mypy_source_files": 110
+  },
+  "backend_regression": {
+    "passed": 198,
+    "deselected": 366,
+    "scope": "feedback, notifications, performance, review security, feedback schemas/eligibility"
+  },
+  "frontend": {
+    "tests": 176,
+    "files": 25,
+    "lint": "passed",
+    "typecheck": "passed",
+    "production_build": "passed"
+  },
+  "user_stack": {
+    "schema_head": "20261114_0009",
+    "api_web_postgres": "healthy",
+    "business_account_and_notification_tables_unchanged": 15,
+    "prior_audit_history_verified": true,
+    "backup_created": true,
+    "no_seed_or_password_reset": true
+  },
+  "production_ui": {
+    "production_hr_dashboard_shortcut": true,
+    "production_assignment_workspace": true,
+    "modal_opens_and_closes_preserving_cycle": true,
+    "multi_picker_readable": true,
+    "existing_password_preserved": true,
+    "domain_writes": 0,
+    "ai_calls": 0
+  }
+}

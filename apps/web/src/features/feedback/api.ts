@@ -19,7 +19,7 @@ export interface ReviewerOption {
   is_active: boolean; existing_assignment_id: string | null; existing_status: Status | null;
 }
 export interface Coverage { ready: boolean; missing_relationships: Relationship[]; pending_required: number; blocked_required: number; pending_assignment_ids: string[]; blocked_assignment_ids: string[] }
-export interface AdministrationContext { participant_id: string; cycle_id: string; employee_id: string; employee_code: string; display_name: string; evidence_version: number; cycle_status: CycleStatus; finalized: boolean; coverage: Coverage }
+export interface AdministrationContext { participant_id: string; cycle_id: string; employee_id: string; employee_code: string; display_name: string; evidence_version: number; cycle_status: CycleStatus; finalized: boolean; active_assignment_count?: number; coverage: Coverage }
 export interface Summary {
   participant_id: string; employee_id: string; cycle_id: string; evidence_version: number; ready: boolean;
   count: number; mean: string | null; own_submission: Submission | null;
@@ -27,12 +27,14 @@ export interface Summary {
 }
 export interface Versions { expected_assignment_version: number; expected_evidence_version: number }
 export interface FeedbackInput extends Versions { assignment_id: string; rating: number; comment: string }
+export interface BatchAssignmentInput { participant_id: string; reviewer_ids: string[]; relationship: "PEER" | "SUBORDINATE"; required: boolean; due_at: string | null; expected_evidence_version: number }
 export type Reason = "WRONG_SELECTION" | "REVIEWER_UNAVAILABLE" | "NO_LONGER_REQUIRED";
 const query = (filters: Filters) => new URLSearchParams(Object.entries(filters)
   .filter(([, value]) => value !== undefined && value !== "").map(([key, value]) => [key, String(value)])).toString();
 const write = <T>(path: string, method: string, body: unknown) => apiFetch<T>(path, { method, body: JSON.stringify(body) });
 const base = "/api/v1/feedback-assignments";
 export const feedbackApi = {
+  createBatch: (body: BatchAssignmentInput) => write<{ assignment_ids: string[]; created_count: number; evidence_version: number }>(`${base}/bulk`, "POST", body),
   list: (filters: Filters) => apiFetch<Page<Assignment>>(`${base}?${query(filters)}`),
   administration: (filters: Filters) => apiFetch<Page<Administration>>(`${base}?${query({ ...filters, view: "administration" })}`),
   detail: (id: string) => apiFetch<Assignment>(`${base}/${id}`),

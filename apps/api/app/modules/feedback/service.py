@@ -9,9 +9,12 @@ from app.core.errors import ApiError
 from app.core.policies import AuthContext
 from app.modules.audit.models import AuditValue
 from app.modules.audit.service import AuditWriter
+from app.modules.employees.models import Employee
 from app.modules.feedback.models import AssignmentStatus, Feedback, FeedbackAssignment, Relationship
 from app.modules.feedback.repository import FeedbackRepository
 from app.modules.feedback.schemas import (
+    AssignmentBatchCreate,
+    AssignmentBatchResult,
     AssignmentCancel,
     AssignmentCreate,
     AssignmentReplace,
@@ -146,6 +149,7 @@ class FeedbackService:
         required: bool,
         due_at: datetime | None,
         rows: list[FeedbackAssignment],
+        eligible_pair: tuple[Employee, User] | None = None,
     ) -> FeedbackAssignment:
         if any(r.reviewer_id == reviewer_id for r in rows):
             raise ApiError(
@@ -157,7 +161,9 @@ class FeedbackService:
             raise ApiError(
                 409, "required_relationship_exists", "Mandatory relationship already assigned"
             )
-        employee, reviewer = self.repository.eligible(participant, reviewer_id, relationship)
+        employee, reviewer = eligible_pair or self.repository.eligible(
+            participant, reviewer_id, relationship
+        )
         row = FeedbackAssignment(
             participant_id=participant.id,
             reviewer_id=reviewer.id,
@@ -201,6 +207,82 @@ class FeedbackService:
             self.session.flush()
             self.audit(actor, "assignment.created", row, participant, request_id)
             return self.repository.view(row, administration=True)
+
+    def create_batch(
+        self, body: AssignmentBatchCreate, context: AuthContext, *, csrf: CsrfCheck, request_id: str
+    ) -> AssignmentBatchResult:
+        with self.session.begin():
+            actor = authorize_domain_write(
+                self.session, context, csrf, (UserRole.HR,), set(body.reviewer_ids)
+            )
+            participant, _ = self.lock_participant(body.participant_id)
+            require_version(
+                participant.evidence_version, body.expected_evidence_version, evidence=True
+            )
+            future_deadline(body.due_at)
+            rows = self.lock_assignments(participant.id)
+            if (
+                sum(row.status != AssignmentStatus.CANCELLED for row in rows)
+                + len(body.reviewer_ids)
+                > 100
+            ):
+                raise ApiError(409, "assignment_limit_reached", "At most 100 active assignments")
+            duplicates = set(body.reviewer_ids) & {row.reviewer_id for row in rows}
+            if duplicates:
+                raise ApiError(
+                    409,
+                    "assignment_already_exists",
+                    "Assignment exists; reload explicitly",
+                    [{"reviewer_id": str(identifier)} for identifier in sorted(duplicates)],
+                )
+            pairs = {
+                reviewer.id: (employee, reviewer)
+                for employee, reviewer in self.session.execute(
+                    self.repository.eligible_query(participant, body.relationship).where(
+                        User.id.in_(body.reviewer_ids)
+                    )
+                )
+            }
+            if set(pairs) != set(body.reviewer_ids):
+                raise ApiError(
+                    409,
+                    "reviewer_ineligible",
+                    "A reviewer is no longer eligible",
+                    [
+                        {"reviewer_id": str(identifier)}
+                        for identifier in sorted(set(body.reviewer_ids) - set(pairs))
+                    ],
+                )
+            inactive = [reviewer.id for _, reviewer in pairs.values() if not reviewer.is_active]
+            if inactive:
+                raise ApiError(
+                    409,
+                    "reviewer_inactive",
+                    "A reviewer account is inactive",
+                    [{"reviewer_id": str(identifier)} for identifier in sorted(inactive)],
+                )
+            created = []
+            for identifier in sorted(body.reviewer_ids):
+                row = self.new_row(
+                    participant,
+                    identifier,
+                    body.relationship,
+                    body.required,
+                    body.due_at,
+                    rows,
+                    eligible_pair=pairs[identifier],
+                )
+                rows.append(row)
+                created.append(row)
+            participant.evidence_version += 1
+            self.session.flush()
+            for row in created:
+                self.audit(actor, "assignment.created", row, participant, request_id)
+            return AssignmentBatchResult(
+                assignment_ids=[row.id for row in created],
+                created_count=len(created),
+                evidence_version=participant.evidence_version,
+            )
 
     def update(
         self,

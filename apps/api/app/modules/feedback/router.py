@@ -2,16 +2,19 @@ from typing import Annotated, Literal
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Query, Request, Response
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db_session
 from app.core.policies import AuthContext, get_auth_context, require_roles
 from app.modules.auth.router import require_csrf, require_same_origin
-from app.modules.feedback.models import AssignmentStatus, Relationship
+from app.modules.feedback.models import AssignmentStatus, FeedbackAssignment, Relationship
 from app.modules.feedback.repository import FeedbackRepository
 from app.modules.feedback.schemas import (
     AdministrationContext,
     AdministrationView,
+    AssignmentBatchCreate,
+    AssignmentBatchResult,
     AssignmentCancel,
     AssignmentCreate,
     AssignmentReplace,
@@ -71,6 +74,15 @@ def administration_context(
             evidence_version=participant.evidence_version,
             cycle_status=cycle.status,
             finalized=participant.finalized_at is not None,
+            active_assignment_count=session.scalar(
+                select(func.count())
+                .select_from(FeedbackAssignment)
+                .where(
+                    FeedbackAssignment.participant_id == participant.id,
+                    FeedbackAssignment.status != AssignmentStatus.CANCELLED,
+                )
+            )
+            or 0,
             coverage=coverage(session, participant.id),
         )
 
@@ -125,6 +137,8 @@ def reviewer_options(
     page: PageNumber = 1,
     page_size: PageSize = 20,
     q: Annotated[str | None, Query(max_length=100)] = None,
+    department_id: UUID | None = None,
+    available_only: bool = False,
 ) -> Page[ReviewerOption]:
     private(response)
     with session.begin():
@@ -133,7 +147,35 @@ def reviewer_options(
         cycle = session.get(ReviewCycle, participant.cycle_id)
         assert cycle is not None
         writable(participant, cycle)
-        return repository.options(participant, relationship, page=page, page_size=page_size, q=q)
+        return repository.options(
+            participant,
+            relationship,
+            page=page,
+            page_size=page_size,
+            q=q,
+            department_id=department_id,
+            available_only=available_only,
+        )
+
+
+@router.post(
+    "/feedback-assignments/bulk",
+    response_model=AssignmentBatchResult,
+    status_code=201,
+    dependencies=[Depends(require_same_origin)],
+)
+def create_assignment_batch(
+    body: AssignmentBatchCreate,
+    context: HR,
+    session: Database,
+    request: Request,
+) -> AssignmentBatchResult:
+    return FeedbackService(session).create_batch(
+        body,
+        context,
+        csrf=lambda row: require_csrf(request, row),
+        request_id=request.state.request_id,
+    )
 
 
 @router.get("/feedback-coverage", response_model=CoverageView)

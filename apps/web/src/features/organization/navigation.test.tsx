@@ -11,13 +11,13 @@ beforeEach(() => { state.role = "HR"; state.path = "/review-cycles/c1"; });
 it("marks the current section and groups links by task", () => {
   render(<WorkspaceNavigation />);
   expect(screen.getByRole("link", { name: "Chu kỳ đánh giá" }).getAttribute("aria-current")).toBe("page");
-  expect(screen.getByRole("link", { name: "Quản trị phản hồi" }).getAttribute("href")).toBe("/feedback-administration");
+  expect(screen.getByRole("link", { name: "Phân công phản hồi" }).getAttribute("href")).toBe("/feedback-administration");
 });
 it("ADMIN has a reviewer inbox and system controls without HR reports", () => {
   state.role = "ADMIN"; render(<WorkspaceNavigation />);
   expect(screen.getByRole("link", { name: "Phản hồi của tôi" })).toBeTruthy();
   expect(screen.getByRole("link", { name: "Quản lý tài khoản" })).toBeTruthy();
-  expect(screen.queryByRole("link", { name: "Quản trị phản hồi" })).toBeNull();
+  expect(screen.queryByRole("link", { name: "Phân công phản hồi" })).toBeNull();
   expect(screen.queryByRole("link", { name: "Nhân viên" })).toBeNull();
 });
 it("mobile navigation opens with a button and closes on link selection", async () => {
@@ -55,7 +55,7 @@ it("keeps the same HR menu when switching to organization", () => {
 it.each(["MANAGER", "EMPLOYEE"])("hides HR catalogs and administration from %s", (role) => {
   state.role = role;
   render(<WorkspaceNavigation />);
-  for (const label of ["Phòng ban", "Chức danh", "Danh mục KPI", "Quản trị phản hồi", "Quản lý tài khoản", "Cấu hình chấm điểm"]) {
+  for (const label of ["Phòng ban", "Chức danh", "Danh mục KPI", "Phân công phản hồi", "Quản lý tài khoản", "Cấu hình chấm điểm"]) {
     expect(screen.queryByRole("link", { name: label })).toBeNull();
   }
   expect(screen.getByRole("link", { name: "Chu kỳ đánh giá" })).toBeTruthy();

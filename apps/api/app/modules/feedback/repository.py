@@ -216,8 +216,22 @@ class FeedbackRepository:
         page: int,
         page_size: int,
         q: str | None,
+        department_id: UUID | None = None,
+        available_only: bool = False,
     ) -> Page[ReviewerOption]:
         query = self.eligible_query(participant, relationship)
+        if department_id:
+            query = query.where(Employee.department_id == department_id)
+        if available_only:
+            assigned = (
+                select(FeedbackAssignment.id)
+                .where(
+                    FeedbackAssignment.participant_id == participant.id,
+                    FeedbackAssignment.reviewer_id == User.id,
+                )
+                .exists()
+            )
+            query = query.where(User.is_active, ~assigned)
         if q:
             from sqlalchemy import or_
 

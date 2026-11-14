@@ -12,10 +12,12 @@ import { FeedbackSummary } from "./summary";
 
 const mocks = vi.hoisted(() => ({ role: "EMPLOYEE", api: {
   list: vi.fn(), administration: vi.fn(), context: vi.fn(), adminDetail: vi.fn(), detail: vi.fn(), submit: vi.fn(), summary: vi.fn(), coverage: vi.fn(),
-  options: vi.fn(), create: vi.fn(), update: vi.fn(), cancel: vi.fn(), replace: vi.fn(),
+  options: vi.fn(), create: vi.fn(), createBatch: vi.fn(), update: vi.fn(), cancel: vi.fn(), replace: vi.fn(),
 } }));
 vi.mock("../auth/auth-provider", () => ({ useAuth: () => ({ user: { id: "user", role: mocks.role } }) }));
 vi.mock("./api", () => ({ feedbackApi: mocks.api }));
+vi.mock("./assignment-workspace", () => ({ AssignmentWorkspace: () => null }));
+vi.mock("../organization/employee-form", () => ({ ReferencePicker: () => null }));
 const assignment = {
   id: "a1", participant_id: "p1", cycle_id: "c1", cycle_name: "Quý IV", cycle_status: "ACTIVE",
   start_date: "2026-10-01", end_date: "2026-12-31", employee_id: "e1", employee_code: "NV01",
@@ -36,6 +38,7 @@ beforeEach(() => {
     coverage: { ready: false, missing_relationships: ["SELF", "MANAGER"], pending_required: 0, blocked_required: 0 } });
   mocks.api.options.mockResolvedValue({ items: [{ reviewer_id: "user", employee_id: "e1", employee_code: "NV01", display_name: "An", is_active: true, existing_assignment_id: null, existing_status: null }], total: 1, page: 1, page_size: 20 });
   mocks.api.create.mockResolvedValue(assignment);
+  mocks.api.createBatch.mockResolvedValue({ assignment_ids: ["a1"], created_count: 1, evidence_version: 4 });
   mocks.api.submit.mockResolvedValue({ ...assignment, status: "SUBMITTED", version: 2, evidence_version: 4,
     submission: { rating: 4, comment: "Cẩn thận", submitted_at: "2026-10-20T00:00:00Z" } });
 });
@@ -174,11 +177,13 @@ it("HR replaces a peer only after confirmation and keeps required under server c
 it("defaults a peer assignment to optional while self and manager stay required", async () => {
   mocks.role = "HR"; const user = userEvent.setup(); mount(<FeedbackAdministration participantId="p1" />);
   await user.selectOptions(await screen.findByLabelText("Quan hệ người đánh giá"), "PEER");
-  await screen.findByRole("option", { name: "NV01 · An" });
+  await screen.findByRole("checkbox", { name: "NV01 · An" });
   expect((screen.getByLabelText("Bắt buộc hoàn thành") as HTMLInputElement).checked).toBe(false);
-  await user.selectOptions(screen.getByLabelText("Người đánh giá hợp lệ"), "user");
-  await user.click(screen.getByRole("button", { name: "Giao phản hồi" }));
-  await waitFor(() => expect(mocks.api.create).toHaveBeenCalledWith(expect.objectContaining({ relationship: "PEER", required: false })));
+  await user.click(screen.getByRole("checkbox", { name: "NV01 · An" }));
+  await user.click(screen.getByRole("button", { name: "Xem lại 1 người đã chọn" }));
+  expect(mocks.api.createBatch).not.toHaveBeenCalled();
+  await user.click(screen.getByRole("button", { name: "Xác nhận giao 1 phiếu" }));
+  await waitFor(() => expect(mocks.api.createBatch).toHaveBeenCalledWith(expect.objectContaining({ relationship: "PEER", required: false, reviewer_ids: ["user"] }), expect.anything()));
 });
 it("shows overdue assignments in the inbox without offering an automatic retry", async () => {
   mocks.api.list.mockResolvedValue({ items: [{ ...assignment, due_at: "2020-01-01T00:00:00Z" }], total: 1, page: 1, page_size: 20 });

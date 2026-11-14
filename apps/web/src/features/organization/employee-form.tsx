@@ -81,10 +81,10 @@ export function EmployeeForm({ initial, onSaved }: { initial?: Employee; onSaved
   </section>;
 }
 
-export function ReferencePicker({ kind, value, onChange, current, inputRef, labelOverride, activeOnly = true }: {
+export function ReferencePicker({ kind, value, onChange, current, inputRef, labelOverride, activeOnly = true, emptyLabel }: {
   kind: ReferenceKind; value: string; onChange: (value: string) => void;
   current?: { id: string; label: string }; inputRef?: Ref<HTMLSelectElement>;
-  labelOverride?: string; activeOnly?: boolean;
+  labelOverride?: string; activeOnly?: boolean; emptyLabel?: string;
 }) {
   const [q, setQ] = useState(""); const [page, setPage] = useState(1);
   const id = useId();
@@ -97,7 +97,7 @@ export function ReferencePicker({ kind, value, onChange, current, inputRef, labe
       setSelected(row ? { id: row.id, label: referenceLabel(row) } : undefined);
       onChange(event.target.value);
     }}>
-      <option value="">Chọn {label.toLowerCase()}</option>
+      <option value="">{emptyLabel ?? `Chọn ${label.toLowerCase()}`}</option>
       {selected && !query.data?.items.some((row) => row.id === selected.id) && <option value={selected.id}>{selected.label} (đã chọn)</option>}
       {query.data?.items.map((row) => <option key={row.id} value={row.id}>{referenceLabel(row)} ({row.code})</option>)}
     </select>{query.isError && <p role="alert">Không thể tải {label.toLowerCase()}.</p>}

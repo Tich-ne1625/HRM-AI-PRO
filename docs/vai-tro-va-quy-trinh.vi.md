@@ -67,7 +67,7 @@ Ví dụ: ADMIN tạo tài khoản cho Bình với role EMPLOYEE; HR mới là n
 | Chuẩn bị kỳ | Tạo bản nháp, đặt tên/ngày, thêm người tham gia | **Đánh giá hiệu suất → Chu kỳ đánh giá** | Danh sách người sẽ được đánh giá |
 | Bắt đầu kỳ | Kiểm tra người tham gia và cấu hình rồi kích hoạt | **Kích hoạt chu kỳ → Xác nhận kích hoạt** | Kỳ ACTIVE; thông tin tổ chức và cấu hình được đóng băng cho lịch sử |
 | Chuẩn bị KPI | Quản lý danh mục KPI; theo dõi phân bổ do quản lý trực tiếp thực hiện | **Danh mục KPI**; dòng nhân viên trong kỳ → **Quản lý KPI** | Quản lý chọn KPI từ danh mục để giao cho cấp dưới; HR chỉ xem |
-| Thu thập phản hồi | Giao SELF/MANAGER bắt buộc; thêm PEER/SUBORDINATE nếu phù hợp; đặt hạn | Dòng nhân viên → **Phân công phản hồi**, hoặc **Quản trị phản hồi** | Phiếu hiện trong **Phản hồi của tôi** của người được giao |
+| Thu thập phản hồi | Giao SELF/MANAGER bắt buộc; thêm PEER/SUBORDINATE nếu phù hợp; đặt hạn | Dòng nhân viên → **Phân công phản hồi**, hoặc **Phân công phản hồi** | Phiếu hiện trong **Phản hồi của tôi** của người được giao |
 | Theo dõi thiếu dữ liệu | Xem KPI chưa nhập, phân công bắt buộc chưa gửi; gia hạn khi cần | **Kết quả → Việc cần hoàn thành**; quản trị phân công | Xác định đúng người cần làm tiếp |
 | Tổng hợp | Chờ quản lý tính điểm; kiểm tra chi tiết và lịch sử đã lưu | **Kết quả → Chi tiết / Lịch sử tính điểm** | HR xác định kết quả đủ điều kiện chốt |
 | Xác nhận từng người | Kiểm tra kết quả hiện tại, xem phân công còn mở rồi xác nhận | **Chốt kết quả** | Hồ sơ người đó bị khóa sửa bằng chứng trong kỳ |
@@ -198,3 +198,6 @@ Mọi phản hồi đã gửi được tính ngang nhau, gồm cả phản hồi
 HR tổ chức và chốt; quản lý cung cấp bằng chứng và tính điểm. Hệ thống gửi tin cho người liên quan qua chuông **Thông báo** trên header. Ví dụ: HR giao SELF → Bình có tin và việc gửi phiếu; Bình gửi → HR/quản lý có tin cập nhật; quản lý tính điểm → HR có việc kiểm tra/chốt; HR chốt → Bình/quản lý nhận tin kết quả đã chốt.
 
 Sidebar bên phải có **Thông báo** (mới/chưa đọc/đã đọc) và **Việc cần làm** (việc của mình hoặc đang chờ phối hợp). Tin được cập nhật trực tiếp, trạng thái đọc đồng bộ giữa các tab. Bấm tin mở khung chi tiết đúng hồ sơ; đóng bằng ×. Đọc tin không thay thế thao tác gửi phiếu, tính hay chốt. Quy tắc người nhận và dữ liệu riêng tư nằm trong [tài liệu thông báo](notifications-contract.vi.md).
+
+
+Hướng dẫn HR giao nhiều người cùng lúc, lọc phòng ban và xác nhận một lần: [Phân công phản hồi](phan-cong-phan-hoi.vi.md).

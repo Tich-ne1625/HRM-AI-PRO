@@ -81,6 +81,26 @@ class AssignmentUpdate(Patch, AssignmentVersions):
         return self
 
 
+class AssignmentBatchCreate(EvidenceVersion):
+    participant_id: UUID
+    reviewer_ids: Annotated[list[UUID], Field(min_length=1, max_length=100)]
+    relationship: Literal[Relationship.PEER, Relationship.SUBORDINATE]
+    required: StrictBool
+    due_at: Deadline | None = None
+
+    @model_validator(mode="after")
+    def distinct_reviewers(self) -> Self:
+        if len(set(self.reviewer_ids)) != len(self.reviewer_ids):
+            raise ValueError("Choose each reviewer only once")
+        return self
+
+
+class AssignmentBatchResult(BaseModel):
+    assignment_ids: list[UUID]
+    created_count: int
+    evidence_version: int
+
+
 class AssignmentCancel(AssignmentVersions):
     reason_code: ReasonCode
 
@@ -177,4 +197,5 @@ class AdministrationContext(BaseModel):
     evidence_version: int
     cycle_status: CycleStatus
     finalized: bool
+    active_assignment_count: int = 0
     coverage: CoverageView
