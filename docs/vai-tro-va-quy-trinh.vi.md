@@ -4,6 +4,8 @@ Xem [bản đồ giao diện theo role](giao-dien-theo-role.vi.md) để biết 
 
 Tài liệu này giải thích **cách hệ thống vận hành**. Khi đã hiểu, dùng [bài nghiệm thu từng bước](nghiem-thu.vi.md) để thao tác trên dữ liệu demo.
 
+**Hướng nâng cấp đang đề xuất:** [quản lý cả quá trình làm việc và AI cố vấn](nang-cap-quan-ly-hieu-suat-lien-tuc.vi.md). Tài liệu đó mô tả quyền mới dự kiến của nhân viên/quản lý; các thao tác giao việc, cập nhật bằng chứng và check-in chưa được triển khai. Các mục dưới đây vẫn mô tả phiên bản đang chạy.
+
 ## 1. Dự án giải quyết việc gì?
 
 InsightHR tổ chức một đợt **đánh giá hiệu suất nhân viên**: xác định ai được đánh giá, giao chỉ tiêu, thu thập kết quả công việc và phản hồi, tính điểm, chốt kết quả, rồi cung cấp tư vấn AI tham khảo.
@@ -113,7 +115,7 @@ Nhân viên chọn rating 1–5 và nhập nhận xét, bấm **Kiểm tra và g
 
 ## 7. Mọi người tương tác với nhau THÔNG QUA CÁI GÌ?
 
-Hệ thống hiện phối hợp bằng **các bản ghi dùng chung theo quyền và trạng thái công việc**. Người A lưu dữ liệu, người B mở màn hình tương ứng để xem hoặc xử lý bước tiếp theo. Không có phòng chat, email tự gửi hoặc nút “gửi toàn bộ hồ sơ sang HR”. Khi cần nhắc một người làm tiếp, người điều phối hiện nhắc bên ngoài ứng dụng; người nhận vào hệ thống để xử lý.
+Hệ thống phối hợp bằng **các bản ghi dùng chung theo quyền, thông báo và giao tiếp nội bộ**. Người A lưu một thao tác nghiệp vụ, người B nhận thông báo hoặc mở phần Việc cần làm để xử lý bước tiếp theo. Đã có [chat riêng 1–1, bảng tin công ty/phòng ban và @nhắc](bang-tin-va-chat.vi.md). Nội dung trao đổi không tự thay thế việc gửi phiếu, xác nhận số liệu hay chốt kết quả; hiện chưa có workflow giao việc/nghiệm thu như đề xuất nâng cấp. Không có email tự gửi hoặc thao tác ngầm chuyển toàn bộ hồ sơ cho người ngoài quyền.
 
 | Từ ai → đến ai | Vật được bàn giao | Người nhận nhìn thấy ở đâu? | Dấu hiệu đã bàn giao xong |
 | --- | --- | --- | --- |

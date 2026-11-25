@@ -5,7 +5,9 @@ Status: Approved; Phases 1–10 implemented and CI-verified as of 2026-10-25. Ph
 
 ## Implementation status
 
-2026-11-14 follow-up: HR organizes/monitors/finalizes; only direct managers allocate individual KPIs, enter actuals and calculate. A shared header bell opens a right sidebar with durable personal notices and derived next actions. Audit-triggered delivery shares the business transaction; PostgreSQL LISTEN/NOTIFY drives SSE, with commit-only signals, reconnect catch-up and polling fallback. No new external services. Current schema head: `20261114_0009`. See [notification contract](notifications-contract.vi.md) and [role UI guide](giao-dien-theo-role.vi.md).
+2026-11-25 planning update: the current runtime also includes internal feed/direct chat (schema head `20261114_0010`) and the additive 60-employee demo. A [continuous performance-management proposal](nang-cap-quan-ly-hieu-suat-lien-tuc.vi.md) and [Phase 11 implementation plan](superpowers/plans/2026-11-25-phase-11-work-management.md) describe goals, work execution, verified measurements, check-ins and contextual AI coaching. These are proposals, not implemented runtime capabilities.
+
+2026-11-14 notification follow-up: HR organizes/monitors/finalizes; only direct managers allocate individual KPIs, enter actuals and calculate. A shared header bell opens a right sidebar with durable personal notices and derived next actions. Audit-triggered delivery shares the business transaction; PostgreSQL LISTEN/NOTIFY drives SSE, with commit-only signals, reconnect catch-up and polling fallback. No new external services. Notification migration at that milestone: `20261114_0009`; current collaboration head is `20261114_0010`. See [notification contract](notifications-contract.vi.md) and [role UI guide](giao-dien-theo-role.vi.md).
 
 Phase 10 is implemented: [contract](phase-10-contract.md), [completed eight-task plan](superpowers/plans/2026-10-24-phase-10-kubernetes-docs.md), [report](phase-10-report.vi.md). A separate single-node k3d target uses existing images, explicit migration Job/Lease, web-only ingress, verified local TLS and independently restored PostgreSQL backups. [Cluster CI](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/40118509036) and [full CI](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/40118504207) record the gates. UI reuses existing pages with contextual navigation and progressive disclosure; Compose data/config remains unchanged. See [local cluster instructions](kubernetes.vi.md).
 
@@ -21,7 +23,7 @@ InsightHR is a university capstone for employee performance management. The demo
 
 At the initial design on 2026-10-03, the workspace was empty with no existing application architecture to preserve. This proposal established `hrm-ai/`; its current implementation is summarized above.
 
-Scope excludes payroll, attendance, recruitment, CV parsing, chat, microservices, Kafka, Redis, vector databases, and Helm. Use fictional data in demos. No external service is required for numeric scoring.
+Scope excludes payroll, attendance, recruitment, CV parsing, microservices, Kafka, Redis, vector databases, and Helm. Internal feed/direct chat were added after the initial design; contextual AI coaching and work-process management remain proposed extensions. Use fictional data in demos. No external service is required for numeric scoring.
 
 ## 1. Proposed architecture
 

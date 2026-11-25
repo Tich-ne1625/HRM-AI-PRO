@@ -6,6 +6,8 @@ Hệ thống quản lý hiệu suất nhân viên: hồ sơ, KPI, phản hồi 3
 
 **Dữ liệu demo mở rộng:** [60 nhân viên, 8 phòng ban, tài khoản và cách thực hành](docs/du-lieu-mo-rong.vi.md). Nạp thêm bằng `docker compose --env-file .env exec api python -m app.cli.expand_demo`; giữ nguyên tài khoản và tiến độ cũ.
 
+**Kế hoạch nâng cấp theo góp ý giảng viên:** [quản lý quá trình làm việc, KPI định kỳ và AI cố vấn](docs/nang-cap-quan-ly-hieu-suat-lien-tuc.vi.md), kèm [kế hoạch Phase 11](docs/superpowers/plans/2026-11-25-phase-11-work-management.md). Đang ở trạng thái đề xuất, chưa thay đổi tính năng hiện tại.
+
 ## Chạy và xem ngay
 
 1. Mở **Docker Desktop**.
