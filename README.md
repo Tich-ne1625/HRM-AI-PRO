@@ -221,4 +221,6 @@ Rebuild an existing Compose stack with `docker compose --env-file .env up --buil
 All business decimals are JSON strings. Feedback, calculation, finalization, AI, dashboards and demo seed remain outside Phase 4. See the [Vietnamese walkthrough](README.vi.md) and [contract](docs/phase-4-contract.md).
 # Internal communication
 
+The optional [expanded demo company](docs/du-lieu-mo-rong.vi.md) adds employees, departments, specialist titles, KPIs and sample communication. Run `python -m app.cli.expand_demo` inside the API container after the original demo seed. Existing records and active-cycle evidence remain intact; new staff are prepared in a separate draft cycle.
+
 All roles can open `/news` for company and department updates, with comments and explicit @mentions. A compact direct-chat window is available throughout the workspace, including unread counts and read receipts. Company announcements require HR/ADMIN; other staff post in their current department. Direct messages remain private to the two participants. See the [Vietnamese walkthrough](docs/bang-tin-va-chat.vi.md).

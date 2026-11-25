@@ -1,0 +1,77 @@
+{
+  "date": "2026-11-25",
+  "dataset": "office-demo-expansion-v1",
+  "mode": "additive fictional development/test data",
+  "demo_totals": {
+    "employees": 60,
+    "departments": 8,
+    "positions": 13,
+    "users": 62,
+    "kpi_definitions": 14,
+    "cycles": 4
+  },
+  "new_communication": {
+    "posts": 9,
+    "comments": 8,
+    "conversations": 8,
+    "messages": 16
+  },
+  "new_draft_participants": 51,
+  "active_cycle_and_existing_evidence_modified": false,
+  "validation": {
+    "new_integration_tests": 8,
+    "existing_demo_and_collaboration_tests": 33,
+    "integration_tests_run_date": "2026-11-14",
+    "ruff_rechecked": "2026-11-25 passed",
+    "mypy": "117 source files passed",
+    "docker_runtime_and_browser_checked": "2026-11-25",
+    "repeat_command_noop": true
+  },
+  "preservation": {
+    "head": "20261114_0010",
+    "existing_rows_preserved_in_tables": 19,
+    "old_password_hashes_and_roles_unchanged": true,
+    "existing_cycles_and_performance_unchanged": true,
+    "deltas": {
+      "auth_login_limits": 0,
+      "departments": 6,
+      "kpi_definitions": 12,
+      "positions": 11,
+      "review_cycles": 1,
+      "system_config": 0,
+      "users": 52,
+      "audit_logs": 219,
+      "auth_sessions": 17,
+      "chat_messages": 16,
+      "employees": 52,
+      "internal_posts": 9,
+      "cycle_participants": 51,
+      "post_comments": 8,
+      "employee_kpis": 0,
+      "feedback_assignments": 0,
+      "performance_reviews": 0,
+      "feedback": 0,
+      "notifications": 172,
+      "performance_review_revisions": 0,
+      "ai_analyses": 0
+    },
+    "ai_calls": 0
+  },
+  "browser": {
+    "hr_sees_60_demo_employees_8_departments": true,
+    "new_manager_login": true,
+    "manager_scope_7_people_including_self": true,
+    "staff_login": true,
+    "staff_sees_company_and_own_department_only": true,
+    "sample_chat_order_correct": true,
+    "widths": [
+      1280,
+      390
+    ],
+    "domain_writes": 0,
+    "ai_calls": 0
+  },
+  "live_ai_calls": 0,
+  "secrets_or_user_content_in_evidence": false,
+  "note": "HR/ADMIN remain organizers, not employees under review. Root managers and Chi are excluded from the draft until an eligible manager is configured. Existing custom records are additional to demo totals."
+}

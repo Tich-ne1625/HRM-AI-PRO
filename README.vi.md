@@ -4,6 +4,8 @@ Hệ thống quản lý hiệu suất nhân viên: hồ sơ, KPI, phản hồi 3
 
 **Trao đổi nội bộ:** [Hướng dẫn bảng tin, chat cửa sổ nhỏ và @nhắc](docs/bang-tin-va-chat.vi.md). Vào **Tổng quan → Bảng tin nội bộ** để xem tin công ty/phòng ban; nút **Chat nội bộ** ở góc phải dưới dùng để nhắn riêng.
 
+**Dữ liệu demo mở rộng:** [60 nhân viên, 8 phòng ban, tài khoản và cách thực hành](docs/du-lieu-mo-rong.vi.md). Nạp thêm bằng `docker compose --env-file .env exec api python -m app.cli.expand_demo`; giữ nguyên tài khoản và tiến độ cũ.
+
 ## Chạy và xem ngay
 
 1. Mở **Docker Desktop**.
