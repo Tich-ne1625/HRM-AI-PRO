@@ -1,5 +1,7 @@
 # AI design status
 
+2026-11-25 planning update: [Phase 13 contextual coaching](superpowers/plans/2026-11-25-phase-13-contextual-ai-coaching.md) and its [draft contract](phase-13-contract.vi.md) add a proposed private conversation workflow using Phase 11–12 work/progress data. It is not implemented. Existing review-based generation below remains unchanged. Coaching will use a separate schema/module, owner and current-scope authorization, bounded server-selected history, source manifests, fenced attempts and explicit handoffs; HR receives coordination metadata only. Current runtime head remains `20261125_0012`.
+
 Phases 1–10 are implemented. Optional Gemini generation, saved advice and separate PUBLIC/HR_PRIVATE audiences are available. HR explicitly requests generation; model/key are configured by the operator. See the [Phase 7 contract](phase-7-contract.md), [implementation plan and acceptance](superpowers/plans/2026-10-22-phase-7-gemini.md), and [Phase 10 delivery report](phase-10-report.vi.md). For a plain-language explanation of who creates and reads advice, see the [Vietnamese role and workflow guide](vai-tro-va-quy-trinh.vi.md).
 
 The implemented boundary:

@@ -14,6 +14,8 @@ Phase 11 đã có [báo cáo nghiệm thu local](docs/phase-11-report.vi.md). De
 
 **Phase 12 — số đo và check-in:** đã bổ sung luồng nhân viên nộp số có nguồn → quản lý xác minh → KPI cập nhật → check-in → giao và xác nhận hỗ trợ. Xem [hướng dẫn theo từng role, demo cổng 13049](docs/phase-12-huong-dan.vi.md), [quy tắc nghiệp vụ](docs/phase-12-contract.vi.md) và [báo cáo kiểm chứng](docs/phase-12-report.vi.md). Schema mới `20261125_0012`; số chưa xác minh không được cộng, sửa số giữ lịch sử, HR chỉ điều phối. AI cố vấn và điểm cuối kỳ CONTINUOUS thuộc Phase 13–14.
 
+**Kế hoạch tiếp theo — Phase 13:** [8 task triển khai AI cố vấn theo công việc](docs/superpowers/plans/2026-11-25-phase-13-contextual-ai-coaching.md), kèm [dự thảo nghiệp vụ và quyền riêng tư](docs/phase-13-contract.vi.md). Nhân viên/quản lý hỏi trong quá trình làm, xem nguồn, chọn gợi ý và xác nhận trước khi tạo việc hoặc chia sẻ; HR hỏi metadata điều phối. Đây là kế hoạch để xem xét, chưa có chức năng coaching trong runtime.
+
 1. Mở **Docker Desktop**.
 2. Mở terminal tại thư mục **`hrm-ai`** và chạy:
 

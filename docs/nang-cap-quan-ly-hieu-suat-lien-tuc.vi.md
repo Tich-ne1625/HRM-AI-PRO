@@ -2,7 +2,7 @@
 
 Ngày phân tích: **25/11/2026**. Mã nguồn đối chiếu: `3e32324`, migration `20261114_0010`.
 
-**Trạng thái cập nhật 25/11/2026:** đây là đề xuất tổng thể ban đầu dựa trên baseline ghi phía trên. **Phase 11 đã triển khai và nghiệm thu local tại `13fd9e3`**; xem [báo cáo](phase-11-report.vi.md). **Phase 12 đã triển khai sổ đo có xác minh và check-in hai chiều**, xem [hướng dẫn](phase-12-huong-dan.vi.md) và [báo cáo kiểm chứng](phase-12-report.vi.md); Phase 13–15 tiếp tục là đề xuất. Những bảng mô tả “hiện tại” dưới đây ghi nhận thời điểm phân tích ban đầu, không thay thế báo cáo runtime mới nhất. Đây là hướng nâng cấp sau phần đã hoàn thành, không phải diễn giải lại rằng dự án từ đầu có sẵn 15 phase.
+**Trạng thái cập nhật 25/11/2026:** đây là đề xuất tổng thể ban đầu dựa trên baseline ghi phía trên. **Phase 11 đã triển khai và nghiệm thu local tại `13fd9e3`**; xem [báo cáo](phase-11-report.vi.md). **Phase 12 đã triển khai sổ đo có xác minh và check-in hai chiều**, xem [hướng dẫn](phase-12-huong-dan.vi.md) và [báo cáo kiểm chứng](phase-12-report.vi.md); Phase 13 đã có [kế hoạch](superpowers/plans/2026-11-25-phase-13-contextual-ai-coaching.md) và [dự thảo contract](phase-13-contract.vi.md), chưa triển khai; Phase 14–15 tiếp tục là đề xuất. Những bảng mô tả “hiện tại” dưới đây ghi nhận thời điểm phân tích ban đầu, không thay thế báo cáo runtime mới nhất. Đây là hướng nâng cấp sau phần đã hoàn thành, không phải diễn giải lại rằng dự án từ đầu có sẵn 15 phase.
 
 ## 1. Kết luận và mục tiêu sản phẩm
 
