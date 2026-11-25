@@ -8,6 +8,8 @@ The project is a modular monolith: a Next.js web application, a FastAPI backend,
 
 ## Current scope
 
+Phase 11 adds CONTINUOUS cycles, revisioned personal plans, employee acknowledgement, scoped work assignment/progress/blockers, immutable evidence submissions and manager acceptance/return. Existing cycles default to LEGACY. Continuous work does not create KPI actuals, scores or AI coaching yet. See the [Vietnamese walkthrough and isolated demo](docs/phase-11-huong-dan.vi.md), [contract](docs/phase-11-contract.vi.md) and [plan](docs/superpowers/plans/2026-11-25-phase-11-work-management.md). Current migration head is `20261125_0011`; earlier acceptance counts below describe their original releases.
+
 Phases 1–10 are implemented. Phase 10 adds isolated local Kubernetes deployment, guarded migration Jobs, ingress/TLS, tested backup/restore and a simpler role-aware workspace. Application UI is `559e74a`; deployment tooling is `d4a78bc`. [Full CI](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/40118504207) passed 843 backend/141 web tests; [cluster acceptance](https://github.com/Tich-ne1625/HRM-AI-PRO/actions/runs/40118509036) verifies browser forms, failure/recovery, restore and TLS. Read the [Vietnamese report](docs/phase-10-report.vi.md), [Kubernetes guide](docs/kubernetes.vi.md) and [short Vietnamese README](README.vi.md). Compose remains the everyday setup; production/cloud hosting is outside scope.
 
 ## Earlier acceptance milestones
@@ -148,7 +150,7 @@ alembic revision --autogenerate -m "describe the schema change"
 alembic upgrade head
 ```
 
-Review every generated migration before running it. Current head is `20261114_0009` (notifications), following `20261024_0008` (login limiter), following AI `20261022_0007` and performance `20261022_0006`; Phase 10 adds no schema change. Back up data that must be kept before upgrades.
+Review every generated migration before running it. Current head is `20261125_0011` (work management), following `20261114_0010` (collaboration), `20261114_0009` (notifications), and `20261024_0008` (login limiter), following AI `20261022_0007` and performance `20261022_0006`; Phase 10 adds no schema change. Back up data that must be kept before upgrades.
 
 ## Tests and quality gates
 
@@ -188,7 +190,7 @@ The [Phase 6 plan](docs/superpowers/plans/2026-10-22-phase-6-performance.md) and
 
 ## Feedback walkthrough (Phase 5)
 
-Rebuild with `docker compose --env-file .env up --build --wait` to apply current head `20261114_0009`, preserving accounts and Phase 4 evidence.
+Rebuild with `docker compose --env-file .env up --build --wait` to apply current head `20261125_0011`, preserving accounts and Phase 4 evidence.
 
 1. HR opens an ACTIVE cycle and selects **Phân công phản hồi** beside a participant. Assign SELF and MANAGER explicitly; activation does not create these required assignments. Historical accounts cannot be delegated to a new manager; ADMIN must restore a disabled historical account.
 2. Each assigned reviewer, including ADMIN when assigned, opens **Phản hồi của tôi**, enters a 1–5 rating and up to 2,000 plain-text characters, and confirms the immutable submission. HR has access to raw feedback.
@@ -209,7 +211,7 @@ The [Phase 2 implementation plan](docs/superpowers/plans/2026-10-03-phase-2-auth
 
 ## Cycle and KPI walkthrough (Phase 4)
 
-Rebuild an existing Compose stack with `docker compose --env-file .env up --build --wait` to apply current head `20261114_0009`, retaining its volume and accounts; cycle/KPI functionality was introduced in `20261020_0004`. Back up valuable data before upgrading.
+Rebuild an existing Compose stack with `docker compose --env-file .env up --build --wait` to apply current head `20261125_0011`, retaining its volume and accounts; cycle/KPI functionality was introduced in `20261020_0004`. Back up valuable data before upgrading.
 
 1. ADMIN may edit `/settings/scoring`: component weights must total 100.00; defaults affect future activations only. ADMIN has no HR access.
 2. HR creates definitions at `/kpis`, then creates a DRAFT at `/review-cycles`, selects active employees in paginated batches, and confirms activation. Employees and their active managers need active linked accounts; references must be active. Validation identifies profiles needing attention.

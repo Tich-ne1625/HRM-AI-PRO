@@ -49,7 +49,7 @@ def snapshot():
 
 def main():
     before = snapshot()
-    assert before["head"] == "20261114_0009"
+    assert before["head"] == "20261125_0011"
     assert before["tables"]["performance_review_revisions"]["count"] >= 2
     assert before["tables"]["ai_analyses"]["count"] == 3
     run(["exec", "-T", "api", "alembic", "downgrade", "20261022_0007"])

@@ -14,6 +14,14 @@ from app.modules.performance.models import PerformanceReview, PerformanceReviewR
 from app.modules.review_cycles.models import CycleParticipant, CycleStatus, ReviewCycle
 from app.modules.settings.models import SystemConfig
 from app.modules.users.models import User, UserRole
+from app.modules.work_management.models import (
+    EvidenceSubmission,
+    PlanRevision,
+    WorkEvent,
+    WorkGoal,
+    WorkItem,
+    WorkPlan,
+)
 
 __all__ = [
     "AIAnalysis",
@@ -28,6 +36,7 @@ __all__ = [
     "Employee",
     "EmployeeKPI",
     "EmploymentStatus",
+    "EvidenceSubmission",
     "Feedback",
     "FeedbackAssignment",
     "InternalPost",
@@ -37,6 +46,7 @@ __all__ = [
     "Notification",
     "PerformanceReview",
     "PerformanceReviewRevision",
+    "PlanRevision",
     "Position",
     "PostComment",
     "Relationship",
@@ -44,4 +54,8 @@ __all__ = [
     "SystemConfig",
     "User",
     "UserRole",
+    "WorkEvent",
+    "WorkGoal",
+    "WorkItem",
+    "WorkPlan",
 ]

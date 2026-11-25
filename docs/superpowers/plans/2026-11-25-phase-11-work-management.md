@@ -1,6 +1,16 @@
 # Kế hoạch Phase 11 — Kế hoạch hiệu suất và công việc có nghiệm thu
 
-Ngày: **25/11/2026**. Trạng thái: **đề xuất, chưa triển khai; 0 task được nghiệm thu**.
+Ngày: **25/11/2026**. Trạng thái: **hoàn thành nghiệm thu local — Task 0–6 đạt gate**. Xem [báo cáo và bằng chứng](../../phase-11-report.vi.md), [hướng dẫn theo role](../../phase-11-huong-dan.vi.md). Chưa tuyên bố nghiệm thu production hoặc hoàn thành các Phase 12–15.
+
+| Task | Gate đã kiểm chứng |
+| --- | --- |
+| 0 | Contract, quyền/trạng thái, nguồn số và đường tương thích LEGACY |
+| 1 | Migration `20261125_0011`, fresh upgrade, metadata/constraint/immutability, fingerprint dữ liệu cũ |
+| 2 | Hai tài khoản thống nhất kế hoạch, sửa revision, xác nhận đúng bản, điều kiện activation |
+| 3 | Giao/đề xuất/sửa draft, tiến trình, vướng mắc, nộp/trả/nộp lại/nghiệm thu, replay/race/rollback |
+| 4 | Thông báo/SSE/readiness/deep link theo scope, chặn API cũ và chuyển tổ chức khi ACTIVE |
+| 5 | UI theo role, tab cố định/modal/draft/error/focus, browser desktop 1280px và mobile 390px |
+| 6 | Demo riêng qua domain services, browser đầu–cuối, tài liệu, deploy và bảo toàn dữ liệu chính |
 
 Đọc trước: [đề xuất quản lý hiệu suất liên tục](../../nang-cap-quan-ly-hieu-suat-lien-tuc.vi.md), [kiến trúc hiện tại](../../architecture.md), [vai trò](../../vai-tro-va-quy-trinh.vi.md), [cách dùng bộ dữ liệu mở rộng](../../du-lieu-mo-rong.vi.md).
 

@@ -197,6 +197,16 @@ class EmployeeService:
                     else {field for field, value in values.items() if getattr(row, field) != value}
                 )
                 if not creating:
+                    if changed & {
+                        "department_id",
+                        "position_id",
+                        "manager_id",
+                        "user_id",
+                        "employment_status",
+                    }:
+                        from app.modules.work_management.repository import guard_organization_change
+
+                        guard_organization_change(self.session, row.id)
                     for field, value in values.items():
                         setattr(row, field, value)
                 self._validate_references(row, changed, creating=creating)

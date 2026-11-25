@@ -13,7 +13,10 @@ ENV NEXT_TELEMETRY_DISABLED=1
 WORKDIR /app
 COPY --from=dependencies /app/node_modules ./node_modules
 COPY apps/web ./
-RUN npm run build
+# Keep the compiler in a separate worker and bound its heap on small Docker Desktop VMs.
+# Type checking remains enabled; this limit applies only to the build stage.
+ARG WEB_BUILD_HEAP_MB=1536
+RUN NODE_OPTIONS="--max-old-space-size=${WEB_BUILD_HEAP_MB}" npm run build -- --webpack
 
 FROM node:24-bookworm-slim AS runtime
 

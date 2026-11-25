@@ -1,3 +1,4 @@
+from decimal import Decimal
 from uuid import UUID
 
 from sqlalchemy import select
@@ -27,6 +28,38 @@ class AllocationService:
     def view(
         self, participant: CycleParticipant, employee: Employee, cycle: ReviewCycle, user: User
     ) -> AllocationView:
+        if cycle.workflow_mode == "CONTINUOUS":
+            from app.modules.work_management.models import WorkGoal, WorkPlan
+
+            goals = self.session.scalars(
+                select(WorkGoal)
+                .join(WorkPlan, WorkGoal.plan_id == WorkPlan.id)
+                .where(
+                    WorkPlan.participant_id == participant.id,
+                    WorkPlan.status == "APPROVED",
+                    WorkGoal.revision == WorkPlan.revision,
+                )
+                .order_by(WorkGoal.id)
+            )
+            return AllocationView(
+                participant=self.repository.present_participant(
+                    participant, employee, cycle, user, self.repository.actor_employee(user)
+                ),
+                cycle_status=cycle.status,
+                items=[
+                    AllocationLine(
+                        id=goal.id,
+                        definition_id=goal.definition_id,
+                        definition=DefinitionSnapshot.model_validate(
+                            goal.specification["definition"]
+                        ),
+                        target=Decimal(str(goal.specification["target"])),
+                        actual=None,
+                        weight=Decimal(str(goal.specification["weight"])),
+                    )
+                    for goal in goals
+                ],
+            )
         rows = self.session.scalars(
             select(EmployeeKPI)
             .where(
@@ -62,6 +95,9 @@ class AllocationService:
     def require_writable(
         self, participant: CycleParticipant, employee: Employee, cycle: ReviewCycle, user: User
     ) -> None:
+        from app.modules.work_management.repository import require_legacy
+
+        require_legacy(cycle)
         if cycle.status != CycleStatus.ACTIVE:
             raise ApiError(409, "cycle_not_active", "KPI evidence requires an ACTIVE cycle")
         if participant.finalized_at is not None:

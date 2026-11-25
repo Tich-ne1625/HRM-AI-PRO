@@ -3,6 +3,7 @@ import { apiFetch } from "../../lib/api-client";
 export interface CycleOption { id: string; name: string; status: string }
 export interface Activity { id: string; action: string; occurred_at: string; employee_id: string | null; display_name: string | null; cycle_id: string | null }
 export interface Overview {
+  continuous?: Record<string, number> | null;
   role: string; pending_feedback: number;
   recent_activities?: Activity[];
   active_accounts?: number; inactive_accounts?: number; account_roles?: Record<string, number>;

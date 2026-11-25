@@ -6,9 +6,11 @@ Hệ thống quản lý hiệu suất nhân viên: hồ sơ, KPI, phản hồi 3
 
 **Dữ liệu demo mở rộng:** [60 nhân viên, 8 phòng ban, tài khoản và cách thực hành](docs/du-lieu-mo-rong.vi.md). Nạp thêm bằng `docker compose --env-file .env exec api python -m app.cli.expand_demo`; giữ nguyên tài khoản và tiến độ cũ.
 
-**Kế hoạch nâng cấp theo góp ý giảng viên:** [quản lý quá trình làm việc, KPI định kỳ và AI cố vấn](docs/nang-cap-quan-ly-hieu-suat-lien-tuc.vi.md), kèm [kế hoạch Phase 11](docs/superpowers/plans/2026-11-25-phase-11-work-management.md). Đang ở trạng thái đề xuất, chưa thay đổi tính năng hiện tại.
+**Phase 11 — công việc từ đầu đến nghiệm thu:** [Hướng dẫn thao tác theo role và demo riêng](docs/phase-11-huong-dan.vi.md). Quản lý thống nhất kế hoạch → nhân viên xác nhận → HR kích hoạt → giao việc → cập nhật/vướng mắc → nộp bằng chứng → quản lý nghiệm thu/trả lại. Kỳ cũ giữ chế độ LEGACY. Kỳ CONTINUOUS chưa tính điểm hoặc có AI cố vấn; sổ đo, check-in và AI tiếp nối ở Phase 12–14 trong [đề xuất tổng thể](docs/nang-cap-quan-ly-hieu-suat-lien-tuc.vi.md). Xem [contract](docs/phase-11-contract.vi.md) và [kế hoạch triển khai](docs/superpowers/plans/2026-11-25-phase-11-work-management.md).
 
 ## Chạy và xem ngay
+
+Phase 11 đã có [báo cáo nghiệm thu local](docs/phase-11-report.vi.md). Demo quy trình mới dùng `http://localhost:13039` theo [hướng dẫn riêng](docs/phase-11-huong-dan.vi.md); dữ liệu đang dùng ở cổng 3000 được giữ nguyên.
 
 1. Mở **Docker Desktop**.
 2. Mở terminal tại thư mục **`hrm-ai`** và chạy:

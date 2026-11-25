@@ -28,6 +28,7 @@ from app.modules.performance.router import router as performance_router
 from app.modules.review_cycles.router import router as cycles_router
 from app.modules.settings.router import router as settings_router
 from app.modules.users.router import router as users_router
+from app.modules.work_management.router import router as work_router
 
 
 @asynccontextmanager
@@ -76,6 +77,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(audit_router)
     app.include_router(notifications_router)
     app.include_router(collaboration_router)
+    app.include_router(work_router)
     return app
 
 

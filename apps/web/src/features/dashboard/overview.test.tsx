@@ -21,6 +21,14 @@ function mount() {
   render(<QueryClientProvider client={cache}><DashboardOverview /></QueryClientProvider>);
 }
 beforeEach(() => { vi.resetAllMocks(); mocks.role = "HR"; mocks.get.mockResolvedValue(overview); });
+it("uses process metrics without score charts for a continuous cycle", async () => {
+  mocks.get.mockResolvedValue({...overview, continuous: {participants: 5, acknowledged: 3, missing_plans: 1, open_work: 8, submitted: 2, accepted: 4, blocked: 1}});
+  mount(); await screen.findByText("Tiến trình kế hoạch & công việc");
+  expect(screen.queryByText("Điểm trung bình hợp lệ")).toBeNull();
+  expect(screen.queryByText("KPI đã nhập thực tế")).toBeNull();
+  expect(screen.queryByText("Phân bố điểm hợp lệ")).toBeNull();
+  expect(screen.getByRole("link", {name: /Theo dõi thống nhất kế hoạch/}).getAttribute("href")).toBe("/work-management?cycle_id=c1");
+});
 it("shows scoped metrics, sample sizes and links to existing workflows", async () => {
   mount(); await screen.findByText("84.90");
   expect(screen.getByText("2 kết quả hiện hành / đã chốt")).toBeTruthy();

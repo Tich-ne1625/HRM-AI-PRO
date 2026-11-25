@@ -25,6 +25,12 @@ def drop_test_tables(engine: Engine) -> None:
     with engine.begin() as connection:
         for table in (
             "notifications",
+            "work_events",
+            "work_submissions",
+            "work_items",
+            "work_goals",
+            "work_plan_revisions",
+            "work_plans",
             "post_comments",
             "internal_posts",
             "chat_messages",

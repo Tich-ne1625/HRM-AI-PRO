@@ -8,7 +8,12 @@ from app.core.errors import ApiError
 from app.modules.employees.models import Employee, EmploymentStatus
 from app.modules.employees.repository import employee_scope
 from app.modules.organization.models import Department, Position
-from app.modules.review_cycles.models import CycleParticipant, CycleStatus, ReviewCycle
+from app.modules.review_cycles.models import (
+    CycleParticipant,
+    CycleStatus,
+    ReviewCycle,
+    WorkflowMode,
+)
 from app.modules.review_cycles.schemas import ParticipantSnapshot, ParticipantView
 from app.modules.users.models import User, UserRole
 
@@ -25,13 +30,29 @@ def cycle_scope(user: User) -> ColumnElement[bool]:
         )
         .exists()
     )
-    return and_(ReviewCycle.status != CycleStatus.DRAFT, scoped)
+    from sqlalchemy import or_
+
+    return and_(
+        or_(
+            ReviewCycle.status != CycleStatus.DRAFT,
+            ReviewCycle.workflow_mode == WorkflowMode.CONTINUOUS,
+        ),
+        scoped,
+    )
 
 
 def participant_scope(user: User) -> ColumnElement[bool]:
     if user.role == UserRole.HR:
         return true()
-    return and_(ReviewCycle.status != CycleStatus.DRAFT, employee_scope(user))
+    from sqlalchemy import or_
+
+    return and_(
+        or_(
+            ReviewCycle.status != CycleStatus.DRAFT,
+            ReviewCycle.workflow_mode == WorkflowMode.CONTINUOUS,
+        ),
+        employee_scope(user),
+    )
 
 
 def can_write_kpis(
@@ -41,7 +62,11 @@ def can_write_kpis(
     cycle: ReviewCycle,
     participant: CycleParticipant,
 ) -> bool:
-    if cycle.status != CycleStatus.ACTIVE or participant.finalized_at is not None:
+    if (
+        cycle.status != CycleStatus.ACTIVE
+        or participant.finalized_at is not None
+        or cycle.workflow_mode != WorkflowMode.LEGACY
+    ):
         return False
     return bool(
         user.role == UserRole.MANAGER

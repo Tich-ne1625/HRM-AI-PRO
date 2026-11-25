@@ -14,6 +14,7 @@ export function OrganizationAccess({ children }: { children: ReactNode }) {
 
 export function organizationError(error: Error | null): string {
   const messages: Record<string, string> = {
+    active_workflow_handover_required: "Nhân viên đang tham gia kỳ theo tiến trình. Cần quy trình bàn giao trước khi đổi tổ chức hoặc quản lý; liên hệ HR.",
     duplicate_code: "Mã này đã tồn tại.", employee_code_already_exists: "Mã nhân viên đã tồn tại.",
     user_already_linked: "Tài khoản đã liên kết với hồ sơ khác.",
     reporting_cycle: "Quan hệ quản lý tạo thành vòng lặp. Hãy chọn người quản lý khác.",

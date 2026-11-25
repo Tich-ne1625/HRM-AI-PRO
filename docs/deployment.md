@@ -1,5 +1,15 @@
 # Deployment and operations
 
+## Phase 11 — additive migration and isolated work demo
+
+Current head is `20261125_0011`, following collaboration `20261114_0010`. Back up PostgreSQL before upgrading. Existing cycles receive LEGACY as their default mode; no cycle is activated, closed, reseeded or converted by this migration. Accounts, passwords, KPI actuals, scoring, feedback, chat/feed and AI history are retained. Rebuild the usual Compose stack with `docker compose --env-file .env up -d --build --wait`; never use `down -v` to update code.
+
+The independent acceptance stack uses `infrastructure/docker/phase11-test.compose.yml`, project `insighthr-phase11-acceptance`, web `13039`, API `18039`, an empty `_test` PostgreSQL database on tmpfs, no `.env` and no Gemini. Seed with `python -m app.cli.seed_continuous_demo` inside its API container. Its marker is idempotent, existing-account collisions are refused and late failures roll back the whole dataset. Do not point this seed at the main data volume. See [step-by-step instructions](phase-11-huong-dan.vi.md).
+
+There is still one ACTIVE cycle globally per database. Try the new workflow in the isolated demo instead of closing the user's current LEGACY cycle. Phase 11 does not enable CONTINUOUS final scoring/closure or claim offline deadline scheduling. Future ledger/coaching/scoring/handover phases remain separate.
+
+The web Docker build uses the separate Webpack compiler worker with a default Node heap limit of 1536 MB (`WEB_BUILD_HEAP_MB` build argument), suitable for the local 4 GB Docker VM used in acceptance. TypeScript checking runs during the build. This setting applies to the builder stage; the running web container keeps its normal runtime configuration.
+
 ## Notification update (2026-11-14)
 
 Rebuild Compose with `docker compose --env-file .env up --build --detach --wait`. Migration `20261114_0009` adds a notification table; retain the PostgreSQL volume and existing accounts. No seed/reset or new environment variables are required. Back up important data first. Do not downgrade past 0009 if notification/read history must be retained.

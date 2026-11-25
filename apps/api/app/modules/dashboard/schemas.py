@@ -38,6 +38,7 @@ class AdminDashboard(BaseModel):
 
 
 class Dashboard(BaseModel):
+    continuous: dict[str, int] | None = None
     role: str
     pending_feedback: int
     recent_activities: list[Activity] = Field(default_factory=list)

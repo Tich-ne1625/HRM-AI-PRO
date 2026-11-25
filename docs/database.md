@@ -1,8 +1,16 @@
 # Database design status
 
-## Current head: notifications
+## Current head: work management — `20261125_0011`
 
-Current head is `20261114_0009`, parent `20261024_0008`. The new `notifications` table stores an audit event, recipient/current-at-delivery role, event kind, optional employee/cycle/assignment links, created_at and nullable read_at. Unique `(event_id,recipient_id)` prevents duplicate delivery; `(recipient_id,created_at,id)` indexes inbox ordering. No raw comments, AI outputs or credentials are copied. Existing accounts, password hashes, evidence and histories are untouched. Read state survives reload/restart. Downgrading to 0008 deletes the notification table/history only; back up before rollback. No historical business events are backfilled.
+Parent `20261114_0010`. Adds `review_cycles.workflow_mode` (existing rows default LEGACY) and nullable `workflow_schedule`, plus `work_plans`, `work_plan_revisions`, `work_goals`, `work_items`, `work_submissions`, `work_events`. Notifications gain nullable typed `work_plan_id`/`work_item_id` links. No historical business row is backfilled or recalculated.
+
+Plans are unique per participant; revisions/goals and evidence/events are append-only, with PostgreSQL triggers rejecting UPDATE/DELETE. Composite foreign keys keep work goals in the same plan/revision and work events in their plan. Work source keys are unique per plan; `(actor_id, client_request_id)` prevents duplicate commands. Positive versions, state/priority checks, bounded paged queries and participant/status/deadline indexes enforce the workflow. Acknowledgement references the current revision; revisions are never overwritten. Work acceptance does not write EmployeeKPI.actual.
+
+Writes reuse organization guard → sorted active ADMIN/users → auth family → cycle → participant → plan/work. Audit, append-only event, notification and state commit atomically. SQL scope is applied before pagination; ADMIN cannot read work, HR reads plan coordination and aggregate work counts without individual evidence. See [the contract](phase-11-contract.vi.md).
+
+## Earlier notifications migration
+
+Notification milestone head was `20261114_0009`, parent `20261024_0008`. The new `notifications` table stores an audit event, recipient/current-at-delivery role, event kind, optional employee/cycle/assignment links, created_at and nullable read_at. Unique `(event_id,recipient_id)` prevents duplicate delivery; `(recipient_id,created_at,id)` indexes inbox ordering. No raw comments, AI outputs or credentials are copied. Existing accounts, password hashes, evidence and histories are untouched. Read state survives reload/restart. Downgrading to 0008 deletes the notification table/history only; back up before rollback. No historical business events are backfilled.
 
 ## Phase 9 login reservations
 
@@ -22,7 +30,7 @@ Writes retain guard → sorted ADMIN/users → session family → cycle → part
 
 ## Phase 3 organization schema
 
-Current sole head is `20261022_0006` (performance results/history), following feedback `20261020_0005`, following cycle/KPI `20261020_0004`, organization `20261019_0003`, authentication `20261003_0002` and baseline `20261003_0001`. Upgrade/downgrade and metadata parity are tested against PostgreSQL.
+At Phase 6 the sole head was `20261022_0006` (performance results/history), following feedback `20261020_0005`, following cycle/KPI `20261020_0004`, organization `20261019_0003`, authentication `20261003_0002` and baseline `20261003_0001`. Upgrade/downgrade and metadata parity are tested against PostgreSQL.
 
 | Table | Contract |
 | --- | --- |
@@ -119,7 +127,7 @@ SQL owner scope is independent of current organization/report access. HR raw pre
 
 ## Phase 7 AI history schema
 
-Current head `20261022_0007` adds only `ai_analyses`, with no synthetic backfill. Existing numeric reviews, immutable revisions, feedback and finalized timestamps remain intact. FK review/requester and composite FK(review_id,calculation_version) use RESTRICT. UNIQUE(review_id,audience,generation_version), UNIQUE(requested_by,client_request_id) and a partial UNIQUE(review_id) WHERE status=RUNNING enforce audience history/idempotency/global concurrency.
+The Phase 7 head `20261022_0007` adds only `ai_analyses`, with no synthetic backfill. Existing numeric reviews, immutable revisions, feedback and finalized timestamps remain intact. FK review/requester and composite FK(review_id,calculation_version) use RESTRICT. UNIQUE(review_id,audience,generation_version), UNIQUE(requested_by,client_request_id) and a partial UNIQUE(review_id) WHERE status=RUNNING enforce audience history/idempotency/global concurrency.
 
 Each attempt stores audience, RUNNING/SUCCEEDED/FAILED, generation/calculation/evidence/engine versions, evidence/input/request SHA-256 hashes, prompt/redaction/schema versions, configured/actual model, requester/request UUID, reservation/lease/fence, completion/generation times, allowlisted error, sampled flag and validated output JSONB. It never stores raw comments, prompts, credentials or provider response bodies. Status CHECKs require null output/times/error for RUNNING, object output and non-null equal completion/generation times for SUCCEEDED, and null output/generation with error/completion for FAILED. Versions/hashes/lease/time ordering/audience/status are constrained in PostgreSQL.
 

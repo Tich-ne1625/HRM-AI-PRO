@@ -151,6 +151,9 @@ class PerformanceService:
 
     @staticmethod
     def writable(participant: CycleParticipant, cycle: ReviewCycle) -> None:
+        from app.modules.work_management.repository import require_legacy
+
+        require_legacy(cycle)
         if cycle.status != CycleStatus.ACTIVE:
             raise ApiError(409, "cycle_not_active", "An ACTIVE cycle is required")
         if participant.finalized_at:
@@ -373,6 +376,9 @@ class PerformanceService:
         with self.session.begin():
             actor = authorize_domain_write(self.session, context, csrf, (UserRole.HR,))
             cycle = self.cycles.get(identifier, actor, lock=True)
+            from app.modules.work_management.repository import require_legacy
+
+            require_legacy(cycle)
             if cycle.status == CycleStatus.CLOSED:
                 raise ApiError(409, "cycle_already_closed", "The cycle has already been closed")
             if cycle.status != CycleStatus.ACTIVE:

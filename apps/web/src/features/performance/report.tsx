@@ -36,6 +36,7 @@ function ReportContent({ employeeId, cycleId }: { employeeId: string; cycleId: s
   if (query.isPending) return <p role="status">Đang tải báo cáo hiệu suất…</p>;
   if (query.isError) return <ReviewError error={query.error} reload={() => { void refresh(); }} />;
   const row = query.data;
+  if (row.readiness.issues.some((issue) => issue.code === "managed_by_workflow")) return <section className="auth-card"><h1>{row.display_name} · Theo dõi công việc</h1><p>Kỳ này dùng kế hoạch và bằng chứng theo tiến trình. Chưa có điểm cuối kỳ để công bố.</p><a className="action-link" href={`/work-management?cycle_id=${cycleId}`}>Mở công việc & mục tiêu</a></section>;
   const stateLabel = row.state === "CURRENT" && user?.role === "HR" ? "Chờ HR kiểm tra" : row.state === "CURRENT" && user?.role === "MANAGER" ? "Chờ HR chốt" : states[row.state];
   return <>
     <section className="auth-card wide">

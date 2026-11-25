@@ -40,6 +40,16 @@ TITLES = {
 
 
 def visible(user: User) -> ColumnElement[bool]:
+    from app.modules.work_management.models import WorkPlan
+    from app.modules.work_management.repository import work_scope
+
+    work_notice = (
+        select(WorkPlan.id)
+        .join(CycleParticipant)
+        .join(Employee)
+        .where(WorkPlan.id == Notification.work_plan_id, work_scope(user, hr=False))
+        .exists()
+    )
     post_notice = (
         select(InternalPost.id)
         .where(InternalPost.id == Notification.post_id, post_scope(user))
@@ -67,6 +77,7 @@ def visible(user: User) -> ColumnElement[bool]:
         Notification.recipient_id == user.id,
         Notification.recipient_role == user.role.value,
         or_(
+            work_notice,
             post_notice,
             message_notice,
             own_assignment,
@@ -76,6 +87,27 @@ def visible(user: User) -> ColumnElement[bool]:
 
 
 def present(row: Notification, user: User, subject: str = "", cycle: str = "") -> NotificationView:
+    if row.work_plan_id:
+        titles = {
+            "work.plan_submit": "Kế hoạch đã được gửi để thống nhất",
+            "work.plan_approve": "Kế hoạch đã duyệt — hãy xác nhận đã nhận",
+            "work.plan_clarify": "Kế hoạch cần làm rõ",
+            "work.plan_acknowledge": "Nhân viên đã xác nhận kế hoạch",
+            "work.created": "Có công việc mới cần tiếp nhận",
+            "work.submit": "Có bằng chứng chờ nghiệm thu",
+            "work.return": "Công việc cần bổ sung bằng chứng",
+            "work.accept": "Công việc đã được nghiệm thu",
+            "work.block": "Nhân viên cần hỗ trợ gỡ vướng",
+        }
+        target = f"item={row.work_item_id}" if row.work_item_id else f"plan={row.work_plan_id}"
+        return NotificationView(
+            id=row.id,
+            title=titles.get(row.kind, "Công việc có cập nhật"),
+            message="Mở để xem nội dung và người đang giữ bước tiếp theo.",
+            href=f"/work-management?{target}",
+            created_at=row.created_at,
+            read_at=row.read_at,
+        )
     if row.post_id or row.message_id:
         title = {
             "collaboration.post": "Bảng tin có bài viết mới",
@@ -232,6 +264,11 @@ class NotificationService:
                 for row, employee, cycle in assignments[:20]
             ]
             truncated = len(assignments) > 20
+            from app.modules.work_management.tasks import pending_tasks
+
+            work_items, work_truncated = pending_tasks(self.session, user)
+            items.extend(work_items)
+            truncated = truncated or work_truncated
             if user.role not in (UserRole.HR, UserRole.MANAGER):
                 return WorkPage(items=items, truncated=truncated)
             scope = employee_scope(user)
@@ -246,6 +283,7 @@ class NotificationService:
                     .where(
                         scope,
                         ReviewCycle.status == CycleStatus.ACTIVE,
+                        ReviewCycle.workflow_mode == "LEGACY",
                         CycleParticipant.finalized_at.is_(None),
                     )
                     .order_by(Employee.employee_code, CycleParticipant.id)
@@ -339,7 +377,11 @@ class NotificationService:
                     .exists()
                 )
                 for cycle in self.session.scalars(
-                    select(ReviewCycle).where(ReviewCycle.status == CycleStatus.ACTIVE, ~remaining)
+                    select(ReviewCycle).where(
+                        ReviewCycle.status == CycleStatus.ACTIVE,
+                        ~remaining,
+                        ReviewCycle.workflow_mode == "LEGACY",
+                    )
                 ):
                     items.insert(
                         0,

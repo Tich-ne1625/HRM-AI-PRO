@@ -12,6 +12,9 @@ export function ReviewAccess({ children }: { children: ReactNode }) {
   return user && ["HR", "MANAGER", "EMPLOYEE"].includes(user.role) ? children : <p role="alert">Bạn không có quyền truy cập đánh giá nhân sự.</p>;
 }
 const errors: Record<string, string> = {
+  managed_by_workflow: "Kỳ này theo dõi kế hoạch và công việc. Chưa mở tính điểm; hãy vào Công việc & mục tiêu.",
+  plan_schedule_frozen: "Lịch kỳ đã được dùng để lập kế hoạch cá nhân. Chưa hỗ trợ đổi lịch sau bước này; các kế hoạch và xác nhận được giữ nguyên.",
+  participant_has_work_plan: "Nhân viên đã có kế hoạch, cần giữ lại hồ sơ để bảo toàn lịch sử.",
   stale_version: "Dữ liệu đã được người khác thay đổi. Thông tin đang nhập được giữ lại; hãy tải bản mới rồi kiểm tra trước khi lưu lại.",
   stale_evidence_version: "Dữ liệu đánh giá đã thay đổi. Hãy tải bản mới và kiểm tra trước khi xác nhận lại.",
   stale_calculation_version: "Đã có lần tính mới. Hãy tải bản mới để kiểm tra kết quả trước khi chốt.",
@@ -53,6 +56,10 @@ export function ReviewError({ error, reload }: { error: Error; reload?: () => vo
   </div>;
 }
 const issueLabels: Record<string, string> = {
+  plan_approval_required: "Quản lý cần gửi và duyệt kế hoạch hiện hành.",
+  plan_acknowledgement_required: "Nhân viên cần xác nhận đúng phiên bản kế hoạch đã duyệt.",
+  plan_manager_changed: "Quản lý đã thay đổi; cần thống nhất và duyệt lại kế hoạch.",
+  active_work_accounts_required: "Kiểm tra tài khoản nhân viên và vai trò của quản lý trực tiếp.",
   participants_required: "Chọn ít nhất một nhân viên.", employee_inactive: "Nhân viên đã ngừng làm việc.",
   department_inactive: "Phòng ban đã ngừng hoạt động.", position_inactive: "Chức danh đã ngừng hoạt động.",
   self_account_required: "Nhân viên cần tài khoản đang hoạt động.", active_manager_required: "Cần người quản lý đang làm việc.",

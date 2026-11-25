@@ -26,10 +26,20 @@ def test_new_limiter_migration_roundtrip_preserves_all_previous_records(ai_world
                     "internal_posts",
                     "post_comments",
                     "chat_messages",
+                    "work_plans",
+                    "work_plan_revisions",
+                    "work_goals",
+                    "work_items",
+                    "work_submissions",
+                    "work_events",
                 }
             )
             for table in tables:
                 rows = [dict(r) for r in conn.execute(text(f'SELECT * FROM "{table}"')).mappings()]
+                if table == "review_cycles":
+                    for row in rows:
+                        row.pop("workflow_mode", None)
+                        row.pop("workflow_schedule", None)
                 data[table] = sorted(json.dumps(r, sort_keys=True, default=str) for r in rows)
         return hashlib.sha256(json.dumps(data, sort_keys=True).encode()).hexdigest()
 
@@ -41,4 +51,4 @@ def test_new_limiter_migration_roundtrip_preserves_all_previous_records(ai_world
     assert fingerprint() == before
     with world.engine.connect() as conn:
         assert conn.scalar(text("SELECT count(*) FROM auth_login_limits")) == 0
-        assert conn.scalar(text("SELECT version_num FROM alembic_version")) == "20261114_0010"
+        assert conn.scalar(text("SELECT version_num FROM alembic_version")) == "20261125_0011"

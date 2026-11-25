@@ -51,6 +51,8 @@ def collect(
     session: Session, participant: CycleParticipant, employee: Employee, cycle: ReviewCycle
 ) -> Evidence:
     issues: list[Issue] = []
+    if cycle.workflow_mode == "CONTINUOUS":
+        issues.append(Issue(code="managed_by_workflow"))
     subject = {
         "employee_id": str(employee.id),
         "employee_code": employee.employee_code,

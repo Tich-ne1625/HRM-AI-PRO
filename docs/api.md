@@ -1,5 +1,32 @@
 # API contract
 
+## Continuous work management — Phase 11
+
+Cycle creation accepts `workflow_mode: LEGACY | CONTINUOUS` (default LEGACY). CONTINUOUS requires `workflow_schedule`: IANA `timezone` and aware timestamps `acknowledgement_due_at`, `input_cutoff_at`, `verification_due_at`, `response_due_at`. APIs normalize timestamps to UTC and validate the local date window/order. Mode is fixed at creation; the schedule is fixed once personal plans exist. Cycle responses expose `workflow_mode`, `workflow_schedule`, `workflow_schedule_frozen`.
+
+All endpoints below require authentication. Writes additionally require exact same Origin, CSRF, current role/session, version and scoped ownership/direct management. ADMIN has no work access. HR may read plans and aggregate progress, not individual work evidence.
+
+| Endpoint under `/api/v1/work-management` | Purpose |
+| --- | --- |
+| `GET /participants?page=&cycle_id=` | SQL-scoped paged participants and current-plan readiness, including CONTINUOUS drafts |
+| `GET /definitions?page=&q=` | Active KPI options for managers preparing a plan |
+| `POST /participants/{id}/plan` | Manager creates a plan or appends a draft revision |
+| `GET /plans/{id}` | Current revision, frozen goal definitions, acknowledgement, available actions |
+| `POST /plans/{id}/actions` | `submit`, `approve`, `clarify`, `acknowledge`, `comment`; revision and expected version required |
+| `GET /plans/{id}/revisions?page=` | Paged immutable goal/baseline revisions |
+| `GET /plans/{id}/history?page=&work_id=` | Paged scoped events/comments; work evidence remains owner/manager only |
+| `POST /plans/{id}/items` | Manager assigns work; employee proposes work for self |
+| `GET /items?page=&plan_id=&status=&blocked=` | SQL-scoped, stable paged work board |
+| `GET /items/{id}?page=` | Work detail and immutable evidence submissions (20 per page) |
+| `POST /items/{id}/actions` | Start/update/block/unblock/submit, manager publish/return/accept/cancel/reopen, scoped comment/change request |
+| `POST /items/{id}/draft` | Employee edits only their unpublished PROPOSED item; formal commitments remain fixed after manager publication |
+
+Commands carry `client_request_id` UUID and `expected_version`. Same actor/UUID/content retries return the current scoped resource without duplicating events; reusing a UUID for other content returns `request_id_conflict`. Stale versions return `stale_version`. Plan commands also carry the exact revision being read/acknowledged. Text is bounded; evidence URLs are HTTP(S) only and are not fetched by the server. Goal weights total exactly 100; ratios require numerator/denominator definitions; milestone weights total 100.
+
+CONTINUOUS activation additionally requires every plan APPROVED and acknowledged at its current revision with valid accounts and current manager approval. Legacy allocation/actual/calculate/finalize/close write paths return `managed_by_workflow` for the new mode. Read-only target/weight allocation adapters expose approved goals with `actual: null`; they never create EmployeeKPI evidence. Dashboard `continuous` contains process counts and suppresses score charts. Existing LEGACY contracts remain unchanged.
+
+Work notifications have typed plan/item targets under `/work-management?plan=...` or `?item=...`. The existing SSE connection invalidates work/notification/dashboard domains; SSE carries no descriptions or evidence. Reading a notice does not complete a workflow action. See [business contract](phase-11-contract.vi.md) and [Vietnamese walkthrough](phase-11-huong-dan.vi.md).
+
 ## HR bulk feedback assignment (2026-11-14)
 
 `POST /api/v1/feedback-assignments/bulk` is HR-only, exact-Origin/CSRF protected and no-store. Body: `{participant_id,reviewer_ids,relationship,required,due_at,expected_evidence_version}`. `reviewer_ids` contains 1–100 distinct UUIDs; only PEER/SUBORDINATE are allowed. SELF/MANAGER retain their existing single-recipient workflow. Success 201: `{assignment_ids,created_count,evidence_version}`.

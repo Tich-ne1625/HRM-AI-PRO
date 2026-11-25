@@ -30,6 +30,16 @@ class CycleService:
         self.repository = CycleRepository(session)
 
     def view(self, cycle: ReviewCycle, user: User) -> CycleView:
+        from app.modules.work_management.models import WorkPlan
+
+        schedule_frozen = cycle.workflow_mode == "CONTINUOUS" and bool(
+            self.session.scalar(
+                select(WorkPlan.id)
+                .join(CycleParticipant)
+                .where(CycleParticipant.cycle_id == cycle.id)
+                .limit(1)
+            )
+        )
         count = (
             self.session.scalar(
                 select(func.count()).select_from(
@@ -60,6 +70,9 @@ class CycleService:
             can_edit=editable,
             can_activate=editable and count > 0,
             activated_at=cycle.activated_at,
+            workflow_mode=cycle.workflow_mode,
+            workflow_schedule_frozen=schedule_frozen,
+            workflow_schedule=cycle.workflow_schedule,
         )
 
     def list(
@@ -161,7 +174,12 @@ class CycleService:
         with self.session.begin():
             user = authorize_domain_write(self.session, context, csrf, (UserRole.HR,))
             if isinstance(body, CycleCreate):
-                cycle = ReviewCycle(**body.model_dump())
+                cycle = ReviewCycle(
+                    **body.model_dump(mode="python", exclude={"workflow_schedule"}),
+                    workflow_schedule=body.workflow_schedule.model_dump(mode="json")
+                    if body.workflow_schedule
+                    else None,
+                )
                 self.session.add(cycle)
                 changed = set(body.model_fields_set)
                 previous = 0
@@ -171,13 +189,46 @@ class CycleService:
                 self.require_draft(cycle)
                 require_version(cycle.version, body.expected_version)
                 values = body.model_dump(exclude_unset=True, exclude={"expected_version"})
+                if body.workflow_schedule is not None:
+                    values["workflow_schedule"] = body.workflow_schedule.model_dump(mode="json")
                 changed = {key for key, value in values.items() if getattr(cycle, key) != value}
                 previous = cycle.version
                 for key, value in values.items():
                     setattr(cycle, key, value)
                 if cycle.start_date > cycle.end_date:
                     raise ApiError(422, "validation_error", "start_date must not be after end_date")
+                from app.modules.review_cycles.models import WorkflowMode
+                from app.modules.work_management.schemas import WorkflowSchedule
+
+                if (cycle.workflow_mode == WorkflowMode.CONTINUOUS) != (
+                    cycle.workflow_schedule is not None
+                ):
+                    raise ApiError(422, "validation_error", "Workflow schedule does not match mode")
+                if cycle.workflow_schedule:
+                    try:
+                        WorkflowSchedule.model_validate(cycle.workflow_schedule).validate_window(
+                            cycle.start_date, cycle.end_date
+                        )
+                    except ValueError as error:
+                        raise ApiError(422, "validation_error", str(error)) from error
                 if changed:
+                    from app.modules.work_management.models import WorkPlan
+
+                    if (
+                        cycle.workflow_mode == WorkflowMode.CONTINUOUS
+                        and changed & {"start_date", "end_date", "workflow_schedule"}
+                        and self.session.scalar(
+                            select(WorkPlan.id)
+                            .join(CycleParticipant)
+                            .where(CycleParticipant.cycle_id == cycle.id)
+                            .limit(1)
+                        )
+                    ):
+                        raise ApiError(
+                            409,
+                            "plan_schedule_frozen",
+                            "The schedule is fixed once personal plans are prepared",
+                        )
                     cycle.version += 1
             self.session.flush()
             if changed:
@@ -277,6 +328,12 @@ class CycleService:
             if row is None:
                 raise ApiError(404, "participant_not_found", "Participant not found")
             from app.modules.kpis.models import EmployeeKPI
+            from app.modules.work_management.models import WorkPlan
+
+            if self.session.scalar(select(WorkPlan.id).where(WorkPlan.participant_id == row.id)):
+                raise ApiError(
+                    409, "participant_has_work_plan", "A participant with a plan is retained"
+                )
 
             if (
                 row.snapshot is not None

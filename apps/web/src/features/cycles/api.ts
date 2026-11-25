@@ -6,6 +6,9 @@ export type Direction = "HIGHER_IS_BETTER" | "LOWER_IS_BETTER";
 export interface Policy { schema_version: 1; kpi_weight: string; feedback_weight: string; kpi_cap: string | null }
 export interface ScoringDefaults { version: number; policy: Policy }
 export interface Cycle {
+  workflow_mode?: "LEGACY" | "CONTINUOUS";
+  workflow_schedule_frozen?: boolean;
+  workflow_schedule?: {timezone: string; acknowledgement_due_at: string; input_cutoff_at: string; verification_due_at: string; response_due_at: string} | null;
   id: string; name: string; start_date: string; end_date: string; status: CycleStatus;
   version: number; policy: Policy; policy_source_version: number; policy_is_preview: boolean;
   participant_count: number; can_edit: boolean; can_activate: boolean; activated_at: string | null;

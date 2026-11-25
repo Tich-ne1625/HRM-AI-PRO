@@ -109,6 +109,18 @@ class ReferenceService:
                     )
                     if row is None:
                         raise ApiError(404, "reference_not_found", "Reference not found")
+                    if values.get("is_active") is False and row.is_active:
+                        from app.modules.work_management.repository import guard_organization_change
+
+                        reference = (
+                            Employee.department_id
+                            if self.kind == "department"
+                            else Employee.position_id
+                        )
+                        for employee_id in self.session.scalars(
+                            select(Employee.id).where(reference == row.id).order_by(Employee.id)
+                        ):
+                            guard_organization_change(self.session, employee_id)
                     for field, value in values.items():
                         setattr(row, field, value)
                 self.session.flush()

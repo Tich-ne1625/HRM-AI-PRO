@@ -17,12 +17,23 @@ class CycleStatus(StrEnum):
     CLOSED = "CLOSED"
 
 
+class WorkflowMode(StrEnum):
+    LEGACY = "LEGACY"
+    CONTINUOUS = "CONTINUOUS"
+
+
 class ReviewCycle(Timestamps, Base):
     __tablename__ = "review_cycles"
     __table_args__ = (
         CheckConstraint("start_date <= end_date", name="ck_review_cycles_dates"),
         CheckConstraint("name ~ '[^[:space:]]'", name="ck_review_cycles_name"),
         CheckConstraint("version >= 1", name="ck_review_cycles_version"),
+        CheckConstraint(
+            "(workflow_mode = 'LEGACY' AND workflow_schedule IS NULL) OR "
+            "(workflow_mode = 'CONTINUOUS' AND workflow_schedule IS NOT NULL "
+            "AND jsonb_typeof(workflow_schedule) = 'object')",
+            name="ck_review_cycles_workflow_schedule",
+        ),
         CheckConstraint(
             "(status = 'DRAFT' AND scoring_policy_snapshot IS NULL "
             "AND policy_source_version IS NULL AND activated_at IS NULL) OR "
@@ -61,6 +72,17 @@ class ReviewCycle(Timestamps, Base):
     )
     policy_source_version: Mapped[int | None]
     activated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    workflow_mode: Mapped[WorkflowMode] = mapped_column(
+        Enum(
+            WorkflowMode,
+            native_enum=False,
+            create_constraint=True,
+            name="ck_review_cycles_workflow_mode",
+        ),
+        default=WorkflowMode.LEGACY,
+        server_default="LEGACY",
+    )
+    workflow_schedule: Mapped[dict[str, object] | None] = mapped_column(JSONB(none_as_null=True))
 
 
 class CycleParticipant(Timestamps, Base):

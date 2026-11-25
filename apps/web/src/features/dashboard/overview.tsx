@@ -26,7 +26,7 @@ export function DashboardOverview() {
     {query.isPending && <p role="status">Đang tải tổng quan…</p>}
     {query.isError && <p role="alert">Không tải được tổng quan. Hãy thử tải lại hoặc kiểm tra phiên đăng nhập.</p>}
     {data && !query.isError && <>
-      {user?.role === "HR" && <div className="dashboard-task"><div><strong>Phân công phản hồi</strong><p>Chọn người cần đánh giá, giao phiếu cho nhiều đồng nghiệp hoặc cấp dưới và theo dõi việc gửi.</p></div><Link href="/feedback-administration">Mở phân công phản hồi →</Link></div>}
+      {user?.role === "HR" && !data.continuous && <div className="dashboard-task"><div><strong>Phân công phản hồi</strong><p>Chọn người cần đánh giá, giao phiếu cho nhiều đồng nghiệp hoặc cấp dưới và theo dõi việc gửi.</p></div><Link href="/feedback-administration">Mở phân công phản hồi →</Link></div>}
       <div className="dashboard-task"><div><strong>Phản hồi của tôi</strong><p>{data.pending_feedback} nhiệm vụ còn mở trong các chu kỳ đang hoạt động.</p></div><Link href="/feedback">Mở hộp việc →</Link></div>
       {admin ? <>
         <div className="metric-grid"><Metric label="Tài khoản hoạt động" value={data.active_accounts ?? 0} /><Metric label="Tài khoản đã khóa" value={data.inactive_accounts ?? 0} /></div>
@@ -38,6 +38,7 @@ export function DashboardOverview() {
           {data.cycles?.map((item) => <option key={item.id} value={item.id}>{item.name} · {item.status === "ACTIVE" ? "Đang hoạt động" : item.status === "CLOSED" ? "Đã đóng" : "Bản nháp"}</option>)}
         </select>{data.cycles_truncated && <small>Hiển thị 100 chu kỳ ưu tiên gần nhất và chu kỳ đang chọn.</small>}</div>
 
+        {data.continuous ? <><h2>Tiến trình kế hoạch & công việc</h2><div className="metric-grid"><Metric label="Kế hoạch đã xác nhận" value={`${data.continuous.acknowledged ?? 0}/${data.continuous.participants ?? 0}`} /><Metric label="Chưa có kế hoạch" value={data.continuous.missing_plans ?? 0} /><Metric label="Công việc cần theo dõi" value={data.continuous.open_work ?? 0} /><Metric label="Bản nộp chờ nghiệm thu" value={data.continuous.submitted ?? 0} /><Metric label="Công việc đang bị vướng" value={data.continuous.blocked ?? 0} /><Metric label="Công việc đã nghiệm thu" value={data.continuous.accepted ?? 0} /></div><p className="help-text">Các số này theo dõi công việc, chưa phải điểm hiệu suất. Kết quả cuối kỳ cần dữ liệu đo được xác minh.</p><a className="action-link" href={`/work-management?cycle_id=${data.selected_cycle?.id ?? ""}`}>{user?.role === "HR" ? "Theo dõi thống nhất kế hoạch" : "Mở công việc & mục tiêu"} →</a></> : <>
         <div className="metric-grid dashboard-summary">{user?.role !== "EMPLOYEE" && <Metric label="Nhân viên đang làm việc" value={data.active_employees ?? 0} detail="Trong phạm vi quản lý" />}
           {user?.role !== "EMPLOYEE" && <Metric label="Người tham gia chu kỳ" value={data.participants ?? 0} />}
           <Metric label={employee ? "Trạng thái của tôi" : "Chưa hoàn tất"} value={employee ? data.finalized ? "Đã chốt" : data.stale ? "Cần tính lại" : data.current ? "Đã tính điểm" : "Chưa tính điểm" : data.awaiting_completion ?? 0} detail={employee ? undefined : `${data.finalized ?? 0} người đã chốt kết quả`} />
@@ -57,6 +58,7 @@ export function DashboardOverview() {
             <div className="table-scroll" tabIndex={0} role="region" aria-label="Kết quả phòng ban, có thể cuộn ngang"><table><thead><tr><th scope="col">Phòng ban</th><th scope="col">Tham gia</th><th scope="col">Số mẫu hợp lệ</th><th scope="col">Điểm trung bình</th></tr></thead><tbody>{data.departments?.map((item) => <tr key={item.id}><th scope="row">{item.name}</th><td>{item.participants}</td><td>{item.sample_size}</td><td>{item.average ?? "—"}</td></tr>)}</tbody></table></div>
             {data.departments_truncated && <p>Hiển thị tối đa 100 nhóm phòng ban.</p>}
           </details>}
+        </>}
         </>}
       </>}
       <RecentActivities items={data.recent_activities ?? []} admin={admin} />

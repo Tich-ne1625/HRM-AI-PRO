@@ -19,13 +19,27 @@ const cycleSchema = z.object({ name: z.string().trim().min(1, "Nhập tên chu k
 export type CycleValues = z.infer<typeof cycleSchema> & { expected_version?: number };
 export function CycleForm({ initial, pending, onSave }: { initial?: Cycle; pending: boolean; onSave: (values: CycleValues) => void }) {
   const [version] = useState(initial?.version);
+  const [mode, setMode] = useState(initial?.workflow_mode ?? "LEGACY");
   const form = useForm<z.infer<typeof cycleSchema>>({ resolver: zodResolver(cycleSchema), defaultValues: {
     name: initial?.name ?? "", start_date: initial?.start_date ?? "", end_date: initial?.end_date ?? "",
   } });
-  return <form onSubmit={form.handleSubmit((values) => onSave({ ...values, ...(version ? {expected_version: version} : {}) }))}>
+  return <form onSubmit={(event) => {
+    const data = new FormData(event.currentTarget);
+    void form.handleSubmit((values) => {
+      const schedule = mode === "CONTINUOUS" && !initial?.workflow_schedule_frozen ? {timezone: String(data.get("timezone")), ...Object.fromEntries(["acknowledgement_due_at", "input_cutoff_at", "verification_due_at", "response_due_at"].map((key) => [key, new Date(String(data.get(key))).toISOString()]))} : undefined;
+      onSave({...values, ...(version ? {expected_version: version} : mode === "CONTINUOUS" ? {workflow_mode: mode} : {}), ...(schedule ? {workflow_schedule: schedule} : {})});
+    })(event);
+  }}>
+    {!initial && <><label htmlFor="cycle-mode">Cách vận hành</label><select id="cycle-mode" value={mode} onChange={(e) => setMode(e.target.value as "LEGACY" | "CONTINUOUS")}><option value="LEGACY">Đánh giá kết quả (luồng hiện tại)</option><option value="CONTINUOUS">Quản lý theo tiến trình (kế hoạch & công việc)</option></select><p className="help-text">Chế độ được giữ cố định sau khi tạo chu kỳ.</p></>}
     <label htmlFor="cycle-name">Tên chu kỳ</label><input id="cycle-name" maxLength={200} {...form.register("name")} />
-    <div className="form-grid"><div><label htmlFor="cycle-start">Ngày bắt đầu</label><input id="cycle-start" type="date" {...form.register("start_date")} /></div>
-      <div><label htmlFor="cycle-end">Ngày kết thúc</label><input id="cycle-end" type="date" {...form.register("end_date")} /></div></div>
+    <div className="form-grid"><div><label htmlFor="cycle-start">Ngày bắt đầu</label><input id="cycle-start" type="date" readOnly={initial?.workflow_schedule_frozen} {...form.register("start_date")} /></div>
+      <div><label htmlFor="cycle-end">Ngày kết thúc</label><input id="cycle-end" type="date" readOnly={initial?.workflow_schedule_frozen} {...form.register("end_date")} /></div></div>
+    {initial?.workflow_schedule_frozen && <p className="help-text">Lịch đã được dùng để thống nhất kế hoạch. Chỉ đổi tên kỳ; mốc thời gian được giữ cố định.</p>}
+    {mode === "CONTINUOUS" && <fieldset disabled={initial?.workflow_schedule_frozen}><legend>Lịch điều phối theo tiến trình</legend><label htmlFor="workflow-zone">Múi giờ của kỳ</label><input id="workflow-zone" name="timezone" defaultValue={initial?.workflow_schedule?.timezone ?? "Asia/Ho_Chi_Minh"} required />{Object.entries({acknowledgement_due_at: "Hạn xác nhận kế hoạch (trước ngày bắt đầu)", input_cutoff_at: "Hạn nộp dữ liệu (sau ngày kết thúc)", verification_due_at: "Hạn xác minh", response_due_at: "Hạn giải trình"}).map(([key, label]) => {
+      const value = initial?.workflow_schedule?.[key as "input_cutoff_at"];
+      const local = value ? new Date(new Date(value).getTime() - new Date(value).getTimezoneOffset() * 60000).toISOString().slice(0, 16) : "";
+      return <div key={key}><label htmlFor={key}>{label}</label><input id={key} name={key} type="datetime-local" required defaultValue={local} /></div>;
+    })}<p className="help-text">Giờ nhập theo múi giờ máy của bạn; hệ thống lưu UTC. Múi giờ kỳ xác định ngày bắt đầu/kết thúc công việc.</p></fieldset>}
     {Object.entries(form.formState.errors).map(([key, error]) => <p key={key} role="alert">{error.message}</p>)}
     <button disabled={pending}>{pending ? "Đang lưu…" : initial ? "Lưu thông tin chu kỳ" : "Tạo chu kỳ nháp"}</button>
   </form>;

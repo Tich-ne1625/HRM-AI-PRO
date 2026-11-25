@@ -33,5 +33,7 @@ class Notification(Base):
     message_id: Mapped[UUID | None] = mapped_column(
         ForeignKey("chat_messages.id", ondelete="RESTRICT")
     )
+    work_plan_id: Mapped[UUID | None] = mapped_column(ForeignKey("work_plans.id"))
+    work_item_id: Mapped[UUID | None] = mapped_column(ForeignKey("work_items.id"))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     read_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))

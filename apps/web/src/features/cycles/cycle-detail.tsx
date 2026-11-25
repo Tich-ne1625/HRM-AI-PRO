@@ -26,13 +26,15 @@ function Detail({ id }: { id: string }) {
   if (cycle.isPending) return <p role="status">Đang tải chu kỳ…</p>;
   if (cycle.isError) return <ReviewError error={cycle.error} reload={() => {void cycle.refetch();}} />;
   const row = cycle.data;
+  const continuous = row.workflow_mode === "CONTINUOUS";
   return <>
     <section className="auth-card wide"><Link href="/review-cycles">← Danh sách chu kỳ</Link><p className="eyebrow">{cycleStatus[row.status]}</p><h1>{row.name}</h1>
       <p>{row.start_date} – {row.end_date} · Phiên bản {row.version} · {row.participant_count} người tham gia trong phạm vi</p>
-      {user?.role === "HR" && <><h2>{row.policy_is_preview ? "Cấu hình dự kiến khi kích hoạt" : "Cấu hình đã đóng băng"}</h2>
+      {continuous && <section className="confirmation"><h2>Quản lý theo tiến trình</h2><p>Quản lý và nhân viên thống nhất kế hoạch trước khi HR kích hoạt. Sau đó giao việc, theo dõi và nghiệm thu bằng chứng.</p><a className="action-link" href={`/work-management?cycle_id=${id}`}>{user?.role === "HR" ? "Theo dõi kế hoạch và xác nhận" : "Mở công việc & mục tiêu"}</a><p className="help-text">Chưa mở tính điểm cuối kỳ; cần sổ đo được xác minh ở giai đoạn tiếp theo.</p></section>}
+      {!continuous && user?.role === "HR" && <><h2>{row.policy_is_preview ? "Cấu hình dự kiến khi kích hoạt" : "Cấu hình đã đóng băng"}</h2>
       <p>KPI: {row.policy.kpi_weight}% · Phản hồi: {row.policy.feedback_weight}% · Giới hạn điểm KPI: {row.policy.kpi_cap ?? "Không giới hạn"}</p>
       {row.policy_is_preview && <p>Cấu hình và tổ chức có thể thay đổi trước khi kích hoạt. Nhân viên và người quản lý cần có tài khoản đang hoạt động.</p>}</>}
-      {row.status === "ACTIVE" && user?.role === "HR" && <CloseCycle cycle={row} />}
+      {!continuous && row.status === "ACTIVE" && user?.role === "HR" && <CloseCycle cycle={row} />}
       {user?.role === "HR" && row.can_activate && <button disabled={activate.isPending} onClick={() => setConfirmation(row.version)}>Kích hoạt chu kỳ</button>}
       {confirmation !== null && <section className="confirmation" role="group" aria-label="Xác nhận kích hoạt">
         <p>Kích hoạt sẽ đóng băng danh sách, phòng ban, chức danh, quan hệ quản lý và cấu hình chấm điểm. Sau đó không sửa danh sách tham gia.</p>
@@ -47,7 +49,7 @@ function Detail({ id }: { id: string }) {
       <form className="filters" onSubmit={(e) => {e.preventDefault(); setQ(String(new FormData(e.currentTarget).get("q") ?? "")); setPage(1);}}><label htmlFor="participant-search">Tìm người tham gia</label><input id="participant-search" name="q" maxLength={100} /><button>Tìm</button></form>
       {participants.isPending && <p role="status">Đang tải người tham gia…</p>}{participants.isError && <ReviewError error={participants.error} />}
       {!participants.isError && participants.data && <><div className="table-scroll" tabIndex={0} role="region" aria-label="Người tham gia chu kỳ, có thể cuộn ngang"><table><caption>{participants.data.total} người tham gia trong phạm vi</caption><thead><tr><th>Nhân viên</th><th>Phòng ban</th><th>Chức danh</th><th>Thao tác</th></tr></thead><tbody>
-        {participants.data.items.map((p) => <tr key={p.id}><td>{p.employee_code} · {p.display_name}</td><td>{p.department_name}</td><td>{p.position_title}</td><td>{user?.role === "HR" && row.can_edit
+        {participants.data.items.map((p) => <tr key={p.id}><td>{p.employee_code} · {p.display_name}</td><td>{p.department_name}</td><td>{p.position_title}</td><td>{continuous ? <a className="action-link" href={`/work-management?cycle_id=${id}`}>Kế hoạch & công việc</a> : user?.role === "HR" && row.can_edit
           ? <button className="secondary" disabled={remove.isPending} onClick={() => remove.mutate(p.id)}>Bỏ {p.employee_code} khỏi nháp</button>
           : <div className="row-actions">{user?.role === "HR" && row.status === "ACTIVE" && <Link className="action-link" href={`/feedback-administration?participant_id=${p.id}&cycle_id=${id}`}>Phân công phản hồi</Link>}<Link className="action-link" href={`/employees/${p.employee_id}/performance?cycle_id=${id}`}>Mở đánh giá</Link></div>}</td></tr>)}</tbody></table></div>
         {!participants.data.items.length && <p>Chưa có người tham gia phù hợp.</p>}

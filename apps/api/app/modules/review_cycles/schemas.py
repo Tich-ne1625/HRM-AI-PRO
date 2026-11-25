@@ -7,19 +7,26 @@ from pydantic import BaseModel, Field, model_validator
 from app.core.decimal_types import Version
 from app.modules.employees.models import EmploymentStatus
 from app.modules.organization.schemas import Input, Label, Patch
-from app.modules.review_cycles.models import CycleStatus
+from app.modules.review_cycles.models import CycleStatus, WorkflowMode
 from app.modules.settings.schemas import ScoringPolicy
+from app.modules.work_management.schemas import WorkflowSchedule
 
 
 class CycleCreate(Input):
     name: Label
     start_date: date
     end_date: date
+    workflow_mode: WorkflowMode = WorkflowMode.LEGACY
+    workflow_schedule: WorkflowSchedule | None = None
 
     @model_validator(mode="after")
     def date_order(self) -> Self:
         if self.start_date > self.end_date:
             raise ValueError("start_date must not be after end_date")
+        if (self.workflow_mode == WorkflowMode.CONTINUOUS) != (self.workflow_schedule is not None):
+            raise ValueError("Only CONTINUOUS cycles require a workflow schedule")
+        if self.workflow_schedule:
+            self.workflow_schedule.validate_window(self.start_date, self.end_date)
         return self
 
 
@@ -32,6 +39,7 @@ class CycleUpdate(Patch):
     name: Label | None = None
     start_date: date | None = None
     end_date: date | None = None
+    workflow_schedule: WorkflowSchedule | None = None
 
     @model_validator(mode="after")
     def has_change(self) -> Self:
@@ -77,6 +85,7 @@ class ParticipantSnapshot(Input):
 
 
 class CycleView(BaseModel):
+    workflow_schedule_frozen: bool = False
     id: UUID
     name: str
     start_date: date
@@ -90,6 +99,8 @@ class CycleView(BaseModel):
     can_edit: bool
     can_activate: bool
     activated_at: datetime | None
+    workflow_mode: WorkflowMode = WorkflowMode.LEGACY
+    workflow_schedule: WorkflowSchedule | None = None
 
 
 class ParticipantView(BaseModel):

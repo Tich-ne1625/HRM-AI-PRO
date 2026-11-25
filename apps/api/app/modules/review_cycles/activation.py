@@ -123,6 +123,18 @@ class CycleActivation:
                     "Resolve activation requirements",
                     [*issues[:100], {"issue_count": len(issues)}],
                 )
+            from app.modules.review_cycles.models import WorkflowMode
+            from app.modules.work_management.repository import activation_issues
+
+            if cycle.workflow_mode == WorkflowMode.CONTINUOUS:
+                plan_issues = activation_issues(self.session, participants)
+                if plan_issues:
+                    raise ApiError(
+                        409,
+                        "activation_requirements_not_met",
+                        "Approve and acknowledge every current plan revision",
+                        [*plan_issues[:100], {"issue_count": len(plan_issues)}],
+                    )
             # No partial activation: prepare every snapshot only after all checks.
             policy = ScoringPolicy.model_validate(defaults.scoring_policy)
             reports: dict[UUID, list[RelationshipSnapshot]] = {}

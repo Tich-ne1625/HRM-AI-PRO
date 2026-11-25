@@ -5,6 +5,7 @@ export type NavigationGroup = { label: string; href: string; items: { href: stri
 export function navigationGroups(role: UserRole): NavigationGroup[] {
   const groups: NavigationGroup[] = [{ label: "Tổng quan", href: "/dashboard", items: [{ href: "/dashboard", label: "Tổng quan" }] }];
   groups[0]!.items.push({ href: "/news", label: "Bảng tin nội bộ" });
+  if (role === "MANAGER" || role === "EMPLOYEE") groups.push({ label: "Công việc & mục tiêu", href: "/work-management", items: [{href: "/work-management", label: role === "MANAGER" ? "Điều phối nhóm" : "Công việc của tôi"}] });
   if (role !== "ADMIN") groups.push({ label: "Đánh giá hiệu suất", href: "/review-cycles", items: [
     { href: "/review-cycles", label: "Chu kỳ đánh giá" },
     ...(role === "HR" ? [{ href: "/feedback-administration", label: "Phân công phản hồi" }, { href: "/kpis", label: "Danh mục KPI" }] : []),
@@ -27,6 +28,7 @@ export function navigationPath(path: string): string {
 }
 
 export function workspaceRouteAllowed(role: UserRole, path: string): boolean {
+  if (path === "/work-management") return role !== "ADMIN";
   if (/^\/(admin|settings)(\/|$)/.test(path)) return role === "ADMIN";
   if (/^\/(departments|positions|kpis|feedback-administration)(\/|$)/.test(path)) return role === "HR";
   if (path === "/employees") return role === "HR" || role === "MANAGER";

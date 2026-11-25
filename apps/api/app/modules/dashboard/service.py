@@ -105,6 +105,12 @@ class DashboardService:
         # A pinned older cycle remains selectable even when outside the latest 100.
         if all(c.id != selected.id for c in result.cycles):
             result.cycles.append(result.selected_cycle)
+        if selected.workflow_mode == "CONTINUOUS":
+            from app.modules.work_management.overview import overview
+
+            result.continuous = overview(self.session, user, selected)
+            result.participants = result.continuous["participants"]
+            return result
         finalized = and_(
             PerformanceReview.finalized_at.is_not(None),
             PerformanceReview.finalized_at == CycleParticipant.finalized_at,

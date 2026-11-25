@@ -197,6 +197,8 @@ Mọi phản hồi đã gửi được tính ngang nhau, gồm cả phản hồi
 
 ## 12. Bàn giao qua thông báo
 
+**Bổ sung Phase 11:** các mục nhập actual/tính điểm/chốt ở trên mô tả kỳ **LEGACY**. Với kỳ **CONTINUOUS**, quản lý thống nhất kế hoạch và giao đầu ra; nhân viên xác nhận, cập nhật, báo vướng và nộp bằng chứng; quản lý nghiệm thu/trả lại; HR theo dõi sự thống nhất và kích hoạt kỳ. ADMIN không xem công việc. Chưa có điểm cuối kỳ theo tiến trình hoặc AI cố vấn. Xem [hướng dẫn mới theo đúng thứ tự role](phase-11-huong-dan.vi.md) để không trộn hai chế độ.
+
 HR tổ chức và chốt; quản lý cung cấp bằng chứng và tính điểm. Hệ thống gửi tin cho người liên quan qua chuông **Thông báo** trên header. Ví dụ: HR giao SELF → Bình có tin và việc gửi phiếu; Bình gửi → HR/quản lý có tin cập nhật; quản lý tính điểm → HR có việc kiểm tra/chốt; HR chốt → Bình/quản lý nhận tin kết quả đã chốt.
 
 Sidebar bên phải có **Thông báo** (mới/chưa đọc/đã đọc) và **Việc cần làm** (việc của mình hoặc đang chờ phối hợp). Tin được cập nhật trực tiếp, trạng thái đọc đồng bộ giữa các tab. Bấm tin mở khung chi tiết đúng hồ sơ; đóng bằng ×. Đọc tin không thay thế thao tác gửi phiếu, tính hay chốt. Quy tắc người nhận và dữ liệu riêng tư nằm trong [tài liệu thông báo](notifications-contract.vi.md).
