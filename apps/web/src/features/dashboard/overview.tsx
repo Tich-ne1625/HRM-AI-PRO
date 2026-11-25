@@ -11,6 +11,10 @@ function Metric({ label, value, detail }: { label: string; value: string | numbe
   return <div className="metric"><span>{label}</span><strong>{value}</strong>{detail && <small>{detail}</small>}</div>;
 }
 
+function ContinuousSignals({counts, cycle, hr}: {counts: Record<string, number>; cycle: string; hr: boolean}) {
+  return <div className="dashboard-task"><div><strong>Việc cần phối hợp tiếp theo</strong><p>Chờ xác minh số liệu: {counts.waiting_measurements ?? 0} · Hỗ trợ đang mở: {counts.open_support_actions ?? 0} · Biên bản chưa đọc: {counts.unreviewed_checkins ?? 0}</p></div><Link href={`/work-management?${hr ? "" : "tab=measurements&"}cycle_id=${cycle}`}>{hr ? "Điều phối tiến trình" : "Mở số liệu & check-in"} →</Link></div>;
+}
+
 export function DashboardOverview() {
   const { user } = useAuth();
   const [cycle, setCycle] = useState("");
@@ -38,7 +42,7 @@ export function DashboardOverview() {
           {data.cycles?.map((item) => <option key={item.id} value={item.id}>{item.name} · {item.status === "ACTIVE" ? "Đang hoạt động" : item.status === "CLOSED" ? "Đã đóng" : "Bản nháp"}</option>)}
         </select>{data.cycles_truncated && <small>Hiển thị 100 chu kỳ ưu tiên gần nhất và chu kỳ đang chọn.</small>}</div>
 
-        {data.continuous ? <><h2>Tiến trình kế hoạch & công việc</h2><div className="metric-grid"><Metric label="Kế hoạch đã xác nhận" value={`${data.continuous.acknowledged ?? 0}/${data.continuous.participants ?? 0}`} /><Metric label="Chưa có kế hoạch" value={data.continuous.missing_plans ?? 0} /><Metric label="Công việc cần theo dõi" value={data.continuous.open_work ?? 0} /><Metric label="Bản nộp chờ nghiệm thu" value={data.continuous.submitted ?? 0} /><Metric label="Công việc đang bị vướng" value={data.continuous.blocked ?? 0} /><Metric label="Công việc đã nghiệm thu" value={data.continuous.accepted ?? 0} /></div><p className="help-text">Các số này theo dõi công việc, chưa phải điểm hiệu suất. Kết quả cuối kỳ cần dữ liệu đo được xác minh.</p><a className="action-link" href={`/work-management?cycle_id=${data.selected_cycle?.id ?? ""}`}>{user?.role === "HR" ? "Theo dõi thống nhất kế hoạch" : "Mở công việc & mục tiêu"} →</a></> : <>
+        {data.continuous ? <><h2>Tiến trình kế hoạch & công việc</h2><div className="metric-grid"><Metric label="Kế hoạch đã xác nhận" value={`${data.continuous.acknowledged ?? 0}/${data.continuous.participants ?? 0}`} /><Metric label="Chưa có kế hoạch" value={data.continuous.missing_plans ?? 0} /><Metric label="Công việc cần theo dõi" value={data.continuous.open_work ?? 0} /><Metric label="Bản nộp chờ nghiệm thu" value={data.continuous.submitted ?? 0} /><Metric label="Công việc đang bị vướng" value={data.continuous.blocked ?? 0} /><Metric label="Công việc đã nghiệm thu" value={data.continuous.accepted ?? 0} /></div><ContinuousSignals counts={data.continuous} cycle={data.selected_cycle?.id ?? ""} hr={user?.role === "HR"} /><p className="help-text">Các số này theo dõi công việc, chưa phải điểm hiệu suất. Kết quả cuối kỳ cần dữ liệu đo được xác minh.</p><a className="action-link" href={`/work-management?cycle_id=${data.selected_cycle?.id ?? ""}`}>{user?.role === "HR" ? "Theo dõi thống nhất kế hoạch" : "Mở công việc & mục tiêu"} →</a></> : <>
         <div className="metric-grid dashboard-summary">{user?.role !== "EMPLOYEE" && <Metric label="Nhân viên đang làm việc" value={data.active_employees ?? 0} detail="Trong phạm vi quản lý" />}
           {user?.role !== "EMPLOYEE" && <Metric label="Người tham gia chu kỳ" value={data.participants ?? 0} />}
           <Metric label={employee ? "Trạng thái của tôi" : "Chưa hoàn tất"} value={employee ? data.finalized ? "Đã chốt" : data.stale ? "Cần tính lại" : data.current ? "Đã tính điểm" : "Chưa tính điểm" : data.awaiting_completion ?? 0} detail={employee ? undefined : `${data.finalized ?? 0} người đã chốt kết quả`} />

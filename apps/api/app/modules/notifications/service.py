@@ -87,6 +87,33 @@ def visible(user: User) -> ColumnElement[bool]:
 
 
 def present(row: Notification, user: User, subject: str = "", cycle: str = "") -> NotificationView:
+    if row.kind.startswith("progress."):
+        title = {
+            "progress.measurement.submit": "Có số đo KPI chờ xác minh",
+            "progress.measurement.verify": "Số đo KPI đã được xác minh",
+            "progress.measurement.return": "Số đo KPI cần bổ sung",
+            "progress.measurement.reject": "Số đo KPI chưa được chấp nhận",
+            "progress.checkin.create": "Bạn có lịch check-in mới",
+            "progress.checkin.publish": "Biên bản check-in đã công bố",
+            "progress.checkin.clarify": "Biên bản check-in cần làm rõ",
+            "progress.checkin.addendum": "Có phụ lục check-in cần đọc",
+            "progress.action.create": "Bạn có hành động hỗ trợ cần theo dõi",
+        }.get(row.kind, "Tiến trình công việc có cập nhật")
+        target = (
+            f"measurement={row.measurement_id}"
+            if row.measurement_id
+            else f"checkin={row.checkin_id}"
+            if row.checkin_id
+            else f"plan={row.work_plan_id}"
+        )
+        return NotificationView(
+            id=row.id,
+            title=title,
+            message="Mở để xem bước cần xử lý. Đọc thông báo không hoàn tất hành động.",
+            href=f"/work-management?{target}",
+            created_at=row.created_at,
+            read_at=row.read_at,
+        )
     if row.work_plan_id:
         titles = {
             "work.plan_submit": "Kế hoạch đã được gửi để thống nhất",
@@ -269,6 +296,11 @@ class NotificationService:
             work_items, work_truncated = pending_tasks(self.session, user)
             items.extend(work_items)
             truncated = truncated or work_truncated
+            from app.modules.progress.tasks import pending_tasks as progress_tasks
+
+            progress_items, progress_truncated = progress_tasks(self.session, user)
+            items.extend(progress_items)
+            truncated = truncated or progress_truncated
             if user.role not in (UserRole.HR, UserRole.MANAGER):
                 return WorkPage(items=items, truncated=truncated)
             scope = employee_scope(user)

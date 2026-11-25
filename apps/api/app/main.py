@@ -25,6 +25,7 @@ from app.modules.notifications.realtime import NotificationHub
 from app.modules.notifications.router import router as notifications_router
 from app.modules.organization.router import router as organization_router
 from app.modules.performance.router import router as performance_router
+from app.modules.progress.router import router as progress_router
 from app.modules.review_cycles.router import router as cycles_router
 from app.modules.settings.router import router as settings_router
 from app.modules.users.router import router as users_router
@@ -62,6 +63,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         https=application_settings.app_env == "production",
     )
     app.include_router(health_router)
+    app.include_router(progress_router)
     app.include_router(auth_router)
     app.include_router(users_router)
     app.include_router(organization_router)

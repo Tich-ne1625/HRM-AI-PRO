@@ -42,7 +42,43 @@ def overview(session: Session, user: User, cycle: ReviewCycle) -> dict[str, int]
         )
         or 0
     )
+    from app.modules.progress.models import Checkin, CheckinAction, Measurement
+
+    waiting_measurements = (
+        session.scalar(
+            select(func.count())
+            .select_from(Measurement)
+            .where(Measurement.plan_id.in_(plan_ids), Measurement.status == "SUBMITTED")
+        )
+        or 0
+    )
+    unreviewed_checkins = (
+        session.scalar(
+            select(func.count())
+            .select_from(Checkin)
+            .where(
+                Checkin.plan_id.in_(plan_ids),
+                Checkin.status == "PUBLISHED",
+                Checkin.acknowledged_publication.is_(None),
+            )
+        )
+        or 0
+    )
+    open_actions = (
+        session.scalar(
+            select(func.count())
+            .select_from(CheckinAction)
+            .where(
+                CheckinAction.plan_id.in_(plan_ids),
+                CheckinAction.status.notin_(["DONE", "CANCELLED"]),
+            )
+        )
+        or 0
+    )
     return {
+        "waiting_measurements": waiting_measurements,
+        "unreviewed_checkins": unreviewed_checkins,
+        "open_support_actions": open_actions,
         "participants": participants,
         "plans": plans,
         "approved": approved,

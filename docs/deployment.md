@@ -1,5 +1,13 @@
 # Deployment and operations
 
+## Phase 12 — verified progress and isolated check-in demo
+
+Current head is `20261125_0012`. Back up PostgreSQL before migration, rebuild API/web and run the migration service before starting the new API. The ordinary update remains `docker compose --env-file .env up -d --build --wait`. Never use `down -v` to update code. Existing cycles, accounts, passwords and business evidence are retained; no new cycle is activated and no main database seed is required.
+
+The separate `infrastructure/docker/phase12-test.compose.yml` uses project `insighthr-phase12-acceptance`, web `13049`, API `18049`, a disposable `_test` database on tmpfs and Gemini disabled. It does not load the main `.env`. Seed only this stack using `python -m app.cli.seed_progress_demo` inside its API container. The seed is idempotent, requires an empty explicitly disposable database and rolls back on late failure. Stopping/removing that database container loses its demo data; this is independent of `insighthr_postgres_data`. Follow the [Vietnamese walkthrough](phase-12-huong-dan.vi.md).
+
+Phase 12 supplies verified progress/check-ins, not AI coaching or final CONTINUOUS closure. Deadline status is derived during reads/commands; no offline reminder scheduler is claimed.
+
 ## Phase 11 — additive migration and isolated work demo
 
 Current head is `20261125_0011`, following collaboration `20261114_0010`. Back up PostgreSQL before upgrading. Existing cycles receive LEGACY as their default mode; no cycle is activated, closed, reseeded or converted by this migration. Accounts, passwords, KPI actuals, scoring, feedback, chat/feed and AI history are retained. Rebuild the usual Compose stack with `docker compose --env-file .env up -d --build --wait`; never use `down -v` to update code.

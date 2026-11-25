@@ -1,6 +1,6 @@
 # Kế hoạch Phase 12 — KPI theo tiến trình và check-in
 
-Ngày **25/11/2026**. **Đã lập kế hoạch; chưa triển khai, chưa nghiệm thu.** Baseline **`13fd9e3`**: Phase 11 đã hoàn thành local, head **`20261125_0011`**. [Dự thảo contract](../../phase-12-contract.vi.md), [báo cáo Phase 11](../../phase-11-report.vi.md), [lộ trình mở rộng](../../nang-cap-quan-ly-hieu-suat-lien-tuc.vi.md).
+Ngày **25/11/2026**. **Đã triển khai; kết quả nghiệm thu local theo [báo cáo Phase 12](../../phase-12-report.vi.md).** Baseline **`13fd9e3`**: Phase 11 đã hoàn thành local; migration Phase 12 **`20261125_0012`**. [Contract](../../phase-12-contract.vi.md), [hướng dẫn theo role](../../phase-12-huong-dan.vi.md), [lộ trình mở rộng](../../nang-cap-quan-ly-hieu-suat-lien-tuc.vi.md).
 
 ## 1. Mục tiêu sử dụng được
 
@@ -26,14 +26,14 @@ Các quyết định chi tiết nằm trong contract: nguồn theo từng đối
 
 | Task | Phụ thuộc | Đầu ra review được | Trạng thái |
 | --- | --- | --- | --- |
-| 0 | Phase 11 | Chốt contract, ma trận quyền/chuyển trạng thái, ví dụ số và wireframe | Chưa thực hiện gate |
-| 1 | 0 | Migration và constraints cho rule/ledger/snapshot/check-in/actions | Chưa triển khai |
-| 2 | 1 | Nộp/duyệt/trả/sửa/rút số, nguồn và bất biến | Chưa triển khai |
-| 3 | 2 | Tổng hợp chính xác, snapshot, xử lý reopen/treo nguồn | Chưa triển khai |
-| 4 | 1, 3 | Check-in hai chiều và hành động hỗ trợ | Chưa triển khai |
-| 5 | 2–4 | Quyền, tasks/dashboard, thông báo và SSE tích hợp | Chưa triển khai |
-| 6 | 2–5 | Web theo role, form số đo và check-in, modal/responsive | Chưa triển khai |
-| 7 | 0–6 | Demo đầu–cuối, hồi quy, tài liệu/báo cáo, deploy có bảo toàn | Chưa triển khai |
+| 0 | Phase 11 | Chốt contract, ma trận quyền/chuyển trạng thái, ví dụ số và wireframe | Đã hiện thực và đối chiếu bằng kiểm thử |
+| 1 | 0 | Migration và constraints cho rule/ledger/snapshot/check-in/actions | Đã triển khai; fresh/upgrade, parity, triggers |
+| 2 | 1 | Nộp/duyệt/trả/sửa/rút số, nguồn và bất biến | Đã triển khai; quyền, replay, race, rollback |
+| 3 | 2 | Tổng hợp chính xác, snapshot, xử lý reopen/treo nguồn | Đã triển khai; bốn phép đo và lịch sử có nguồn |
+| 4 | 1, 3 | Check-in hai chiều và hành động hỗ trợ | Đã triển khai; riêng tư, công bố, phụ lục, kiểm tra chéo |
+| 5 | 2–4 | Quyền, tasks/dashboard, thông báo và SSE tích hợp | Đã tích hợp vào hạ tầng hiện có |
+| 6 | 2–5 | Web theo role, form số đo và check-in, modal/responsive | Đã triển khai; kiểm thử component và trình duyệt |
+| 7 | 0–6 | Demo đầu–cuối, hồi quy, tài liệu/báo cáo, deploy có bảo toàn | Đạt local; 989 backend / 202 web theo các lượt ghi trong báo cáo; main 0012 giữ dữ liệu cũ |
 
 Thực hiện lần lượt, gate task trước đạt mới chuyển phần phụ thuộc. Không triển khai một lượt rồi mới kiểm tra quyền/tính nguyên tử. Không ước lượng ngày hoàn thành hoặc số test thành công trước khi có kết quả.
 
@@ -47,7 +47,7 @@ Thực hiện lần lượt, gate task trước đạt mới chuyển phần ph�
 - Chốt số VERIFIED cũ vẫn hiệu lực khi bản sửa đang chờ; VOID loại cả dòng; work reopen treo cả dòng và phải xác minh lại sau nghiệm thu mới.
 - Wireframe trang và modal cho ba role nghiệp vụ; kiểm tra tránh nút trùng/tab lồng nhau; đọc hiểu ví dụ đầu–cuối không cần đọc schema.
 
-**Gate:** có các ví dụ hợp lệ và bị chặn với đáp án định lượng; không còn quyết định tác động tới unique/FK/nguồn dữ liệu bị để “xử lý sau” trong Task 1. Contract hiện tại là đầu vào để review, không phải gate đã đạt.
+**Gate:** có các ví dụ hợp lệ và bị chặn với đáp án định lượng; không còn quyết định tác động tới unique/FK/nguồn dữ liệu bị để “xử lý sau” trong Task 1. Contract được đối chiếu với schema, service và các ca kiểm thử, kể cả vị trí LAST/MILESTONE sau VOID.
 
 ## Task 1 — Schema và migration bổ sung
 

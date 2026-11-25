@@ -1,5 +1,29 @@
 # API contract
 
+## Verified progress and check-ins — Phase 12
+
+All routes below are under `/api/v1`. Reads require current session and owner/direct-manager scope. HR has coordination metadata only; ADMIN cannot read private progress/check-ins. Writes require same Origin, CSRF, `expected_version` and `client_request_id` UUID. Replaying an identical command does not duplicate effects; UUID reuse with another payload and stale versions return conflicts. Role denial occurs before resolving write targets. Services re-authorize the account/session under the shared domain locks.
+
+| Route | Purpose |
+| --- | --- |
+| `GET /progress/plans/{id}/goals?from_date=&to_date=` | Exact verified aggregates, missing-data state, rule and pending counts; dates use the cycle timezone |
+| `GET/POST /progress/goals/{id}/measurements` | Paged source streams / save a new draft |
+| `GET /progress/measurements/{id}?page=&revision_number=` | Current detail or an exact immutable historical revision |
+| `POST /progress/measurements/{id}/draft` | Append a correction/draft revision without overwriting earlier evidence |
+| `POST /progress/measurements/{id}/actions` | Submit, verify, return or reject with scoped state/deadline validation; VOID is a draft revision kind submitted and verified through the same flow |
+| `GET /progress/plans/{id}/snapshots?page=` | Existing aggregate history; no write on read |
+| `GET /progress/snapshots/{id}?page=&goal_id=` | Frozen values and paged exact source revisions |
+| `GET /checkins?plan_id=&page=` | Scoped check-in list |
+| `POST /progress/plans/{id}/checkins` | Manager schedules a check-in |
+| `GET /checkins/{id}?page=` | Preparation visibility, publications, actions and history |
+| `POST /checkins/{id}/preparation` | Save own private preparation; share only by explicit choice |
+| `POST /checkins/{id}/actions` | Open, reschedule, cancel, publish, acknowledge, clarify or append a supplement |
+| `POST /checkins/{id}/follow-ups` | Create one owned support action with deadline and the other participant as reviewer |
+| `POST /checkin-actions/{id}/actions` | Start, submit, confirm, request changes, cancel or replace an action |
+| `GET /progress/plans/{id}/coordination` | HR-only counts, overdue metadata and coordination status; no private text or values |
+
+Collection scope is applied before pagination. A missing verified value is null, not zero. SUM uses deltas, LAST uses occurrence time, RATIO uses total numerator/denominator, MILESTONE uses frozen weights. Corrections leave the prior verified value effective until verified; VOID removes the stream without falling back to older revisions. Published check-ins pin an existing immutable snapshot; acknowledgement means read, not agreement. See [the complete business rules](phase-12-contract.vi.md).
+
 ## Continuous work management — Phase 11
 
 Cycle creation accepts `workflow_mode: LEGACY | CONTINUOUS` (default LEGACY). CONTINUOUS requires `workflow_schedule`: IANA `timezone` and aware timestamps `acknowledgement_due_at`, `input_cutoff_at`, `verification_due_at`, `response_due_at`. APIs normalize timestamps to UTC and validate the local date window/order. Mode is fixed at creation; the schedule is fixed once personal plans exist. Cycle responses expose `workflow_mode`, `workflow_schedule`, `workflow_schedule_frozen`.

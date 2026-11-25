@@ -17,23 +17,28 @@ def test_new_limiter_migration_roundtrip_preserves_all_previous_records(ai_world
     def fingerprint():
         data = {}
         with world.engine.connect() as conn:
-            tables = sorted(
-                set(inspect(conn).get_table_names())
-                - {
-                    "alembic_version",
-                    "auth_login_limits",
-                    "notifications",
-                    "internal_posts",
-                    "post_comments",
-                    "chat_messages",
-                    "work_plans",
-                    "work_plan_revisions",
-                    "work_goals",
-                    "work_items",
-                    "work_submissions",
-                    "work_events",
-                }
-            )
+            # This round trip targets 0007. Later, intentionally dropped tables must
+            # not change its fingerprint merely by appearing/disappearing empty.
+            original_tables = {
+                "users",
+                "auth_sessions",
+                "audit_logs",
+                "departments",
+                "positions",
+                "employees",
+                "system_config",
+                "review_cycles",
+                "cycle_participants",
+                "kpi_definitions",
+                "employee_kpis",
+                "feedback_assignments",
+                "feedback",
+                "performance_reviews",
+                "performance_review_revisions",
+                "ai_analyses",
+            }
+            assert original_tables <= set(inspect(conn).get_table_names())
+            tables = sorted(original_tables)
             for table in tables:
                 rows = [dict(r) for r in conn.execute(text(f'SELECT * FROM "{table}"')).mappings()]
                 if table == "review_cycles":
@@ -51,4 +56,4 @@ def test_new_limiter_migration_roundtrip_preserves_all_previous_records(ai_world
     assert fingerprint() == before
     with world.engine.connect() as conn:
         assert conn.scalar(text("SELECT count(*) FROM auth_login_limits")) == 0
-        assert conn.scalar(text("SELECT version_num FROM alembic_version")) == "20261125_0011"
+        assert conn.scalar(text("SELECT version_num FROM alembic_version")) == "20261125_0012"

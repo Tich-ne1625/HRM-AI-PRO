@@ -25,6 +25,7 @@ class WorkPlan(Base):
     __table_args__ = (
         UniqueConstraint("participant_id", name="uq_work_plans_participant"),
         CheckConstraint("version >= 1 AND revision >= 1", name="ck_work_plans_version"),
+        CheckConstraint("measurement_version >= 0", name="ck_work_plans_measurement_version"),
         CheckConstraint(
             "status IN ('DRAFT','SUBMITTED','CHANGES_REQUESTED','APPROVED')",
             name="ck_work_plans_status",
@@ -38,6 +39,7 @@ class WorkPlan(Base):
     participant_id: Mapped[UUID] = mapped_column(ForeignKey("cycle_participants.id"))
     version: Mapped[int] = mapped_column(default=1, server_default="1")
     revision: Mapped[int] = mapped_column(default=1, server_default="1")
+    measurement_version: Mapped[int] = mapped_column(default=0, server_default="0")
     status: Mapped[str] = mapped_column(String(24), default="DRAFT", server_default="DRAFT")
     acknowledged_revision: Mapped[int | None]
     approved_by: Mapped[UUID | None] = mapped_column(ForeignKey("users.id"))

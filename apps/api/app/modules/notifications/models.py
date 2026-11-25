@@ -35,5 +35,8 @@ class Notification(Base):
     )
     work_plan_id: Mapped[UUID | None] = mapped_column(ForeignKey("work_plans.id"))
     work_item_id: Mapped[UUID | None] = mapped_column(ForeignKey("work_items.id"))
+    measurement_id: Mapped[UUID | None] = mapped_column(ForeignKey("measurements.id"))
+    checkin_id: Mapped[UUID | None] = mapped_column(ForeignKey("checkins.id"))
+    checkin_action_id: Mapped[UUID | None] = mapped_column(ForeignKey("checkin_actions.id"))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     read_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))

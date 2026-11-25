@@ -113,7 +113,7 @@ class AuditWriter:
             allowed = PERFORMANCE_METADATA_KEYS
         if action.startswith("ai_analysis."):
             allowed = AI_METADATA_KEYS
-        if action.startswith("work."):
+        if action.startswith(("work.", "progress.")):
             allowed = REVIEW_METADATA_KEYS
         if metadata.keys() - allowed:
             raise ValueError("Audit metadata contains an unsupported field")

@@ -209,7 +209,7 @@ def test_revision_uniqueness_foreign_keys_and_migration_roundtrip(world):
     with pytest.raises(IntegrityError), Session(world.engine) as session, session.begin():
         session.add(PerformanceReviewRevision(**values))
     config = Config(str(ALEMBIC_INI))
-    assert ScriptDirectory.from_config(config).get_heads() == ["20261125_0011"]
+    assert ScriptDirectory.from_config(config).get_heads() == ["20261125_0012"]
     command.check(config)
     command.downgrade(config, "20261020_0005")
     command.upgrade(config, "head")

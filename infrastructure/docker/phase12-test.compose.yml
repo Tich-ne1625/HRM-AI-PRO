@@ -1,0 +1,63 @@
+# Standalone disposable acceptance stack; never reads the user's .env or data volume.
+services:
+  postgres:
+    image: postgres:16-bookworm
+    environment:
+      POSTGRES_DB: progress_demo_test
+      POSTGRES_USER: insighthr_test
+      POSTGRES_PASSWORD: test-password
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U insighthr_test -d progress_demo_test"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+  migrate:
+    image: insighthr-api:phase12-acceptance
+    build:
+      context: ../..
+      dockerfile: infrastructure/docker/api.Dockerfile
+    environment: &api-environment
+      APP_ENV: test
+      AUTH_ACCESS_SECRET: phase12-isolated-signing-key-32-characters
+      WEB_ORIGIN: http://localhost:13049
+      DATABASE_URL: postgresql+psycopg://insighthr_test:test-password@postgres:5432/progress_demo_test
+      GEMINI_ENABLED: "false"
+      AUTH_LOGIN_MAX_ATTEMPTS: "100"
+    command: [alembic, upgrade, head]
+    depends_on:
+      postgres:
+        condition: service_healthy
+  api:
+    image: insighthr-api:phase12-acceptance
+    environment: *api-environment
+    ports:
+      - "127.0.0.1:18049:8000"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/ready')"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+  web:
+    image: insighthr-web:phase12-acceptance
+    build:
+      context: ../..
+      dockerfile: infrastructure/docker/web.Dockerfile
+    environment:
+      APP_ENV: test
+      API_INTERNAL_URL: http://api:8000
+      WEB_ORIGIN: http://localhost:13049
+    ports:
+      - "127.0.0.1:13049:3000"
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: [CMD, node, -e, "fetch('http://127.0.0.1:3000').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 5s
+      timeout: 5s
+      retries: 20

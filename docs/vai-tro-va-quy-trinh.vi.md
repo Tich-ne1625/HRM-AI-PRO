@@ -1,5 +1,7 @@
 # Ai làm gì trong InsightHR? Vai trò, nhiệm vụ và cách phối hợp
 
+**Quy trình theo dõi liên tục mới:** xem [hướng dẫn Phase 12](phase-12-huong-dan.vi.md). Nhân viên làm việc và nộp số có nguồn; quản lý nghiệm thu công việc, xác minh số và tổ chức check-in; hai bên nhận hỗ trợ và kiểm tra chéo kết quả. HR điều phối khâu chờ/quá hạn, không nhập số hay đọc biên bản riêng. ADMIN quản trị tài khoản, không xem nội dung đánh giá riêng. Các phần KPI/điểm cuối kỳ cũ bên dưới tiếp tục áp dụng cho kỳ LEGACY; CONTINUOUS chưa mở điểm/chốt cuối kỳ.
+
 Xem [bản đồ giao diện theo role](giao-dien-theo-role.vi.md) để biết chính xác từng nhóm menu có gì. Hồ sơ đánh giá mở trong khung nổi, dùng ba tab nội bộ và nút **× Đóng** để quay về danh sách.
 
 Tài liệu này giải thích **cách hệ thống vận hành**. Khi đã hiểu, dùng [bài nghiệm thu từng bước](nghiem-thu.vi.md) để thao tác trên dữ liệu demo.

@@ -1,6 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useRef, useState, type ReactNode } from "react";
 import { ApiClientError } from "../../lib/api-client";
@@ -9,6 +10,7 @@ import { Pagination } from "../organization/shared";
 import { WorkspaceDialog } from "../workspace/dialog";
 import { actionLabel, statusLabel, workApi, type Plan, type Work, type WorkParticipant } from "./api";
 import { PlanEditor } from "./plan-editor";
+import { HRProgress, ProgressWorkspace } from "../progress/workspace";
 
 const tabs = ["Nội dung", "Tiến trình & bằng chứng", "Trao đổi", "Lịch sử"];
 const date = (value: string) => new Date(value).toLocaleString("vi-VN");
@@ -41,11 +43,11 @@ export function useWorkCommand<T = unknown>(onSuccess: (data: T) => void) {
   }, onSuccess: async (data) => {
     previous.current = null;
     onSuccess(data);
-    await Promise.all(["work-management", "notifications", "reviews"].map((domain) => cache.invalidateQueries({queryKey: [domain]})));
+    await Promise.all(["work-management", "notifications", "reviews", "progress", "checkins"].map((domain) => cache.invalidateQueries({queryKey: [domain]})));
   }});
 }
 
-type Selection = {kind: "plan" | "item"; id: string} | {kind: "draft"; participant: WorkParticipant} | null;
+type Selection = {kind: "plan" | "item" | "coordination"; id: string} | {kind: "draft"; participant: WorkParticipant} | null;
 export function WorkWorkspace() {
   const {user} = useAuth();
   if (!user || user.role === "ADMIN") return <p role="alert">Bạn không có quyền truy cập công việc.</p>;
@@ -55,7 +57,10 @@ function Workspace({hr, manager}: {hr: boolean; manager: boolean}) {
   const search = useSearchParams();
   const router = useRouter();
   const [selection, setSelection] = useState<Selection | undefined>(undefined);
-  const [view, setView] = useState(hr ? "plans" : "items");
+  const [localView, setLocalView] = useState(hr ? "plans" : "items");
+  const requestedView = search.get("tab") || (search.has("measurement") || search.has("snapshot") ? "measurements" : search.has("checkin") ? "checkins" : null);
+  const view = hr ? "plans" : ["measurements", "checkins"].includes(requestedView ?? "") ? requestedView : localView;
+  const setView = (value: string) => {setLocalView(value); router.replace(`/work-management${search.get("cycle_id") ? `?cycle_id=${search.get("cycle_id")}` : ""}`, {scroll: false});};
   const [page, setPage] = useState(1), [planPage, setPlanPage] = useState(1);
   const [status, setStatus] = useState(""), [blocked, setBlocked] = useState("");
   const cycle = search.get("cycle_id") ?? undefined;
@@ -64,23 +69,24 @@ function Workspace({hr, manager}: {hr: boolean; manager: boolean}) {
   const plans = useQuery({queryKey: ["work-management", "participants", planPage, cycle], queryFn: () => workApi.participants(planPage, cycle)});
   const work = useQuery({queryKey: ["work-management", "items", page, status, blocked], queryFn: () => workApi.items(page, status, blocked), enabled: !hr && view === "items"});
   return <div className="work-area">
-    <section className="auth-card wide"><p className="eyebrow">CÔNG VIỆC & MỤC TIÊU</p><h1>{hr ? "Theo dõi kế hoạch" : manager ? "Điều phối nhóm" : "Công việc của tôi"}</h1>
+    <section className={`auth-card wide ${view === "measurements" || view === "checkins" ? "work-context-compact" : ""}`}><p className="eyebrow">CÔNG VIỆC & MỤC TIÊU</p><h1>{hr ? "Theo dõi kế hoạch" : manager ? "Điều phối nhóm" : "Công việc của tôi"}</h1>
       <p>{hr ? "Theo dõi hai bên thống nhất kế hoạch trước khi kích hoạt chu kỳ. Quản lý chịu trách nhiệm tiêu chuẩn và nghiệm thu." : manager ? "Thống nhất mục tiêu, giao đầu ra rõ ràng và duyệt bằng chứng của nhân viên trực tiếp." : "Xác nhận mục tiêu, cập nhật công việc và gửi bằng chứng cho quản lý."}</p>
-      <div className="work-tabs" role="group" aria-label="Loại nội dung công việc">{!hr && <button aria-pressed={view === "items"} onClick={() => setView("items")}>Công việc</button>}<button aria-pressed={view === "plans"} onClick={() => setView("plans")}>Kế hoạch & mục tiêu</button></div>
+      <div className="work-tabs" role="group" aria-label="Loại nội dung công việc">{!hr && <button aria-pressed={view === "items"} onClick={() => setView("items")}>Công việc</button>}<button aria-pressed={view === "plans"} onClick={() => setView("plans")}>Kế hoạch & mục tiêu</button>{!hr && <><button aria-pressed={view === "measurements"} onClick={() => setView("measurements")}>Số đo KPI</button><button aria-pressed={view === "checkins"} onClick={() => setView("checkins")}>Check-in</button></>}</div>
     </section>
     {view === "plans" ? <section className="auth-card wide"><h2>Kế hoạch cá nhân</h2>
       {plans.isPending && <p role="status">Đang tải kế hoạch…</p>}{plans.isError && <WorkError error={plans.error} reload={() => {void plans.refetch();}} />}
-      {plans.data && <><div className="work-cards">{plans.data.items.map((p) => <article className="work-card" key={p.participant_id}><small>{p.cycle_name} · {p.cycle_status === "DRAFT" ? "Chuẩn bị" : "Đang thực hiện"}</small><h3>{p.employee_name}</h3><span className="work-badge">{p.plan_status ? statusLabel[p.plan_status] : "Chưa có kế hoạch"}</span><p>{p.acknowledged ? "Nhân viên đã xác nhận bản hiện hành" : "Chưa xác nhận bản hiện hành"}</p>{p.needs_hr && <p role="status">Cần HR kiểm tra tài khoản / quản lý.</p>}<div className="row-actions">{p.plan_id && <button onClick={() => setSelection({kind: "plan", id: p.plan_id!})}>Xem kế hoạch</button>}{!p.plan_id && p.can_draft && <button onClick={() => setSelection({kind: "draft", participant: p})}>Lập kế hoạch</button>}</div></article>)}</div>
+      {plans.data && <><div className="work-cards">{plans.data.items.map((p) => <article className="work-card" key={p.participant_id}><small>{p.cycle_name} · {p.cycle_status === "DRAFT" ? "Chuẩn bị" : "Đang thực hiện"}</small><h3>{p.employee_name}</h3><span className="work-badge">{p.plan_status ? statusLabel[p.plan_status] : "Chưa có kế hoạch"}</span><p>{p.acknowledged ? "Nhân viên đã xác nhận bản hiện hành" : "Chưa xác nhận bản hiện hành"}</p>{p.needs_hr && <p role="status">Cần HR kiểm tra tài khoản / quản lý.</p>}<div className="row-actions">{p.plan_id && <button onClick={() => setSelection({kind: "plan", id: p.plan_id!})}>Xem kế hoạch</button>}{hr && p.plan_id && <button className="secondary" onClick={() => setSelection({kind: "coordination", id: p.plan_id!})}>Điều phối số liệu & check-in</button>}{!p.plan_id && p.can_draft && <button onClick={() => setSelection({kind: "draft", participant: p})}>Lập kế hoạch</button>}</div></article>)}</div>
         {!plans.data.total && <div className="work-empty"><h3>Chưa có kỳ quản lý công việc</h3><p>HR tạo chu kỳ theo tiến trình và thêm người tham gia. Các kỳ đánh giá cũ vẫn ở mục Chu kỳ đánh giá.</p></div>}<Pagination page={planPage} total={plans.data.total} pending={plans.isFetching} onPage={setPlanPage} /></>}
-    </section> : <section className="auth-card wide"><div className="section-heading"><h2>{manager ? "Công việc trong nhóm" : "Việc cần theo dõi"}</h2></div>
+    </section> : view === "items" ? <section className="auth-card wide"><div className="section-heading"><h2>{manager ? "Công việc trong nhóm" : "Việc cần theo dõi"}</h2></div>
       <div className="filters"><div><label htmlFor="work-status">Trạng thái</label><select id="work-status" value={status} onChange={(e) => {setStatus(e.target.value); setPage(1);}}><option value="">Tất cả</option>{["PROPOSED", "TODO", "IN_PROGRESS", "SUBMITTED", "CHANGES_REQUESTED", "ACCEPTED", "CANCELLED"].map((s) => <option value={s} key={s}>{s === "SUBMITTED" ? "Chờ nghiệm thu" : statusLabel[s]}</option>)}</select></div><label className="checkbox-label"><input type="checkbox" checked={blocked === "true"} onChange={(e) => {setBlocked(e.target.checked ? "true" : ""); setPage(1);}} />Chỉ việc bị vướng</label></div>
       {work.isPending && <p role="status">Đang tải công việc…</p>}{work.isError && <WorkError error={work.error} reload={() => {void work.refetch();}} />}
       {work.data && <><div className="work-cards">{work.data.items.map((w) => <article className={`work-card ${w.blocked ? "work-blocked" : ""}`} key={w.id}><small>{w.employee_name} · {w.priority === "HIGH" ? "Ưu tiên cao" : w.priority === "LOW" ? "Ưu tiên thấp" : "Bình thường"}</small><h3>{w.title}</h3><span className="work-badge">{w.status === "SUBMITTED" ? "Chờ nghiệm thu" : statusLabel[w.status]}</span>{w.blocked && <p className="work-warning">Đang vướng: {w.blocked_reason}</p>}<p>Hạn: {date(w.due_at)}<br />Bước tiếp theo: {w.next_actor}</p><button onClick={() => setSelection({kind: "item", id: w.id})}>Mở công việc</button></article>)}</div>
         {!work.data.total && <div className="work-empty"><h3>Chưa có công việc phù hợp</h3><p>Mở Kế hoạch & mục tiêu để xem mục tiêu và giao việc khi chu kỳ đã bắt đầu.</p></div>}<Pagination page={page} total={work.data.total} pending={work.isFetching} onPage={setPage} /></>}
-    </section>}
+    </section> : <ProgressWorkspace key={cycle ?? "all"} mode={view === "checkins" ? "checkins" : "measurements"} />}
     {selected?.kind === "draft" && <WorkModal title={`Lập kế hoạch · ${selected.participant.employee_name}`} close={close}>{(dirty) => <PlanEditor participant={selected.participant.participant_id} dirty={dirty} done={close} />}</WorkModal>}
     {selected?.kind === "plan" && <PlanDialog key={selected.id} id={selected.id} close={close} />}
     {selected?.kind === "item" && <ItemDialog key={selected.id} id={selected.id} close={close} />}
+    {selected?.kind === "coordination" && <HRProgress plan={selected.id} close={close} />}
   </div>;
 }
 
@@ -128,10 +134,11 @@ function ItemDialog({id, close}: {id: string; close: () => void}) {
   return <WorkModal title="Chi tiết công việc" close={close}>{(dirty) => query.isPending ? <p role="status">Đang tải công việc…</p> : query.isError ? <WorkError error={query.error} /> : <ItemContent work={query.data} dirty={dirty} page={page} setPage={setPage} />}</WorkModal>;
 }
 function ItemContent({work, dirty, page, setPage}: {work: Work; dirty: DraftDirty; page: number; setPage: (n: number) => void}) {
+  const {user} = useAuth();
   const [active, setActive] = useState(0);
   const [editing, setEditing] = useState(false);
   const plan = useQuery({queryKey: ["work-management", "plan", work.plan_id], queryFn: () => workApi.plan(work.plan_id), enabled: editing && work.actions.includes("edit_proposal")});
-  return <><p className="eyebrow">{work.employee_name} · {work.status === "SUBMITTED" ? "Chờ nghiệm thu" : statusLabel[work.status]}</p><h3>{work.title}</h3><p>Đang giữ bước: {work.next_actor}</p>{work.needs_hr && <p className="work-warning">Tài khoản quản lý cần HR kiểm tra. Quyền duyệt không tự chuyển cho người khác.</p>}<DetailTabs active={active} change={setActive} />
+  return <><p className="eyebrow">{work.employee_name} · {work.status === "SUBMITTED" ? "Chờ nghiệm thu" : statusLabel[work.status]}</p><h3>{work.title}</h3><p>Đang giữ bước: {work.next_actor}</p>{work.needs_hr && <p className="work-warning">Tài khoản quản lý cần HR kiểm tra. Quyền duyệt không tự chuyển cho người khác.</p>}{work.status === "ACCEPTED" && work.goal_id && user?.role === "EMPLOYEE" && <p><Link href={`/work-management?tab=measurements&work_source=${work.id}&plan_ref=${work.plan_id}`}>Lập số đo từ kết quả này</Link></p>}<DetailTabs active={active} change={setActive} />
     <Panel index={0} active={active}><h4>Đầu ra được cam kết</h4><p className="work-prose">{work.acceptance}</p><p>Hạn: {date(work.due_at)}<br />Nguồn hồ sơ: {work.source_key}<br />{work.goal_id ? "Có gắn mục tiêu KPI" : "Công việc hỗ trợ · không đo KPI"}</p>{work.blocked && <p className="work-warning">Đang vướng: {work.blocked_reason}</p>}<p className="help-text">Muốn đổi hạn hoặc tiêu chuẩn sau khi giao? Gửi đề nghị trong tab Trao đổi; các thông tin đã cam kết được giữ nguyên.</p>{work.actions.some((a) => !["edit_proposal", "comment", "request_change"].includes(a)) && <button onClick={() => setActive(1)}>Thực hiện / cập nhật tiến trình</button>}{work.actions.includes("edit_proposal") && !editing && <button onClick={() => setEditing(true)}>Chỉnh sửa đề xuất</button>}{editing && <>{plan.isPending && <p>Đang tải mục tiêu…</p>}{plan.isError && <WorkError error={plan.error} />}{plan.data && <WorkForm plan={plan.data} initial={work} dirty={dirty} done={() => setEditing(false)} />}</>}</Panel>
     <Panel index={1} active={active}><h3>Tiến trình & bằng chứng</h3><ActionForm kind="work" work={work} dirty={dirty} />{work.submissions?.map((s) => <article className="work-card" key={s.id}><h4>Lần nộp {s.number}</h4><small>{date(s.created_at)}</small><p className="work-prose">{s.body}</p>{s.url && <a href={s.url} rel="noreferrer noopener" target="_blank">Mở liên kết bằng chứng ↗</a>}</article>)}{!work.submissions?.length && <p>Chưa có bản nộp. Cập nhật tiến trình và nộp khi đã sẵn sàng.</p>}<Pagination page={page} total={work.submission_total ?? 0} pending={false} onPage={setPage} /></Panel>
     <Panel index={2} active={active}><p>Trao đổi này được chia sẻ giữa người thực hiện và quản lý. Đề nghị thay đổi được ghi lại, chưa tự sửa cam kết.</p><ActionForm kind="work" work={work} dirty={dirty} discussion /><History plan={work.plan_id} work={work.id} discussion /></Panel>

@@ -363,6 +363,12 @@ class WorkService:
                     "direction": definition.direction,
                     "version": definition.version,
                 }
+                from app.modules.progress.aggregation import validate_rule
+
+                try:
+                    validate_rule(specification)
+                except ValueError as exc:
+                    raise ApiError(422, "measurement_rule_incompatible", str(exc)) from exc
                 self.session.add(
                     WorkGoal(
                         plan_id=plan.id,
@@ -399,6 +405,17 @@ class WorkService:
                 plan.status = "SUBMITTED"
             elif data.action == "approve":
                 self.repo.require_manager(employee, actor)
+                from app.modules.progress.aggregation import validate_rule
+
+                for goal in self.session.scalars(
+                    select(WorkGoal).where(
+                        WorkGoal.plan_id == plan.id, WorkGoal.revision == plan.revision
+                    )
+                ):
+                    try:
+                        validate_rule(goal.specification)
+                    except ValueError as exc:
+                        raise ApiError(409, "measurement_rule_incompatible", str(exc)) from exc
                 plan.status, plan.approved_by = "APPROVED", actor.id
             elif data.action == "clarify":
                 plan.status, plan.acknowledged_revision, plan.approved_by = (
@@ -681,6 +698,10 @@ class WorkService:
                 work.blocked, work.blocked_reason = True, data.body or ""
             elif data.action == "unblock" or data.action in {"cancel", "reopen"}:
                 work.blocked, work.blocked_reason = False, ""
+            if data.action == "reopen":
+                from app.modules.progress.service import suspend_work_source
+
+                suspend_work_source(self.session, plan, work, actor, employee, data, request_id)
             work.version += 1
             self.record(
                 actor,

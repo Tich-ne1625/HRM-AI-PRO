@@ -29,7 +29,7 @@ function Detail({id, cycle}: {id: string; cycle: string}) {
   if (query.isError) return <ReviewError error={query.error} reload={() => {void query.refetch();}} />;
   const data = query.data, participant = data.participant;
   const canManage = participant.can_manage_kpis && user?.role === "MANAGER";
-  if (cycleQuery.data?.workflow_mode === "CONTINUOUS") return <section className="auth-card"><h1>Mục tiêu · {participant.display_name}</h1><p>KPI của kỳ này được thống nhất trong kế hoạch cá nhân. Bằng chứng công việc sẽ nối với sổ đo ở bước tiếp theo.</p><a className="action-link" href={`/work-management?cycle_id=${cycle}`}>Mở kế hoạch & công việc</a></section>;
+  if (cycleQuery.data?.workflow_mode === "CONTINUOUS") return <section className="auth-card"><h1>Mục tiêu · {participant.display_name}</h1><p>KPI được thống nhất trong kế hoạch. Số đã xác minh và nguồn bằng chứng nằm ở tab Số đo KPI; điểm cuối kỳ theo tiến trình chưa được áp dụng.</p><a className="action-link" href={`/work-management?tab=measurements&cycle_id=${cycle}`}>Mở số đo & nguồn bằng chứng</a></section>;
   return <><section className="auth-card wide"><Link href={`/review-cycles/${cycle}`}>← Người tham gia chu kỳ</Link><p className="eyebrow">{cycleQuery.data?.name ?? "Chu kỳ được chọn"} · {cycleStatus[data.cycle_status]}</p>
     <h1>KPI · {participant.display_name}</h1><p>{participant.employee_code} · {participant.department_name} · {participant.position_title}</p>
     {participant.is_snapshot && <EvaluationTabs employeeId={id} cycleId={cycle} active="kpis" />}

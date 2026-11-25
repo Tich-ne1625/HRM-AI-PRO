@@ -1,6 +1,14 @@
 # Database design status
 
-## Current head: work management — `20261125_0011`
+## Current head: verified measurements and check-ins — `20261125_0012`
+
+Parent `20261125_0011`. Adds nine tables: `metric_rules`, `measurements`, `measurement_revisions`, `progress_snapshots`, `checkins`, `checkin_preparations`, `checkin_publications`, `checkin_actions`, `progress_events`. Plans gain `measurement_version`; notifications gain nullable measurement/check-in/action links. Existing business rows are not backfilled, converted or recalculated.
+
+Rules, revisions, snapshots, publications and events are append-only. Measurement identity and action ownership/body/deadline are immutable; state/version projections may change through guarded commands. Composite foreign keys bind plan, goal, rule and work evidence. A canonical source key is unique per rule permanently. Partial unique indexes reserve LAST timestamps and milestone slots only for non-retired sources; VOID permits a correctly identified replacement without permitting double reactivation.
+
+Aggregates retain exact rational values, rule version, effective revision IDs, observation window, known-at timestamp and provenance hash. Reads never create history. Verify, VOID and work reopening update projections, snapshots, events, audit and notifications in one transaction. Reopening suspends linked effective sources; reacceptance requires new verification. This release never writes `EmployeeKPI.actual` or final CONTINUOUS scores. See the [business contract](phase-12-contract.vi.md) and [walkthrough](phase-12-huong-dan.vi.md).
+
+## Previous head: work management — `20261125_0011`
 
 Parent `20261114_0010`. Adds `review_cycles.workflow_mode` (existing rows default LEGACY) and nullable `workflow_schedule`, plus `work_plans`, `work_plan_revisions`, `work_goals`, `work_items`, `work_submissions`, `work_events`. Notifications gain nullable typed `work_plan_id`/`work_item_id` links. No historical business row is backfilled or recalculated.
 

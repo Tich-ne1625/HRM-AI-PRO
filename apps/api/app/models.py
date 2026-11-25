@@ -11,6 +11,17 @@ from app.modules.kpis.models import EmployeeKPI, KPIDefinition, KPIDirection
 from app.modules.notifications.models import Notification
 from app.modules.organization.models import Department, Position
 from app.modules.performance.models import PerformanceReview, PerformanceReviewRevision
+from app.modules.progress.models import (
+    Checkin,
+    CheckinAction,
+    CheckinPreparation,
+    CheckinPublication,
+    Measurement,
+    MeasurementRevision,
+    MetricRule,
+    ProgressEvent,
+    ProgressSnapshot,
+)
 from app.modules.review_cycles.models import CycleParticipant, CycleStatus, ReviewCycle
 from app.modules.settings.models import SystemConfig
 from app.modules.users.models import User, UserRole
@@ -30,6 +41,10 @@ __all__ = [
     "AuditLog",
     "AuthSession",
     "ChatMessage",
+    "Checkin",
+    "CheckinAction",
+    "CheckinPreparation",
+    "CheckinPublication",
     "CycleParticipant",
     "CycleStatus",
     "Department",
@@ -43,12 +58,17 @@ __all__ = [
     "KPIDefinition",
     "KPIDirection",
     "LoginLimit",
+    "Measurement",
+    "MeasurementRevision",
+    "MetricRule",
     "Notification",
     "PerformanceReview",
     "PerformanceReviewRevision",
     "PlanRevision",
     "Position",
     "PostComment",
+    "ProgressEvent",
+    "ProgressSnapshot",
     "Relationship",
     "ReviewCycle",
     "SystemConfig",

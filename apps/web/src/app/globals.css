@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+.metric-value { padding-block: .6rem; line-height: 1.5; }
+.metric-value strong { font-size: 1.35rem; color: var(--foreground); }
+.metric-value small { display: block; color: #596b83; font-size: .85rem; }
+.work-context-compact { padding-block: 1rem; }
+.work-context-compact > .eyebrow, .work-context-compact > p { display: none; }
+.work-context-compact h1 { margin: 0 0 .75rem; font-size: 1.35rem; }
+.work-context-compact .work-tabs { margin-block: 0; }
+
 :root {
   --workspace-accent: #2454d5;
   --workspace-ink: #14213d;

@@ -124,4 +124,4 @@ Không thay `.env`, mật khẩu, dữ liệu thực hành hoặc tự kích ho�
 
 Mỗi phase sau có contract và kế hoạch task riêng khi đến lượt. Bảng này giữ các quyết định phụ thuộc ngay từ đầu; chưa thay cho bản đặc tả triển khai đã duyệt của các phase đó.
 
-Đã lập bước tiếp theo: [kế hoạch Phase 12](2026-11-25-phase-12-measurements-checkins.md) và [dự thảo contract](../../phase-12-contract.vi.md), trạng thái chưa triển khai. Đối chiếu hai tài liệu này trước khi bổ sung ledger/check-in; không thay đổi trạng thái nghiệm thu Phase 11.
+Bước tiếp nối đã triển khai: [kế hoạch Phase 12](2026-11-25-phase-12-measurements-checkins.md), [contract](../../phase-12-contract.vi.md) và [hướng dẫn thao tác](../../phase-12-huong-dan.vi.md). Xem [báo cáo Phase 12](../../phase-12-report.vi.md) cho kết quả kiểm chứng mới; các gate Phase 11 phía trên giữ nguyên theo thời điểm nghiệm thu.

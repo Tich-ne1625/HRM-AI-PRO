@@ -147,7 +147,7 @@ def require_legacy(cycle: ReviewCycle) -> None:
         raise ApiError(
             409,
             "managed_by_workflow",
-            "Continuous cycles use work plans; scoring awaits the verified ledger",
+            "Continuous cycles use verified progress; final scoring uses a separate workflow",
         )
 
 
@@ -164,6 +164,14 @@ def activation_issues(
         )
     }
     repository = WorkRepository(session)
+    from app.modules.progress.aggregation import validate_rule
+    from app.modules.work_management.models import WorkGoal
+
+    goals_by_plan: dict[UUID, list[WorkGoal]] = {}
+    for goal in session.scalars(
+        select(WorkGoal).where(WorkGoal.plan_id.in_([p.id for p in plans.values()]))
+    ):
+        goals_by_plan.setdefault(goal.plan_id, []).append(goal)
     issues: list[dict[str, object]] = []
     for participant in participants:
         plan = plans.get(participant.id)
@@ -183,6 +191,15 @@ def activation_issues(
         )
         if code:
             issues.append({"employee_id": str(employee.id), "code": code})
+        elif plan:
+            try:
+                for goal in goals_by_plan.get(plan.id, []):
+                    if goal.revision == plan.revision:
+                        validate_rule(goal.specification)
+            except ValueError:
+                issues.append(
+                    {"employee_id": str(employee.id), "code": "measurement_rule_incompatible"}
+                )
     return issues
 
 

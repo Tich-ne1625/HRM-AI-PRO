@@ -1,6 +1,6 @@
-# Dự thảo hợp đồng Phase 12 — Sổ đo KPI và check-in định kỳ
+# Hợp đồng Phase 12 — Sổ đo KPI và check-in định kỳ
 
-Ngày **25/11/2026**, đối chiếu commit **`13fd9e3`**, schema **`20261125_0011`**. **Đề xuất để triển khai tiếp; chưa có trong runtime, chưa nghiệm thu.** [Kế hoạch task](superpowers/plans/2026-11-25-phase-12-measurements-checkins.md).
+Ngày **25/11/2026**, triển khai trên baseline **`13fd9e3`**, migration **`20261125_0012`**. Quy tắc dưới đây được hiện thực trong module `progress`; xem [hướng dẫn thao tác](phase-12-huong-dan.vi.md), [kế hoạch task](superpowers/plans/2026-11-25-phase-12-measurements-checkins.md) và [báo cáo kiểm chứng](phase-12-report.vi.md).
 
 ## 1. Kết quả và ranh giới
 
@@ -71,6 +71,8 @@ Không tự sinh số khi bấm **Nghiệm thu công việc**. UI có nút riên
 ## 5. Trạng thái, sửa số và rút số
 
 Luồng revision: `DRAFT → SUBMITTED → VERIFIED | RETURNED | REJECTED`. Nháp được sửa với version; payload đã SUBMITTED bất biến. RETURNED cho phép tạo revision mới; REJECTED kết thúc lần nộp và vẫn giữ lịch sử. Chỉ một revision chờ xử lý của cùng dòng tại một thời điểm.
+
+Triển khai lưu revision bất biến ngay cả mỗi lần lưu nháp; sửa nháp cũng tạo phiên bản mới. Khóa nguồn chuẩn hóa của dòng được giữ vĩnh viễn. Với LAST và MILESTONE, một thời điểm/mốc chỉ có một nguồn chưa rút; VOID giải phóng vị trí này cho nguồn đúng khác mã. Không được kích hoạt lại dòng cũ nếu nguồn thay thế đang chiếm vị trí, không thể cộng hai lần.
 
 - Sửa số VERIFIED là **đề nghị điều chỉnh** chứa giá trị thay thế toàn phần và lý do, không phải delta âm. Bản cũ vẫn hiệu lực khi bản mới đang chờ, bị trả hoặc từ chối. Khi bản mới VERIFIED, chuyển hiệu lực sang đúng bản mới trong cùng giao dịch; không cộng cả hai.
 - Rút số VERIFIED dùng revision loại **VOID**, có lý do, nhân viên nộp và quản lý xác minh. VOID hiệu lực loại cả dòng khỏi tổng; không quay về giá trị cũ. Các revision trước vẫn đọc được.

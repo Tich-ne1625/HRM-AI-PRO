@@ -53,7 +53,7 @@ def main() -> None:
         capture_output=True,
     )
     data = json.loads(result.stdout)
-    assert data["head"] == "20261125_0011"
+    assert data["head"] == "20261125_0012"
     analyses = data["analyses"] or []
     assert len(analyses) == 4, "Seed the explicit offline AI acceptance fixture first"
     assert sorted(a["status"] for a in analyses) == ["FAILED", "RUNNING", "SUCCEEDED", "SUCCEEDED"]
