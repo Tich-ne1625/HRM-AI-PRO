@@ -12,6 +12,8 @@ Hệ thống quản lý hiệu suất nhân viên: hồ sơ, KPI, phản hồi 3
 
 Phase 11 đã có [báo cáo nghiệm thu local](docs/phase-11-report.vi.md). Demo quy trình mới dùng `http://localhost:13039` theo [hướng dẫn riêng](docs/phase-11-huong-dan.vi.md); dữ liệu đang dùng ở cổng 3000 được giữ nguyên.
 
+**Bước tiếp theo — Phase 12:** đã lập [kế hoạch 8 task về sổ đo KPI và check-in](docs/superpowers/plans/2026-11-25-phase-12-measurements-checkins.md), kèm [dự thảo quy tắc nghiệp vụ](docs/phase-12-contract.vi.md). Mục tiêu: nhân viên nộp số có nguồn → quản lý xác minh → theo dõi số liệu → check-in và hành động hỗ trợ. Đây là kế hoạch, chưa có trong ứng dụng; AI cố vấn và điểm cuối kỳ CONTINUOUS tiếp tục thuộc Phase 13–14.
+
 1. Mở **Docker Desktop**.
 2. Mở terminal tại thư mục **`hrm-ai`** và chạy:
 

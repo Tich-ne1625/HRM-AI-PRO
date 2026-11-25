@@ -2,7 +2,7 @@
 
 Ngày phân tích: **25/11/2026**. Mã nguồn đối chiếu: `3e32324`, migration `20261114_0010`.
 
-**Trạng thái: đề xuất nghiệp vụ và kiến trúc, chưa triển khai.** Các quyền, màn hình và trạng thái mới dưới đây chưa tồn tại trong ứng dụng. Đây là hướng nâng cấp sau phần đã hoàn thành, không phải diễn giải lại rằng dự án từ đầu có sẵn 15 phase.
+**Trạng thái cập nhật 25/11/2026:** đây là đề xuất tổng thể ban đầu dựa trên baseline ghi phía trên. **Phase 11 đã triển khai và nghiệm thu local tại `13fd9e3`**; xem [báo cáo](phase-11-report.vi.md). **Phase 12 đã có kế hoạch và dự thảo contract, chưa triển khai**; Phase 13–15 tiếp tục là đề xuất. Những bảng mô tả “hiện tại” dưới đây ghi nhận thời điểm phân tích ban đầu, không thay thế báo cáo runtime mới nhất. Đây là hướng nâng cấp sau phần đã hoàn thành, không phải diễn giải lại rằng dự án từ đầu có sẵn 15 phase.
 
 ## 1. Kết luận và mục tiêu sản phẩm
 
@@ -422,3 +422,5 @@ Thử tối thiểu các nhóm nhân viên, quản lý và HR bằng dữ liệu
 8. Cài đặt/triển khai chỉ sau khi kế hoạch và contract của phase tương ứng được duyệt; phân tích này không tự đổi code hay dữ liệu đang dùng.
 
 Chi tiết bước đầu: [kế hoạch Phase 11](superpowers/plans/2026-11-25-phase-11-work-management.md).
+
+Bước tiếp theo sau Phase 11: [kế hoạch Phase 12 — sổ đo KPI và check-in](superpowers/plans/2026-11-25-phase-12-measurements-checkins.md), [dự thảo contract](phase-12-contract.vi.md). Phạm vi đầu dùng SUM/LAST/RATIO/MILESTONE đúng với code Phase 11; chưa nhận lô thời gian chồng lấn hoặc phương pháp DISTINCT_COUNT riêng. Đây là thu hẹp phạm vi triển khai có chủ ý, không phải xác nhận toàn bộ mô hình khái niệm của đề xuất đã được hiện thực.
